@@ -8,8 +8,11 @@ use Silex\Provider\TwigServiceProvider;
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $debug = true;
+$env = 'dev';
+
 $app = new Application();
 $app['debug'] = $debug;
+$app['env'] = $env;
 
 $app
     ->register(new ServiceControllerServiceProvider())
@@ -17,6 +20,9 @@ $app
         'twig.options' => [
             'cache' => __DIR__ . '/../var/cache/twig'
         ]
+    ])
+    ->register(new \Silex\Provider\MonologServiceProvider(), [
+        'monolog.logfile' => __DIR__ . '/../var/log/' . $app['env'] . '.log'
     ]);
 
 $app['twig.loader.filesystem']->setPaths([
