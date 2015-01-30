@@ -17,5 +17,8 @@
     },
     "autoload": {
         "psr-4": {"Martial\\Warez\\": "src/"}
+    },
+    "config": {
+        "bin-dir": "bin/"
     }
 }
