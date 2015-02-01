@@ -5,6 +5,7 @@ namespace Martial\Warez\T411\Api;
 use GuzzleHttp\ClientInterface as HttpClientInterface;
 use Martial\Warez\T411\Api\Authentication\AccountDisabledException;
 use Martial\Warez\T411\Api\Authentication\AccountNotConfirmedException;
+use Martial\Warez\T411\Api\Authentication\AuthenticationException;
 use Martial\Warez\T411\Api\Authentication\AuthorizationLimitReachedException;
 use Martial\Warez\T411\Api\Authentication\Token;
 use Martial\Warez\T411\Api\Authentication\TokenInterface;
@@ -29,9 +30,11 @@ class Client implements ClientInterface
      * @param string $username
      * @param string $password
      * @return TokenInterface
-     * @throws UserNotFoundException
-     * @throws AccountNotConfirmedException
      * @throws AccountDisabledException
+     * @throws AccountNotConfirmedException
+     * @throws AuthenticationException
+     * @throws AuthorizationLimitReachedException
+     * @throws UserNotFoundException
      * @throws WrongPasswordException
      */
     public function authenticate($username, $password)
@@ -57,6 +60,10 @@ class Client implements ClientInterface
                     throw new AuthorizationLimitReachedException();
                 case 107:
                     throw new WrongPasswordException();
+                default:
+                    throw new AuthenticationException(
+                        'An error occurred during the authentication'
+                    );
             }
         }
 

@@ -13,6 +13,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     const AUTH_ACCOUNT_DISABLED_DUE_TO_CHEATS = 'account_disabled_due_to_cheats';
     const AUTH_ACCOUNT_DISABLED_BY_ADMIN = 'account_disabled_by_admin';
     const AUTH_WRONG_PASSWORD = 'wrong_password';
+    const AUTH_UNKNOWN_ERROR = 'unknown_error';
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -85,6 +86,14 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->authenticate(self::AUTH_WRONG_PASSWORD);
     }
 
+    /**
+     * @expectedException \Martial\Warez\T411\Api\Authentication\AuthenticationException
+     */
+    public function testAuthenticateShouldTrowAnExceptionOnUnknownError()
+    {
+        $this->authenticate(self::AUTH_UNKNOWN_ERROR);
+    }
+
     protected function setUp()
     {
         $this->httpClient = $this->getMock('\GuzzleHttp\ClientInterface');
@@ -117,6 +126,9 @@ class ClientTest extends \PHPUnit_Framework_TestCase
                 break;
             case self::AUTH_WRONG_PASSWORD:
                 $jsonToken = '{"error":"Wrong password","code":107}';
+                break;
+            case self::AUTH_UNKNOWN_ERROR:
+                $jsonToken = '{"error":"You are not human!","code":142}';
                 break;
             default:
                 $jsonToken = '{"uid":"98760954","token":"98760954:31:c18d164416c6affb50b41e233484a278"}';
