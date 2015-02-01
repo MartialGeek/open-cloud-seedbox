@@ -5,6 +5,7 @@ namespace Martial\Warez\T411\Api;
 use GuzzleHttp\ClientInterface as HttpClientInterface;
 use Martial\Warez\T411\Api\Authentication\AccountDisabledException;
 use Martial\Warez\T411\Api\Authentication\AccountNotConfirmedException;
+use Martial\Warez\T411\Api\Authentication\AuthorizationLimitReachedException;
 use Martial\Warez\T411\Api\Authentication\Token;
 use Martial\Warez\T411\Api\Authentication\TokenInterface;
 use Martial\Warez\T411\Api\Authentication\UserNotFoundException;
@@ -46,6 +47,16 @@ class Client implements ClientInterface
             switch ($response['code']) {
                 case 101:
                     throw new UserNotFoundException();
+                case 102:
+                    throw new AccountNotConfirmedException();
+                case 103:
+                case 104:
+                case 105:
+                    throw new AccountDisabledException();
+                case 106:
+                    throw new AuthorizationLimitReachedException();
+                case 107:
+                    throw new WrongPasswordException();
             }
         }
 
