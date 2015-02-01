@@ -42,6 +42,13 @@ class Client implements ClientInterface
             ]
         ])->json();
 
+        if (isset($response['error'])) {
+            switch ($response['code']) {
+                case 101:
+                    throw new UserNotFoundException();
+            }
+        }
+
         $token = new Token();
         $token->setUid($response['uid']);
         $token->setToken($response['token']);
