@@ -1,0 +1,51 @@
+<?php
+
+namespace Martial\Warez\T411\Api;
+
+use GuzzleHttp\ClientInterface as HttpClientInterface;
+use Martial\Warez\T411\Api\Authentication\AccountDisabledException;
+use Martial\Warez\T411\Api\Authentication\AccountNotConfirmedException;
+use Martial\Warez\T411\Api\Authentication\Token;
+use Martial\Warez\T411\Api\Authentication\TokenInterface;
+use Martial\Warez\T411\Api\Authentication\UserNotFoundException;
+use Martial\Warez\T411\Api\Authentication\WrongPasswordException;
+
+class Client implements ClientInterface
+{
+    /**
+     * @var HttpClientInterface
+     */
+    private $httpClient;
+
+    public function __construct(HttpClientInterface $httpClient)
+    {
+        $this->httpClient = $httpClient;
+    }
+
+    /**
+     * Authenticates a user and returns an authentication token.
+     *
+     * @param string $username
+     * @param string $password
+     * @return TokenInterface
+     * @throws UserNotFoundException
+     * @throws AccountNotConfirmedException
+     * @throws AccountDisabledException
+     * @throws WrongPasswordException
+     */
+    public function authenticate($username, $password)
+    {
+        $response = $this->httpClient->post('/auth', [
+            'body' => [
+                'username' => $username,
+                'password' => $password
+            ]
+        ])->json();
+
+        $token = new Token();
+        $token->setUid($response['uid']);
+        $token->setToken($response['token']);
+
+        return $token;
+    }
+}
