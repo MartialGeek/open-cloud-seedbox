@@ -4,7 +4,7 @@ namespace Martial\Warez\T411\Api;
 
 use Martial\Warez\T411\Api\Authentication\AccountDisabledException;
 use Martial\Warez\T411\Api\Authentication\AccountNotConfirmedException;
-use Martial\Warez\T411\Api\Authentication\Token;
+use Martial\Warez\T411\Api\Authentication\TokenInterface;
 use Martial\Warez\T411\Api\Authentication\UserNotFoundException;
 use Martial\Warez\T411\Api\Authentication\WrongPasswordException;
 
@@ -15,7 +15,7 @@ interface ClientInterface
      *
      * @param string $username
      * @param string $password
-     * @return Token
+     * @return TokenInterface
      * @throws UserNotFoundException
      * @throws AccountNotConfirmedException
      * @throws AccountDisabledException

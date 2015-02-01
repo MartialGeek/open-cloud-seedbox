@@ -2,7 +2,7 @@
 
 namespace Martial\Warez\T411\Api\Authentication;
 
-interface Token
+interface TokenInterface
 {
     /**
      * Sets the UID.
