@@ -8,7 +8,7 @@ use Martial\Warez\T411\Api\Authentication\Token;
 use Martial\Warez\T411\Api\Authentication\UserNotFoundException;
 use Martial\Warez\T411\Api\Authentication\WrongPasswordException;
 
-interface Client
+interface ClientInterface
 {
     /**
      * Authenticates a user and returns an authentication token.
