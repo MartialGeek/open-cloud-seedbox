@@ -1,6 +1,8 @@
 <?php
 
+use GuzzleHttp\Client as GuzzleClient;
 use Martial\Warez\Front\Controller\HomeController;
+use Martial\Warez\T411\Api\Client;
 use Silex\Application;
 use Silex\Provider\ServiceControllerServiceProvider;
 use Silex\Provider\TwigServiceProvider;
@@ -28,6 +30,16 @@ $app
 $app['twig.loader.filesystem']->setPaths([
     __DIR__ . '/../src/Front/View/Home'
 ], 'home');
+
+$app['t411.api.http_client'] = $app->share(function() {
+    return new GuzzleClient([
+        'base_url' => 'https://api.t411.me'
+    ]);
+});
+
+$app['t411.api.client'] = $app->share(function() use ($app) {
+    return new Client($app['t411.api.http_client']);
+});
 
 $app['home.controller'] = $app->share(function() use ($app) {
     return new HomeController($app['twig']);
