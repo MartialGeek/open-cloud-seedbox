@@ -11,6 +11,8 @@ use Martial\Warez\T411\Api\Authentication\Token;
 use Martial\Warez\T411\Api\Authentication\TokenInterface;
 use Martial\Warez\T411\Api\Authentication\UserNotFoundException;
 use Martial\Warez\T411\Api\Authentication\WrongPasswordException;
+use Martial\Warez\T411\Api\Category\Category;
+use Martial\Warez\T411\Api\Category\CategoryInterface;
 
 class Client implements ClientInterface
 {
@@ -72,5 +74,62 @@ class Client implements ClientInterface
         $token->setToken($response['token']);
 
         return $token;
+    }
+
+    /**
+     * Retrieves the list of the categories.
+     *
+     * @param TokenInterface $token
+     * @return CategoryInterface[]
+     */
+    public function getCategories(TokenInterface $token)
+    {
+        $response = $this->httpClient->get(
+            '/categories/tree',
+            [
+                'headers' => ['Authorization' => $token->getToken()]
+            ]
+        )->json();
+
+        return $this->extractCategories($response);
+    }
+
+    /**
+     * Extracts the categories from the API response.
+     *
+     * @param array $apiResponse
+     * @return CategoryInterface[]
+     */
+    private function extractCategories(array $apiResponse)
+    {
+        $categories = [];
+
+        foreach ($apiResponse as $category) {
+            if (!isset($category['id'])) {
+                continue;
+            }
+
+            $cat = new Category();
+            $cat->setId($category['id']);
+            $cat->setName($category['name']);
+
+            if (isset($category['cats'])) {
+                $subCategories = [];
+
+                foreach ($category['cats'] as $subCategory) {
+                    $subCat = new Category();
+                    $subCat->setId($subCategory['id']);
+                    $subCat->setName($subCategory['name']);
+                    $subCat->setParentCategory($cat);
+                    $subCategories[] = $subCat;
+                }
+
+                $cat->setSubCategories($subCategories);
+            }
+
+            $categories[] = $cat;
+        }
+
+        return $categories;
     }
 }

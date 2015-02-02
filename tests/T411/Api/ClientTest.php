@@ -21,6 +21,11 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     public $httpClient;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    public $apiResponse;
+
+    /**
      * @var Client
      */
     public $client;
@@ -94,13 +99,30 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->authenticate(self::AUTH_UNKNOWN_ERROR);
     }
 
+    public function testCategoriesShouldReturnACategoryList()
+    {
+        $this->getCategories();
+    }
+
     protected function setUp()
     {
         $this->httpClient = $this->getMock('\GuzzleHttp\ClientInterface');
+        $this->apiResponse = $this->getMock('\GuzzleHttp\Message\ResponseInterface');
         $this->client = new Client($this->httpClient);
     }
 
-    protected function authenticate($errorType = null)
+    /**
+     * Simulates an authentication through the T411 API.
+     *
+     * @param string $errorType
+     * @throws \Martial\Warez\T411\Api\Authentication\AccountDisabledException
+     * @throws \Martial\Warez\T411\Api\Authentication\AccountNotConfirmedException
+     * @throws \Martial\Warez\T411\Api\Authentication\AuthenticationException
+     * @throws \Martial\Warez\T411\Api\Authentication\AuthorizationLimitReachedException
+     * @throws \Martial\Warez\T411\Api\Authentication\UserNotFoundException
+     * @throws \Martial\Warez\T411\Api\Authentication\WrongPasswordException
+     */
+    protected function authenticate($errorType = '')
     {
         $username = 'SuperWarezMan';
         $password = 'p@ssw0rD';
@@ -134,30 +156,68 @@ class ClientTest extends \PHPUnit_Framework_TestCase
                 $jsonToken = '{"uid":"98760954","token":"98760954:31:c18d164416c6affb50b41e233484a278"}';
         }
 
-        $arrayToken = json_decode($jsonToken, true);
-        $response = $this->getMock('\GuzzleHttp\Message\ResponseInterface');
+        $this->requestApi('post', '/auth', $this->equalTo([
+            'body' => [
+                'username' => $username,
+                'password' => $password
+            ]
+        ]));
 
-        $this
-            ->httpClient
-            ->expects($this->once())
-            ->method('post')
-            ->with($this->equalTo('/auth'), $this->equalTo([
-                'body' => [
-                    'username' => $username,
-                    'password' => $password
-                ]
-            ]))
-            ->will($this->returnValue($response));
-
-        $response
-            ->expects($this->once())
-            ->method('json')
-            ->will($this->returnValue($arrayToken));
-
+        $this->decodeResponse(json_decode($jsonToken, true));
         $token = $this->client->authenticate($username, $password);
 
         if (is_null($errorType)) {
             $this->assertInstanceOf('\Martial\Warez\T411\Api\Authentication\TokenInterface', $token);
         }
+    }
+
+    protected function getCategories()
+    {
+        $token = $this->getMock('\Martial\Warez\T411\Api\Authentication\TokenInterface');
+        $tokenStr = uniqid();
+        $apiResponse = include __DIR__ . '/mockCategoriesResponse.php';
+
+        $token
+            ->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue($tokenStr));
+
+        $this->requestApi('get', '/categories/tree', $this->equalTo([
+            'headers' => ['Authorization' => $tokenStr]
+        ]));
+
+        $this->decodeResponse($apiResponse);
+        $categories = $this->client->getCategories($token);
+        $this->assertContainsOnly('\Martial\Warez\T411\Api\Category\CategoryInterface', $categories);
+    }
+
+    /**
+     * Simulates a request to the API.
+     *
+     * @param string $method
+     * @param string $uri
+     * @param \PHPUnit_Framework_Constraint $constraintParams
+     */
+    private function requestApi($method, $uri, \PHPUnit_Framework_Constraint $constraintParams)
+    {
+        $this
+            ->httpClient
+            ->expects($this->once())
+            ->method($method)
+            ->with($this->equalTo($uri), $constraintParams)
+            ->will($this->returnValue($this->apiResponse));
+    }
+
+    /**
+     * Simulates the call to the 'json' method of the response.
+     *
+     * @param array $returnedValue
+     */
+    private function decodeResponse(array $returnedValue)
+    {
+        $this->apiResponse
+            ->expects($this->once())
+            ->method('json')
+            ->will($this->returnValue($returnedValue));
     }
 }
