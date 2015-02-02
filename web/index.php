@@ -2,8 +2,10 @@
 
 use GuzzleHttp\Client as GuzzleClient;
 use Martial\Warez\Front\Controller\HomeController;
+use Martial\Warez\T411\Api\Category\DataTransformer;
 use Martial\Warez\T411\Api\Client;
 use Silex\Application;
+use Silex\Provider\MonologServiceProvider;
 use Silex\Provider\ServiceControllerServiceProvider;
 use Silex\Provider\TwigServiceProvider;
 
@@ -23,13 +25,18 @@ $app
             'cache' => __DIR__ . '/../var/cache/twig'
         ]
     ])
-    ->register(new \Silex\Provider\MonologServiceProvider(), [
+    ->register(new MonologServiceProvider(), [
         'monolog.logfile' => __DIR__ . '/../var/log/' . $app['env'] . '.log'
-    ]);
+    ])
+    ->register(new \Silex\Provider\SessionServiceProvider());
 
 $app['twig.loader.filesystem']->setPaths([
     __DIR__ . '/../src/Front/View/Home'
 ], 'home');
+
+$app['twig.loader.filesystem']->setPaths([
+    __DIR__ . '/../src/Front/View/T411'
+], 't411');
 
 $app['t411.api.http_client'] = $app->share(function() {
     return new GuzzleClient([
@@ -37,8 +44,15 @@ $app['t411.api.http_client'] = $app->share(function() {
     ]);
 });
 
+$app['t411.api.category.data_transformer'] = $app->share(function() {
+    return new DataTransformer();
+});
+
 $app['t411.api.client'] = $app->share(function() use ($app) {
-    return new Client($app['t411.api.http_client']);
+    return new Client(
+        $app['t411.api.http_client'],
+        $app['t411.api.category.data_transformer']
+    );
 });
 
 $app['home.controller'] = $app->share(function() use ($app) {

@@ -9,8 +9,10 @@ class CategoryTest extends \PHPUnit_Framework_TestCase
     public function testInstance()
     {
         $root = new Category();
-        $root->setName('Video');
-        $root->setId(102);
+        $rootName = 'Video';
+        $root->setName($rootName);
+        $rootId = 102;
+        $root->setId($rootId);
 
         $subCategoryMovies = new Category();
         $subCategoryMovies->setId(202);
@@ -29,6 +31,9 @@ class CategoryTest extends \PHPUnit_Framework_TestCase
 
         $categoryInterface = '\Martial\Warez\T411\Api\Category\CategoryInterface';
         $this->assertInstanceOf($categoryInterface, $root);
+        $this->assertSame($rootId, $root->getId());
+        $this->assertSame($rootName, $root->getName());
         $this->assertContainsOnly($categoryInterface, $root->getSubCategories());
+        $this->assertSame($root, $subCategoryCartoons->getParentCategory());
     }
 }

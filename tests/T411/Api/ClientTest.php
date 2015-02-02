@@ -23,6 +23,11 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
+    public $dataTransformer;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     public $apiResponse;
 
     /**
@@ -108,7 +113,8 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     {
         $this->httpClient = $this->getMock('\GuzzleHttp\ClientInterface');
         $this->apiResponse = $this->getMock('\GuzzleHttp\Message\ResponseInterface');
-        $this->client = new Client($this->httpClient);
+        $this->dataTransformer = $this->getMock('\Martial\Warez\T411\Api\Category\DataTransformerInterface');
+        $this->client = new Client($this->httpClient, $this->dataTransformer);
     }
 
     /**
@@ -171,6 +177,9 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * Simulates a request to retrieve the list of the categories.
+     */
     protected function getCategories()
     {
         $token = $this->getMock('\Martial\Warez\T411\Api\Authentication\TokenInterface');
@@ -187,8 +196,14 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         ]));
 
         $this->decodeResponse($apiResponse);
-        $categories = $this->client->getCategories($token);
-        $this->assertContainsOnly('\Martial\Warez\T411\Api\Category\CategoryInterface', $categories);
+
+        $this
+            ->dataTransformer
+            ->expects($this->once())
+            ->method('extractCategoriesFromApiResponse')
+            ->with($this->equalTo($apiResponse));
+
+        $this->client->getCategories($token);
     }
 
     /**
