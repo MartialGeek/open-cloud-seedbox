@@ -23,6 +23,20 @@ interface TorrentInterface
     public function getId();
 
     /**
+     * Sets the name of the torrent.
+     *
+     * @param string $name
+     */
+    public function setName($name);
+
+    /**
+     * Retrieve the name of the torrent.
+     *
+     * @return string
+     */
+    public function getName();
+
+    /**
      * Sets the category of the torrent.
      *
      * @param CategoryInterface $category
