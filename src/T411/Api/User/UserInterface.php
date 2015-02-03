@@ -85,7 +85,7 @@ interface UserInterface
     /**
      * Retrieve the amount of downloaded data (in octets).
      *
-     * @return mixed
+     * @return int
      */
     public function getDownloadedData();
 
@@ -99,7 +99,7 @@ interface UserInterface
     /**
      * Retrieve the amount of uploaded data (in octets).
      *
-     * @return mixed
+     * @return int
      */
     public function getUploadedData();
 }
