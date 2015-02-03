@@ -1,6 +1,11 @@
 <?php
 
-namespace Martial\Warez\T411\Api\Category;
+namespace Martial\Warez\T411\Api\Data;
+
+use Martial\Warez\T411\Api\Category\Category;
+use Martial\Warez\T411\Api\Category\CategoryInterface;
+use Martial\Warez\T411\Api\Torrent\Torrent;
+use Martial\Warez\T411\Api\Torrent\TorrentInterface;
 
 class DataTransformer implements DataTransformerInterface
 {
@@ -41,5 +46,29 @@ class DataTransformer implements DataTransformerInterface
         }
 
         return $categories;
+    }
+
+    /**
+     * Builds the list of the torrents from the API response.
+     *
+     * @param array $response
+     * @return TorrentInterface[]
+     */
+    public function extractTorrentsFromApiResponse(array $response)
+    {
+        $torrents = [];
+
+        if (!isset($response['torrents']) || empty($response['torrents'])) {
+            return $torrents;
+        }
+
+        foreach ($response['torrents'] as $rawTorrentData) {
+            $torrent = new Torrent();
+            $torrent->setId($rawTorrentData['id']);
+            $torrent->setName($rawTorrentData['name']);
+        }
+
+
+        return $torrents;
     }
 }

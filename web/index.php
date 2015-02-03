@@ -2,7 +2,7 @@
 
 use GuzzleHttp\Client as GuzzleClient;
 use Martial\Warez\Front\Controller\HomeController;
-use Martial\Warez\T411\Api\Category\DataTransformer;
+use Martial\Warez\T411\Api\Data\DataTransformer;
 use Martial\Warez\T411\Api\Client;
 use Silex\Application;
 use Silex\Provider\MonologServiceProvider;
@@ -44,14 +44,14 @@ $app['t411.api.http_client'] = $app->share(function() {
     ]);
 });
 
-$app['t411.api.category.data_transformer'] = $app->share(function() {
+$app['t411.api.data.data_transformer'] = $app->share(function() {
     return new DataTransformer();
 });
 
 $app['t411.api.client'] = $app->share(function() use ($app) {
     return new Client(
         $app['t411.api.http_client'],
-        $app['t411.api.category.data_transformer']
+        $app['t411.api.data.data_transformer']
     );
 });
 
