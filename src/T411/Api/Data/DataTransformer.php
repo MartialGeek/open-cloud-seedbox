@@ -6,6 +6,7 @@ use Martial\Warez\T411\Api\Category\Category;
 use Martial\Warez\T411\Api\Category\CategoryInterface;
 use Martial\Warez\T411\Api\Torrent\Torrent;
 use Martial\Warez\T411\Api\Torrent\TorrentInterface;
+use Martial\Warez\T411\Api\User\User;
 
 class DataTransformer implements DataTransformerInterface
 {
@@ -64,10 +65,26 @@ class DataTransformer implements DataTransformerInterface
 
         foreach ($response['torrents'] as $rawTorrentData) {
             $torrent = new Torrent();
+            $category = new Category();
+            $owner = new User();
+
+            $category->setId($rawTorrentData['category']);
+            $category->setName($rawTorrentData['categoryname']);
+
+            $owner->setId($rawTorrentData['owner']);
+            $owner->setUploadedData($rawTorrentData['username']);
+
             $torrent->setId($rawTorrentData['id']);
             $torrent->setName($rawTorrentData['name']);
+            $torrent->setCategory($category);
+            $torrent->setNumberOfLeechers($rawTorrentData['leechers']);
+            $torrent->setNumberOfSeeders($rawTorrentData['seeders']);
+            $torrent->setNumberOfComments($rawTorrentData['comments']);
+            $torrent->setIsVerified($rawTorrentData['isVerified']);
+            $torrent->setAdditionDate(new \DateTime($rawTorrentData['added']));
+            $torrent->setSize($rawTorrentData['size']);
+            $torrent->setTimesCompleted($rawTorrentData['times_completed']);
         }
-
 
         return $torrents;
     }
