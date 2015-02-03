@@ -104,16 +104,21 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->authenticate(self::AUTH_UNKNOWN_ERROR);
     }
 
-    public function testCategoriesShouldReturnACategoryList()
+    public function testCategoriesShouldReturnAListOfCategories()
     {
         $this->getCategories();
+    }
+
+    public function testSearchShouldReturnAListOfTorrents()
+    {
+        $this->search();
     }
 
     protected function setUp()
     {
         $this->httpClient = $this->getMock('\GuzzleHttp\ClientInterface');
         $this->apiResponse = $this->getMock('\GuzzleHttp\Message\ResponseInterface');
-        $this->dataTransformer = $this->getMock('\Martial\Warez\T411\Api\Category\DataTransformerInterface');
+        $this->dataTransformer = $this->getMock('\Martial\Warez\T411\Api\Data\DataTransformerInterface');
         $this->client = new Client($this->httpClient, $this->dataTransformer);
     }
 
@@ -186,24 +191,33 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $tokenStr = uniqid();
         $apiResponse = include __DIR__ . '/mockCategoriesResponse.php';
 
-        $token
-            ->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue($tokenStr));
+        $this->extractToken($token, $tokenStr);
 
         $this->requestApi('get', '/categories/tree', $this->equalTo([
             'headers' => ['Authorization' => $tokenStr]
         ]));
 
         $this->decodeResponse($apiResponse);
-
-        $this
-            ->dataTransformer
-            ->expects($this->once())
-            ->method('extractCategoriesFromApiResponse')
-            ->with($this->equalTo($apiResponse));
-
+        $this->transformData('extractCategoriesFromApiResponse', $apiResponse);
         $this->client->getCategories($token);
+    }
+
+    protected function search()
+    {
+        $token = $this->getMock('\Martial\Warez\T411\Api\Authentication\TokenInterface');
+        $tokenStr = uniqid();
+        $keyWord = 'avatar';
+        $apiResponse = require __DIR__ . '/mockTorrentsResponse.php';
+
+        $this->extractToken($token, $tokenStr);
+
+        $this->requestApi('get', '/torrents/search/' . $keyWord, $this->equalTo([
+            'headers' => ['Authorization' => $tokenStr]
+        ]));
+
+        $this->decodeResponse($apiResponse);
+        $this->transformData('extractTorrentsFromApiResponse', $apiResponse);
+        $this->client->search($token, $keyWord);
     }
 
     /**
@@ -234,5 +248,33 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('json')
             ->will($this->returnValue($returnedValue));
+    }
+
+    /**
+     * Extracts the string part of the token.
+     *
+     * @param \PHPUnit_Framework_MockObject_MockObject $token
+     * @param string $tokenString
+     */
+    private function extractToken(\PHPUnit_Framework_MockObject_MockObject $token, $tokenString)
+    {
+        $token
+            ->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue($tokenString));
+    }
+
+    /**
+     * Simulates
+     * @param $method
+     * @param $apiResponse
+     */
+    private function transformData($method, $apiResponse)
+    {
+        $this
+            ->dataTransformer
+            ->expects($this->once())
+            ->method($method)
+            ->with($this->equalTo($apiResponse));
     }
 }

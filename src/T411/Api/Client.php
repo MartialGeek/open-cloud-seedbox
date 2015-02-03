@@ -12,7 +12,8 @@ use Martial\Warez\T411\Api\Authentication\TokenInterface;
 use Martial\Warez\T411\Api\Authentication\UserNotFoundException;
 use Martial\Warez\T411\Api\Authentication\WrongPasswordException;
 use Martial\Warez\T411\Api\Category\CategoryInterface;
-use Martial\Warez\T411\Api\Category\DataTransformerInterface;
+use Martial\Warez\T411\Api\Data\DataTransformerInterface;
+use Martial\Warez\T411\Api\Torrent\TorrentInterface;
 
 class Client implements ClientInterface
 {
@@ -98,5 +99,26 @@ class Client implements ClientInterface
         )->json();
 
         return $this->dataTransformer->extractCategoriesFromApiResponse($response);
+    }
+
+    /**
+     * Retrieves a list of torrents matching the searched keyword.
+     *
+     * @param TokenInterface $token
+     * @param string $keyWord
+     * @param int $offset
+     * @param int $limit
+     * @return TorrentInterface[]
+     */
+    public function search(TokenInterface $token, $keyWord, $offset = null, $limit = null)
+    {
+        $response = $this->httpClient->get(
+            '/torrents/search/' . $keyWord,
+            [
+                'headers' => ['Authorization' => $token->getToken()]
+            ]
+        )->json();
+
+        return $this->dataTransformer->extractTorrentsFromApiResponse($response);
     }
 }
