@@ -5,13 +5,14 @@
         colors="true">
     <testsuites>
         <testsuite name="warez">
-            <directory suffix="Test.php">tests</directory>
+            <directory suffix="Test.php">./tests/</directory>
         </testsuite>
     </testsuites>
 
     <filter>
         <blacklist>
-            <directory>tests</directory>
+            <directory>./tests/</directory>
+            <directory>./vendor/</directory>
         </blacklist>
     </filter>
 </phpunit>
