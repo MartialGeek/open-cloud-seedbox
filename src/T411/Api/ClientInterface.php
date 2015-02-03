@@ -10,6 +10,7 @@ use Martial\Warez\T411\Api\Authentication\TokenInterface;
 use Martial\Warez\T411\Api\Authentication\UserNotFoundException;
 use Martial\Warez\T411\Api\Authentication\WrongPasswordException;
 use Martial\Warez\T411\Api\Category\CategoryInterface;
+use Martial\Warez\T411\Api\Torrent\TorrentInterface;
 
 interface ClientInterface
 {
@@ -35,4 +36,15 @@ interface ClientInterface
      * @return CategoryInterface[]
      */
     public function getCategories(TokenInterface $token);
+
+    /**
+     * Retrieves a list of torrents matching the searched keyword.
+     *
+     * @param TokenInterface $token
+     * @param string $keyWord
+     * @param int $offset
+     * @param int $limit
+     * @return TorrentInterface[]
+     */
+    public function search(TokenInterface $token, $keyWord, $offset = null, $limit = null);
 }
