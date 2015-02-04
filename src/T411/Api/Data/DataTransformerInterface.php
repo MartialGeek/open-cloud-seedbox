@@ -3,7 +3,7 @@
 namespace Martial\Warez\T411\Api\Data;
 
 use Martial\Warez\T411\Api\Category\CategoryInterface;
-use Martial\Warez\T411\Api\Torrent\TorrentInterface;
+use Martial\Warez\T411\Api\Torrent\TorrentSearchResultInterface;
 
 interface DataTransformerInterface
 {
@@ -19,7 +19,7 @@ interface DataTransformerInterface
      * Builds the list of the torrents from the API response.
      *
      * @param array $response
-     * @return TorrentInterface[]
+     * @return TorrentSearchResultInterface
      */
     public function extractTorrentsFromApiResponse(array $response);
 }

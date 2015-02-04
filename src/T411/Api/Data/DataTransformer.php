@@ -5,7 +5,8 @@ namespace Martial\Warez\T411\Api\Data;
 use Martial\Warez\T411\Api\Category\Category;
 use Martial\Warez\T411\Api\Category\CategoryInterface;
 use Martial\Warez\T411\Api\Torrent\Torrent;
-use Martial\Warez\T411\Api\Torrent\TorrentInterface;
+use Martial\Warez\T411\Api\Torrent\TorrentSearchResult;
+use Martial\Warez\T411\Api\Torrent\TorrentSearchResultInterface;
 use Martial\Warez\T411\Api\User\User;
 
 class DataTransformer implements DataTransformerInterface
@@ -53,15 +54,17 @@ class DataTransformer implements DataTransformerInterface
      * Builds the list of the torrents from the API response.
      *
      * @param array $response
-     * @return TorrentInterface[]
+     * @return TorrentSearchResultInterface
      */
     public function extractTorrentsFromApiResponse(array $response)
     {
-        $torrents = [];
+        $torrentSearchResult = new TorrentSearchResult();
+        $torrentSearchResult->setQuery($response['query']);
+        $torrentSearchResult->setTotal($response['total']);
+        $torrentSearchResult->setOffset($response['offset']);
+        $torrentSearchResult->setLimit($response['limit']);
 
-        if (!isset($response['torrents']) || empty($response['torrents'])) {
-            return $torrents;
-        }
+        $torrents = [];
 
         foreach ($response['torrents'] as $rawTorrentData) {
             $torrent = new Torrent();
@@ -86,6 +89,8 @@ class DataTransformer implements DataTransformerInterface
             $torrent->setTimesCompleted($rawTorrentData['times_completed']);
         }
 
-        return $torrents;
+        $torrentSearchResult->setTorrents($torrents);
+
+        return $torrentSearchResult;
     }
 }

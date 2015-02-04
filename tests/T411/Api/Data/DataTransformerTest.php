@@ -30,7 +30,7 @@ class DataTransformerTest extends \PHPUnit_Framework_TestCase
         $this->extractTorrents();
     }
 
-    public function testExtractTorrentsShouldReturnAnEmptyArrayIfNoTorrentsAreFound()
+    public function testExtractTorrentsWithNoTorrentsFound()
     {
         $this->extractTorrents(self::NO_TORRENTS_FOUND);
     }
@@ -45,12 +45,15 @@ class DataTransformerTest extends \PHPUnit_Framework_TestCase
         $apiResponse = include __DIR__ . '/../mockTorrentsResponse.php';
 
         if ($context === self::NO_TORRENTS_FOUND) {
-            unset($apiResponse['torrents']);
-            $torrents = $this->transformer->extractTorrentsFromApiResponse($apiResponse);
-            $this->assertEmpty($torrents);
+            $apiResponse['torrents'] = [];
+            $torrentResult = $this->transformer->extractTorrentsFromApiResponse($apiResponse);
+            $this->assertEmpty($torrentResult->getTorrents());
         } else {
-            $torrents = $this->transformer->extractTorrentsFromApiResponse($apiResponse);
-            $this->assertContainsOnly('\Martial\Warez\T411\Api\Torrent\TorrentInterface', $torrents);
+            $torrentResult = $this->transformer->extractTorrentsFromApiResponse($apiResponse);
+            $this->assertContainsOnly(
+                '\Martial\Warez\T411\Api\Torrent\TorrentInterface',
+                $torrentResult->getTorrents()
+            );
         }
     }
 }
