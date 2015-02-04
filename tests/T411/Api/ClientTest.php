@@ -2,6 +2,7 @@
 
 namespace Martial\Warez\Tests\T411\Api;
 
+use Martial\Warez\T411\Api\Category\Category;
 use Martial\Warez\T411\Api\Client;
 
 class ClientTest extends \PHPUnit_Framework_TestCase
@@ -109,7 +110,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->getCategories();
     }
 
-    public function testSearchShouldReturnAListOfTorrents()
+    public function testSearchShouldReturnATorrentSearchResultInterface()
     {
         $this->search();
     }
@@ -198,8 +199,13 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         ]));
 
         $this->decodeResponse($apiResponse);
-        $this->transformData('extractCategoriesFromApiResponse', $apiResponse);
-        $this->client->getCategories($token);
+        $transformedData = [
+            new Category(),
+            new Category()
+        ];
+        $this->transformData('extractCategoriesFromApiResponse', $apiResponse, $transformedData);
+        $result = $this->client->getCategories($token);
+        $this->assertSame($transformedData, $result);
     }
 
     protected function search()
@@ -216,8 +222,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         ]));
 
         $this->decodeResponse($apiResponse);
-        $this->transformData('extractTorrentsFromApiResponse', $apiResponse);
-        $this->client->search($token, $keyWord);
+        $transformedData = $this->getMock('\Martial\Warez\T411\Api\Torrent\TorrentSearchResultInterface');
+        $this->transformData('extractTorrentsFromApiResponse', $apiResponse, $transformedData);
+        $torrentSearchResult = $this->client->search($token, $keyWord);
+        $this->assertSame($transformedData, $torrentSearchResult);
     }
 
     /**
@@ -265,16 +273,19 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Simulates
-     * @param $method
-     * @param $apiResponse
+     * Simulates a data transformation.
+     *
+     * @param string $method
+     * @param array $apiResponse
+     * @param mixed $returnedValue
      */
-    private function transformData($method, $apiResponse)
+    private function transformData($method, $apiResponse, $returnedValue)
     {
         $this
             ->dataTransformer
             ->expects($this->once())
             ->method($method)
-            ->with($this->equalTo($apiResponse));
+            ->with($this->equalTo($apiResponse))
+            ->will($this->returnValue($returnedValue));
     }
 }

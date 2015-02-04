@@ -38,13 +38,13 @@ interface ClientInterface
     public function getCategories(TokenInterface $token);
 
     /**
-     * Retrieves a list of torrents matching the searched keyword.
+     * Retrieves a list of torrents matching the searched query.
      *
      * @param TokenInterface $token
-     * @param string $keyWord
+     * @param string $query
      * @param int $offset
      * @param int $limit
      * @return TorrentInterface[]
      */
-    public function search(TokenInterface $token, $keyWord, $offset = null, $limit = null);
+    public function search(TokenInterface $token, $query, $offset = null, $limit = null);
 }
