@@ -3,5 +3,12 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$app = new \Martial\Warez\Command\Application(new \Silex\Application());
+$config = [
+    'assets' => [
+        'source_paths' => [],
+        'destination_path' => ''
+    ]
+];
+
+$app = new \Martial\Warez\Command\Application(new \Silex\Application(), $config);
 $app->run();

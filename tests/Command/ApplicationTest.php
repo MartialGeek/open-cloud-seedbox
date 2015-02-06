@@ -13,6 +13,11 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public $silexApp;
 
     /**
+     * @var array
+     */
+    public $config;
+
+    /**
      * @var Application
      */
     public $console;
@@ -28,6 +33,14 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testList()
+    {
+        $command = $this->console->find('list');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(['command' => $command->getName()]);
+        $this->assertRegExp('/assets:install/', $commandTester->getDisplay(), 'Command assets:install was not found.');
+    }
+
     protected function setUp()
     {
         $this->silexApp = $this
@@ -35,6 +48,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->console = new Application($this->silexApp);
+        $this->config = include __DIR__ . '/mockConsoleConfig.php';
+        $this->console = new Application($this->silexApp, $this->config);
     }
 }
