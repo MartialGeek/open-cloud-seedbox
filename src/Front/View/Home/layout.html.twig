@@ -1,14 +1,22 @@
 <!doctype html>
-<html>
+<html class="no-js" lang="en">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Warez!!!{% endblock %}</title>
-    {% block stylesheets %}{% endblock %}
+    {% block stylesheets %}
+        <link rel="stylesheet" href="/css/app.css" />
+    {% endblock %}
+    <script src="/bower_components/modernizr/modernizr.js"></script>
 </head>
-
 <body>
-    {% block body %}{% endblock %}
 
-    {% block javascripts %}{% endblock %}
+{% block body %}{% endblock %}
+
+{% block javascripts %}
+<script src="/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="/bower_components/foundation/js/foundation.min.js"></script>
+<script src="/js/app.js"></script>
+{% endblock %}
 </body>
 </html>

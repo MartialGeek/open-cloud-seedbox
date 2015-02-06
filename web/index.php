@@ -34,10 +34,6 @@ $app['twig.loader.filesystem']->setPaths([
     __DIR__ . '/../src/Front/View/Home'
 ], 'home');
 
-$app['twig.loader.filesystem']->setPaths([
-    __DIR__ . '/../src/Front/View/T411'
-], 't411');
-
 $app['t411.api.http_client'] = $app->share(function() {
     return new GuzzleClient([
         'base_url' => 'https://api.t411.me'
