@@ -1,0 +1,14 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$config = [
+    'assets' => [
+        'source_paths' => [],
+        'destination_path' => ''
+    ]
+];
+
+$app = new \Martial\Warez\Command\Application(new \Silex\Application(), $config);
+$app->run();
