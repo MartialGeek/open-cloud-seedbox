@@ -47,12 +47,16 @@ class AssetsInstall extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         foreach ($this->sourcePaths as $sourcePath) {
+            $targetDir = $this->destinationPath . substr($sourcePath, strrpos($sourcePath, DIRECTORY_SEPARATOR));
+            $relativePath = $this->fs->makePathRelative($sourcePath, $this->destinationPath);
+
             $output->writeln(sprintf(
                 'Link <info>%s</info> to <info>%s</info>',
-                $sourcePath,
-                $this->destinationPath
+                $relativePath,
+                $targetDir
             ));
-            $this->fs->symlink($sourcePath, $this->destinationPath);
+
+            $this->fs->symlink($relativePath, $targetDir);
         }
     }
 }
