@@ -5,8 +5,10 @@ require __DIR__ . '/../vendor/autoload.php';
 
 $config = [
     'assets' => [
-        'source_paths' => [],
-        'destination_path' => ''
+        'source_paths' => [
+            __DIR__ . '/../src/Front/View/Home/js'
+        ],
+        'destination_path' => __DIR__ . '/../web'
     ]
 ];
 
