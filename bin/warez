@@ -1,16 +1,10 @@
 #!/usr/bin/env php
 <?php
 
+use Martial\Warez\Command\Application;
+use Silex\Application as SilexApplication;
+
 require __DIR__ . '/../vendor/autoload.php';
-
-$config = [
-    'assets' => [
-        'source_paths' => [
-            __DIR__ . '/../src/Front/View/Home/js'
-        ],
-        'destination_path' => __DIR__ . '/../web'
-    ]
-];
-
-$app = new \Martial\Warez\Command\Application(new \Silex\Application(), $config);
+$config = require __DIR__ . '/../config/app.php';
+$app = new Application(new SilexApplication(), $config);
 $app->run();
