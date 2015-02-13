@@ -3,9 +3,11 @@
 namespace Martial\Warez\Command;
 
 use Martial\Warez\Command\Assets\AssetsInstall;
+use Martial\Warez\Command\Server\ServerRun;
 use Silex\Application as SilexApplication;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Process\ProcessBuilder;
 
 class Application extends BaseApplication
 {
@@ -46,5 +48,7 @@ class Application extends BaseApplication
             $this->config['assets']['source_paths'],
             $this->config['assets']['destination_path']
         ));
+
+        $this->add(new ServerRun(new ProcessBuilder(), $this->config['project_root']));
     }
 }

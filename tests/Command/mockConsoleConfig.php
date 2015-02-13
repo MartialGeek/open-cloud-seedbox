@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'project_root' => __DIR__ . '/../..',
     'assets' => [
         'source_paths' => [
             __DIR__ . '/../tests/Command/Assets',
