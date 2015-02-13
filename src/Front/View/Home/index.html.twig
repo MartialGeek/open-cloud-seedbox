@@ -1,5 +1,21 @@
 {% extends "@home/layout.html.twig" %}
 
 {% block body %}
-Welcome
+    <h1>Welcome</h1>
+
+    {% for flashMessage in app.session.flashbag.get('notice') %}
+        <div class="notice">{{ flashMessage }}</div>
+    {% endfor %}
+
+    {% if not app.session.get('connected') %}
+        <form action="{{ path('login') }}" method="post">
+            {{ form_widget(loginForm) }}
+
+            <input type="submit" value="Connect" />
+        </form>
+    {% else %}
+        <p>Let's get the party started!</p>
+        <p><a href="{{ path('logout') }}">Logout</a></p>
+    {% endif %}
+
 {% endblock %}

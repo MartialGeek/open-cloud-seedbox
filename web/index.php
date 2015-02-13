@@ -2,12 +2,18 @@
 
 use GuzzleHttp\Client as GuzzleClient;
 use Martial\Warez\Front\Controller\HomeController;
+use Martial\Warez\Front\Controller\UserController;
 use Martial\Warez\T411\Api\Data\DataTransformer;
 use Martial\Warez\T411\Api\Client;
 use Silex\Application;
+use Silex\Provider\FormServiceProvider;
 use Silex\Provider\MonologServiceProvider;
 use Silex\Provider\ServiceControllerServiceProvider;
+use Silex\Provider\SessionServiceProvider;
+use Silex\Provider\TranslationServiceProvider;
 use Silex\Provider\TwigServiceProvider;
+use Silex\Provider\UrlGeneratorServiceProvider;
+use Silex\Provider\ValidatorServiceProvider;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -28,7 +34,13 @@ $app
     ->register(new MonologServiceProvider(), [
         'monolog.logfile' => __DIR__ . '/../var/log/' . $app['env'] . '.log'
     ])
-    ->register(new \Silex\Provider\SessionServiceProvider());
+    ->register(new SessionServiceProvider())
+    ->register(new FormServiceProvider())
+    ->register(new ValidatorServiceProvider())
+    ->register(new TranslationServiceProvider(), [
+        'translator.domains' => []
+    ])
+    ->register(new UrlGeneratorServiceProvider());
 
 $app['twig.loader.filesystem']->setPaths([
     __DIR__ . '/../src/Front/View/Home'
@@ -52,9 +64,23 @@ $app['t411.api.client'] = $app->share(function() use ($app) {
 });
 
 $app['home.controller'] = $app->share(function() use ($app) {
-    return new HomeController($app['twig']);
+    return new HomeController($app['twig'], $app['form.factory'], $app['session'], $app['url_generator']);
 });
 
-$app->get('/', 'home.controller:index');
+$app['user.controller'] = $app->share(function() use ($app) {
+    return new UserController($app['twig'], $app['form.factory'], $app['session'], $app['url_generator']);
+});
+
+$app
+    ->get('/', 'home.controller:index')
+    ->bind('homepage');
+
+$app
+    ->post('/login', 'user.controller:login')
+    ->bind('login');
+
+$app
+    ->get('/logout', 'user.controller:logout')
+    ->bind('logout');
 
 $app->run();

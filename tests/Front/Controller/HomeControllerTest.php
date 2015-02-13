@@ -2,40 +2,34 @@
 
 namespace Martial\Warez\Tests\Front\Controller;
 
+use Martial\Warez\Form\Login;
 use Martial\Warez\Front\Controller\HomeController;
 
-class HomeControllerTest extends \PHPUnit_Framework_TestCase
+class HomeControllerTest extends ControllerTestCase
 {
     /**
      * @var HomeController
      */
     public $controller;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    public $twig;
-
     public function testIndex()
     {
         $templatePath = '@home/index.html.twig';
-
-        $this
-            ->twig
-            ->expects($this->once())
-            ->method('render')
-            ->with($this->equalTo($templatePath));
+        $this->createForm(new Login());
+        $this->createFormView();
+        $this->render($templatePath, ['loginForm' => $this->formView]);
 
         $response = $this->controller->index();
         $this->assertInstanceOf('\Symfony\Component\HttpFoundation\Response', $response);
     }
 
-    protected function setUp()
+    /**
+     * Returns the full qualified class name of the controller you want to test.
+     *
+     * @return string
+     */
+    protected function getControllerClassName()
     {
-        $this->twig = $this
-            ->getMockBuilder('\Twig_Environment')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->controller = new HomeController($this->twig);
+        return '\Martial\Warez\Front\Controller\HomeController';
     }
 }
