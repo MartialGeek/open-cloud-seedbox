@@ -1,6 +1,9 @@
 <?php
 
 define('CONFIG_PROJECT_ROOT', __DIR__ . '/..');
+define('CONFIG_PROJECT_ENV', 'dev');
+
+$parameters = require __DIR__ . '/parameters.php';
 
 return [
     'project_root' => CONFIG_PROJECT_ROOT,
@@ -9,5 +12,27 @@ return [
             CONFIG_PROJECT_ROOT . '/src/Front/View/Home/js'
         ],
         'destination_path' => CONFIG_PROJECT_ROOT . '/web'
+    ],
+    'twig' => [
+        'twig.options' => [
+            'cache' => __DIR__ . '/../var/cache/twig'
+        ]
+    ],
+    'monolog' => [
+        'monolog.logfile' => __DIR__ . '/../var/log/' . CONFIG_PROJECT_ENV . '.log'
+    ],
+    'translator' => [
+        'translator.domains' => []
+    ],
+    'doctrine' => [
+        'dbal' => [
+            'db.options' => [
+                'driver' => $parameters['doctrine_driver'],
+                'dbname' => $parameters['doctrine_dbname'],
+                'host' => $parameters['doctrine_host'],
+                'user' => $parameters['doctrine_user'],
+                'password' => $parameters['doctrine_password']
+            ]
+        ]
     ]
 ];

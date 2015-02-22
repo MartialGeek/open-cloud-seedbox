@@ -17,30 +17,22 @@ use Silex\Provider\ValidatorServiceProvider;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$debug = true;
-$env = 'dev';
+$config = require __DIR__ . '/../config/app.php';
 
 $app = new Application();
-$app['debug'] = $debug;
-$app['env'] = $env;
+$app['debug'] = CONFIG_PROJECT_ENV == 'dev';
+$app['env'] = CONFIG_PROJECT_ENV;
 
 $app
     ->register(new ServiceControllerServiceProvider())
-    ->register(new TwigServiceProvider(), [
-        'twig.options' => [
-            'cache' => __DIR__ . '/../var/cache/twig'
-        ]
-    ])
-    ->register(new MonologServiceProvider(), [
-        'monolog.logfile' => __DIR__ . '/../var/log/' . $app['env'] . '.log'
-    ])
+    ->register(new TwigServiceProvider(), $config['twig'])
+    ->register(new MonologServiceProvider(), $config['monolog'])
     ->register(new SessionServiceProvider())
     ->register(new FormServiceProvider())
     ->register(new ValidatorServiceProvider())
-    ->register(new TranslationServiceProvider(), [
-        'translator.domains' => []
-    ])
-    ->register(new UrlGeneratorServiceProvider());
+    ->register(new TranslationServiceProvider(), $config['translator'])
+    ->register(new UrlGeneratorServiceProvider())
+    ->register(new \Silex\Provider\DoctrineServiceProvider(), $config['doctrine']['dbal']);
 
 $app['twig.loader.filesystem']->setPaths([
     __DIR__ . '/../src/Front/View/Home'

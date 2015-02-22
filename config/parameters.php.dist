@@ -1,0 +1,9 @@
+<?php
+
+return [
+    'doctrine_driver' => '',
+    'doctrine_dbname' => '',
+    'doctrine_host' => '',
+    'doctrine_user' => '',
+    'doctrine_password' => ''
+];

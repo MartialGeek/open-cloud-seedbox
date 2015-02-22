@@ -6,3 +6,4 @@ web/css
 web/js
 /web/bower_components
 node_modules
+/config/parameters.php

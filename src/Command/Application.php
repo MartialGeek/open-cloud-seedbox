@@ -29,6 +29,9 @@ class Application extends BaseApplication
         $this->registerCommands();
     }
 
+    /**
+     * @todo Extract the validation of the configuration in a separate component.
+     */
     protected function registerCommands()
     {
         if (!isset($this->config['assets'])) {
