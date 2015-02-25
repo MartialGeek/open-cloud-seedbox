@@ -1,10 +1,14 @@
 #!/usr/bin/env php
 <?php
 
+use Martial\Warez\Application\Bootstrap;
 use Martial\Warez\Command\Application;
 use Silex\Application as SilexApplication;
 
 require __DIR__ . '/../vendor/autoload.php';
+
 $config = require __DIR__ . '/../config/app.php';
-$app = new Application(new SilexApplication(), $config);
+$silex = new SilexApplication();
+Bootstrap::createApplication($silex, $config, 'prod');
+$app = new Application($silex, $config);
 $app->run();

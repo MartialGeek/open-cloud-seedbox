@@ -16,6 +16,11 @@ return [
     'twig' => [
         'twig.options' => [
             'cache' => __DIR__ . '/../var/cache/twig'
+        ],
+        'paths' => [
+            'home' => [
+                __DIR__ . '/../src/Front/View/Home'
+            ]
         ]
     ],
     'monolog' => [
