@@ -93,7 +93,7 @@ class Bootstrap
     {
         $app = $this->app;
 
-        $app['doctrine.entity_manager'] = $app->share(function() use ($app) {
+        $app['doctrine.entity_manager'] = $app->share(function() {
 
             if ('dev' == $this->env) {
                 $cache = new ArrayCache();
