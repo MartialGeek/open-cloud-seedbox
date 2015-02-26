@@ -2,6 +2,10 @@
 
 namespace Martial\Warez\Application;
 
+use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Cache\FilesystemCache;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\Setup;
 use GuzzleHttp\Client as GuzzleClient;
 use Martial\Warez\Front\Controller\HomeController;
 use Martial\Warez\Front\Controller\UserController;
@@ -64,10 +68,7 @@ class Bootstrap
     protected function configureApplication()
     {
         $this->app['env'] = $this->env;
-
-        if ($this->env == 'dev') {
-            $this->app['debug'] = true;
-        }
+        $this->app['debug'] = $this->env == 'dev';
 
         foreach ($this->config['twig']['paths'] as $namespace => $paths) {
             $this->app['twig.loader.filesystem']->setPaths($paths, $namespace);
@@ -91,6 +92,24 @@ class Bootstrap
     protected function registerServices()
     {
         $app = $this->app;
+
+        $app['doctrine.entity_manager'] = $app->share(function() use ($app) {
+
+            if ('dev' == $this->env) {
+                $cache = new ArrayCache();
+            } else {
+                $cache = new FilesystemCache($this->config['doctrine']['orm']['cache_dir']);
+            }
+
+            $config = Setup::createAnnotationMetadataConfiguration(
+                $this->config['doctrine']['orm']['paths'],
+                $this->app['debug'],
+                $this->config['doctrine']['orm']['proxy_dir'],
+                $cache
+            );
+
+            return EntityManager::create($this->config['doctrine']['dbal']['db.options'], $config);
+        });
         
         $app['t411.api.http_client'] = $app->share(function() {
             return new GuzzleClient([

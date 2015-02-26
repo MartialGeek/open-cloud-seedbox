@@ -38,6 +38,13 @@ return [
                 'user' => $parameters['doctrine_user'],
                 'password' => $parameters['doctrine_password']
             ]
+        ],
+        'orm' => [
+            'paths' => [
+                __DIR__ . '/../src/Entity'
+            ],
+            'cache_dir' => __DIR__ . '/../var/cache/doctrine/cache',
+            'proxy_dir' => __DIR__ . '/../var/cache/doctrine/proxy',
         ]
     ]
 ];
