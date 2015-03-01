@@ -41,7 +41,7 @@ return [
         ],
         'orm' => [
             'paths' => [
-                __DIR__ . '/../src/Entity'
+                __DIR__ . '/../src/User/Entity'
             ],
             'cache_dir' => __DIR__ . '/../var/cache/doctrine/cache',
             'proxy_dir' => __DIR__ . '/../var/cache/doctrine/proxy',
