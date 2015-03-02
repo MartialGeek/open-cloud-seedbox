@@ -14,7 +14,7 @@ use Doctrine\ORM\Mapping\Table;
 /**
  * Class User
  * @package Martial\Warez\User
- * @Entity(repositoryClass="\Martial\Warez\User\Repository\UserRepositoryInterface")
+ * @Entity(repositoryClass="\Martial\Warez\User\Repository\UserRepository")
  * @Table(name="users")
  * @HasLifecycleCallbacks
  */
