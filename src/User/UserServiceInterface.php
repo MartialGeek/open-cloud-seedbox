@@ -31,6 +31,7 @@ interface UserServiceInterface
      * @param string $email
      * @param string $password
      * @return User
+     * @throws BadCredentialsException
      */
     public function authenticateByEmail($email, $password);
 }

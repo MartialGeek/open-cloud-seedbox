@@ -2,11 +2,14 @@
 
 namespace Martial\Warez\Tests\User;
 
+use Doctrine\ORM\NoResultException;
 use Martial\Warez\User\Entity\User;
 use Martial\Warez\User\UserService;
 
 class UserServiceTest extends \PHPUnit_Framework_TestCase
 {
+    const BAD_CREDENTIALS = 'bad_credentials';
+
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
@@ -96,6 +99,19 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
 
     public function testAuthenticateUser()
     {
+        $this->authenticate();
+    }
+
+    /**
+     * @expectedException \Martial\Warez\User\BadCredentialsException
+     */
+    public function testAuthenticateUserShouldThrowAnExceptionOnInvalidCredentials()
+    {
+        $this->authenticate([self::BAD_CREDENTIALS]);
+    }
+
+    protected function authenticate(array $options = [])
+    {
         $userRepository = $this->getMock('\Martial\Warez\User\Repository\UserRepositoryInterface');
 
         $this
@@ -112,17 +128,24 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('\Martial\Warez\User\Entity\User'))
             ->will($this->returnValue($userRepository));
 
-        $userRepository
+        $repositoryInvocation = $userRepository
             ->expects($this->once())
             ->method('findUserByEmailAndPassword')
-            ->with($this->equalTo($this->userEntity->getEmail()), $this->equalTo($this->hashedPassword))
-            ->will($this->returnValue($this->userEntity));
+            ->with($this->equalTo($this->userEntity->getEmail()), $this->equalTo($this->hashedPassword));
+
+        if (in_array(self::BAD_CREDENTIALS, $options)) {
+            $repositoryInvocation->will($this->throwException(new NoResultException()));
+        } else {
+            $repositoryInvocation->will($this->returnValue($this->userEntity));
+        }
 
         $user = $this
             ->userService
             ->authenticateByEmail($this->userEntity->getEmail(), $this->userEntity->getPassword());
 
-        $this->assertSame($user, $this->userEntity);
+        if (!in_array(self::BAD_CREDENTIALS, $options)) {
+            $this->assertSame($user, $this->userEntity);
+        }
     }
 
     protected function setUp()
