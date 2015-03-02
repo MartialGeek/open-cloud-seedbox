@@ -17,6 +17,8 @@ interface AuthenticationProviderInterface
     public function authenticateByEmail($email, $password);
 
     /**
+     * Generates a hash from the given password.
+     *
      * @param string $password
      * @return string
      */
