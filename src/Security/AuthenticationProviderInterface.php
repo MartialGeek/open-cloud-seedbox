@@ -2,10 +2,19 @@
 
 namespace Martial\Warez\Security;
 
+use Martial\Warez\User\Entity\User;
 
 interface AuthenticationProviderInterface
 {
-    public function authenticate();
+    /**
+     * Authenticates a user by its email and a non-hashed password or throw an exception.
+     *
+     * @param string $email
+     * @param string $password
+     * @return User
+     * @throws BadCredentialsException
+     */
+    public function authenticateByEmail($email, $password);
 
     /**
      * @param string $password

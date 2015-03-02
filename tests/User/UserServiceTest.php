@@ -2,7 +2,7 @@
 
 namespace Martial\Warez\Tests\User;
 
-use Doctrine\ORM\NoResultException;
+use Martial\Warez\Security\BadCredentialsException;
 use Martial\Warez\User\Entity\User;
 use Martial\Warez\User\UserService;
 
@@ -109,7 +109,7 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Martial\Warez\User\BadCredentialsException
+     * @expectedException \Martial\Warez\Security\BadCredentialsException
      */
     public function testAuthenticateUserShouldThrowAnExceptionOnInvalidCredentials()
     {
@@ -179,25 +179,16 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
 
     protected function authenticate(array $options = [])
     {
+        $authenticationResult = in_array(self::BAD_CREDENTIALS, $options) ?
+            $this->throwException(new BadCredentialsException()) :
+            $this->returnValue($this->userEntity);
+
         $this
             ->authenticationProvider
             ->expects($this->once())
-            ->method('generatePasswordHash')
-            ->with($this->equalTo($this->userEntity->getPassword()))
-            ->will($this->returnValue($this->hashedPassword));
-
-        $this->getRepository($this->once());
-
-        $repositoryInvocation = $this->repo
-            ->expects($this->once())
-            ->method('findUserByEmailAndPassword')
-            ->with($this->equalTo($this->userEntity->getEmail()), $this->equalTo($this->hashedPassword));
-
-        if (in_array(self::BAD_CREDENTIALS, $options)) {
-            $repositoryInvocation->will($this->throwException(new NoResultException()));
-        } else {
-            $repositoryInvocation->will($this->returnValue($this->userEntity));
-        }
+            ->method('authenticateByEmail')
+            ->with($this->equalTo($this->userEntity->getEmail()), $this->equalTo($this->userEntity->getPassword()))
+            ->will($authenticationResult);
 
         $user = $this
             ->userService

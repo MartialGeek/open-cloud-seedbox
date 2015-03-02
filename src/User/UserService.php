@@ -3,10 +3,10 @@
 namespace Martial\Warez\User;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\NoResultException;
 use Martial\Warez\Security\AuthenticationProviderInterface;
 use Martial\Warez\User\Entity\User;
 use Martial\Warez\User\Repository\UserRepositoryInterface;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 class UserService implements UserServiceInterface
 {
@@ -89,15 +89,7 @@ class UserService implements UserServiceInterface
      */
     public function authenticateByEmail($email, $password)
     {
-        $hashedPassword = $this->authentication->generatePasswordHash($password);
-
-        try {
-            return $this
-                ->getRepository()
-                ->findUserByEmailAndPassword($email, $hashedPassword);
-        } catch (NoResultException $e) {
-            throw new BadCredentialsException();
-        }
+        return $this->authentication->authenticateByEmail($email, $password);
     }
 
     /**

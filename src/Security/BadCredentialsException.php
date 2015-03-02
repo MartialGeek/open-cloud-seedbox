@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\User;
+namespace Martial\Warez\Security;
 
 
 class BadCredentialsException extends \Exception
