@@ -58,6 +58,8 @@ class UserService implements UserServiceInterface
     }
 
     /**
+     * Unregisters a user.
+     *
      * @param User $user
      */
     public function unregister(User $user)
@@ -96,6 +98,24 @@ class UserService implements UserServiceInterface
         } catch (NoResultException $e) {
             throw new BadCredentialsException();
         }
+    }
+
+    /**
+     * Finds a user by its ID.
+     *
+     * @param int $userId
+     * @return mixed
+     * @throws UserNotFoundException
+     */
+    public function find($userId)
+    {
+        $user = $this->getRepository()->find($userId);
+
+        if (is_null($user)) {
+            throw new UserNotFoundException();
+        }
+
+        return $user;
     }
 
     /**

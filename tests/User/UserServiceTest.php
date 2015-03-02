@@ -11,6 +11,7 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
     const EMAIL_ALREADY_EXISTS = 'email_already_exists';
     const USERNAME_ALREADY_EXISTS = 'username_already_exists';
     const BAD_CREDENTIALS = 'bad_credentials';
+    const USER_NOT_FOUND = 'user_not_found';
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -115,14 +116,22 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
         $this->authenticate([self::BAD_CREDENTIALS]);
     }
 
+    public function testFindExistingUser()
+    {
+        $this->find();
+    }
+
+    /**
+     * @expectedException \Martial\Warez\User\UserNotFoundException
+     */
+    public function testFindUserShouldThrowAnExceptionWhenAUserWasNotFound()
+    {
+        $this->find([self::USER_NOT_FOUND]);
+    }
+
     protected function register(array $options = [])
     {
-        $this
-            ->em
-            ->expects($this->any())
-            ->method('getRepository')
-            ->with($this->equalTo('\Martial\Warez\User\Entity\User'))
-            ->will($this->returnValue($this->repo));
+        $this->getRepository($this->any());
 
         $findByEmailInvocation = $this
             ->repo
@@ -170,8 +179,6 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
 
     protected function authenticate(array $options = [])
     {
-        $userRepository = $this->getMock('\Martial\Warez\User\Repository\UserRepositoryInterface');
-
         $this
             ->authenticationProvider
             ->expects($this->once())
@@ -179,14 +186,9 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo($this->userEntity->getPassword()))
             ->will($this->returnValue($this->hashedPassword));
 
-        $this
-            ->em
-            ->expects($this->once())
-            ->method('getRepository')
-            ->with($this->equalTo('\Martial\Warez\User\Entity\User'))
-            ->will($this->returnValue($userRepository));
+        $this->getRepository($this->once());
 
-        $repositoryInvocation = $userRepository
+        $repositoryInvocation = $this->repo
             ->expects($this->once())
             ->method('findUserByEmailAndPassword')
             ->with($this->equalTo($this->userEntity->getEmail()), $this->equalTo($this->hashedPassword));
@@ -204,6 +206,36 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
         if (!in_array(self::BAD_CREDENTIALS, $options)) {
             $this->assertSame($user, $this->userEntity);
         }
+    }
+
+    protected function find(array $options = [])
+    {
+        $findResult = in_array(self::USER_NOT_FOUND, $options) ? null : $this->userEntity;
+
+        $this->getRepository($this->once());
+
+        $this
+            ->repo
+            ->expects($this->once())
+            ->method('find')
+            ->with($this->equalTo($this->userEntity->getId()))
+            ->will($this->returnValue($findResult));
+
+        $user = $this->userService->find($this->userEntity->getId());
+
+        if (!in_array(self::USER_NOT_FOUND, $options)) {
+            $this->assertSame($this->userEntity, $user);
+        }
+    }
+
+    protected function getRepository(\PHPUnit_Framework_MockObject_Matcher_Invocation $numberOfCalls)
+    {
+        $this
+            ->em
+            ->expects($numberOfCalls)
+            ->method('getRepository')
+            ->with($this->equalTo('\Martial\Warez\User\Entity\User'))
+            ->will($this->returnValue($this->repo));
     }
 
     protected function setUp()

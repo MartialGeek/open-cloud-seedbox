@@ -16,6 +16,8 @@ interface UserServiceInterface
     public function register(User $user);
 
     /**
+     * Unregisters a user.
+     *
      * @param User $user
      */
     public function unregister(User $user);
@@ -36,4 +38,13 @@ interface UserServiceInterface
      * @throws BadCredentialsException
      */
     public function authenticateByEmail($email, $password);
+
+    /**
+     * Finds a user by its ID.
+     *
+     * @param int $userId
+     * @return mixed
+     * @throws UserNotFoundException
+     */
+    public function find($userId);
 }

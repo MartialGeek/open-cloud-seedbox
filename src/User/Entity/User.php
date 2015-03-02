@@ -144,10 +144,13 @@ class User
 
     /**
      * @param \DateTime $createdAt
+     * @return User
      */
     public function setCreatedAt(\DateTime $createdAt)
     {
         $this->createdAt = $createdAt;
+
+        return $this;
     }
 
     /**
@@ -160,10 +163,13 @@ class User
 
     /**
      * @param \DateTime $updatedAt
+     * @return User
      */
     public function setUpdatedAt(\DateTime $updatedAt)
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
     }
 
     /**
