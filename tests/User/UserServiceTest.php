@@ -8,6 +8,8 @@ use Martial\Warez\User\UserService;
 
 class UserServiceTest extends \PHPUnit_Framework_TestCase
 {
+    const EMAIL_ALREADY_EXISTS = 'email_already_exists';
+    const USERNAME_ALREADY_EXISTS = 'username_already_exists';
     const BAD_CREDENTIALS = 'bad_credentials';
 
     /**
@@ -19,6 +21,11 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     public $em;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    public $repo;
 
     /**
      * @var UserService
@@ -42,25 +49,23 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
 
     public function testRegisterUser()
     {
-        $this
-            ->authenticationProvider
-            ->expects($this->once())
-            ->method('generatePasswordHash')
-            ->with($this->equalTo($this->password))
-            ->will($this->returnValue($this->hashedPassword));
+        $this->register();
+    }
 
-        $this
-            ->em
-            ->expects($this->once())
-            ->method('persist')
-            ->with($this->equalTo($this->userEntity));
+    /**
+     * @expectedException \Martial\Warez\User\EmailAlreadyExistsException
+     */
+    public function testRegisterUserShouldThrowAnExceptionWhenAnEmailIsAlreadyExist()
+    {
+        $this->register([self::EMAIL_ALREADY_EXISTS]);
+    }
 
-        $this
-            ->em
-            ->expects($this->once())
-            ->method('flush');
-
-        $this->userService->register($this->userEntity);
+    /**
+     * @expectedException \Martial\Warez\User\UsernameAlreadyExistsException
+     */
+    public function testRegisterUserShouldThrowAnExceptionWhenAnUsernameIsAlreadyExist()
+    {
+        $this->register([self::USERNAME_ALREADY_EXISTS]);
     }
 
     public function testUnregisterUser()
@@ -110,6 +115,59 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
         $this->authenticate([self::BAD_CREDENTIALS]);
     }
 
+    protected function register(array $options = [])
+    {
+        $this
+            ->em
+            ->expects($this->any())
+            ->method('getRepository')
+            ->with($this->equalTo('\Martial\Warez\User\Entity\User'))
+            ->will($this->returnValue($this->repo));
+
+        $findByEmailInvocation = $this
+            ->repo
+            ->expects($this->any())
+            ->method('findBy')
+            ->withConsecutive(
+                [$this->equalTo(['email' => $this->userEntity->getEmail()])],
+                [$this->equalTo(['username' => $this->userEntity->getUsername()])]
+            );
+
+        if (in_array(self::EMAIL_ALREADY_EXISTS, $options)) {
+            $findByEmailInvocation->will($this->onConsecutiveCalls(
+                [$this->userEntity],
+                [$this->userEntity]
+            ));
+        } elseif (in_array(self::USERNAME_ALREADY_EXISTS, $options)) {
+            $findByEmailInvocation->will($this->onConsecutiveCalls(
+                [],
+                [$this->userEntity]
+            ));
+        } else {
+            $findByEmailInvocation->will($this->returnValue([], []));
+
+            $this
+                ->authenticationProvider
+                ->expects($this->once())
+                ->method('generatePasswordHash')
+                ->with($this->equalTo($this->password))
+                ->will($this->returnValue($this->hashedPassword));
+
+            $this
+                ->em
+                ->expects($this->once())
+                ->method('persist')
+                ->with($this->equalTo($this->userEntity));
+
+            $this
+                ->em
+                ->expects($this->once())
+                ->method('flush');
+        }
+
+        $this->userService->register($this->userEntity);
+    }
+
     protected function authenticate(array $options = [])
     {
         $userRepository = $this->getMock('\Martial\Warez\User\Repository\UserRepositoryInterface');
@@ -156,6 +214,8 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('\Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->repo = $this->getMock('\Martial\Warez\User\Repository\UserRepositoryInterface');
 
         $this->userService = new UserService($this->em, $this->authenticationProvider);
 

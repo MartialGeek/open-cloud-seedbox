@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\NoResultException;
 use Martial\Warez\Security\AuthenticationProviderInterface;
 use Martial\Warez\User\Entity\User;
+use Martial\Warez\User\Repository\UserRepositoryInterface;
 
 class UserService implements UserServiceInterface
 {
@@ -33,14 +34,27 @@ class UserService implements UserServiceInterface
      * Registers a new user.
      *
      * @param User $user
+     * @throws EmailAlreadyExistsException
+     * @throws UsernameAlreadyExistsException
      */
     public function register(User $user)
     {
+        if (count($this->getRepository()->findBy([
+            'email' => $user->getEmail()
+        ]))) {
+            throw new EmailAlreadyExistsException();
+        }
+
+        if (count($this->getRepository()->findBy([
+            'username' => $user->getUsername()
+        ]))) {
+            throw new UsernameAlreadyExistsException();
+        }
+
         $hashedPassword = $this->authentication->generatePasswordHash($user->getPassword());
         $user->setPassword($hashedPassword);
         $this->em->persist($user);
         $this->em->flush();
-
     }
 
     /**
@@ -77,11 +91,18 @@ class UserService implements UserServiceInterface
 
         try {
             return $this
-                ->em
-                ->getRepository('\Martial\Warez\User\Entity\User')
+                ->getRepository()
                 ->findUserByEmailAndPassword($email, $hashedPassword);
         } catch (NoResultException $e) {
             throw new BadCredentialsException();
         }
+    }
+
+    /**
+     * @return UserRepositoryInterface
+     */
+    protected function getRepository()
+    {
+        return $this->em->getRepository('\Martial\Warez\User\Entity\User');
     }
 }

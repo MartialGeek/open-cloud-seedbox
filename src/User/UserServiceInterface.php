@@ -10,6 +10,8 @@ interface UserServiceInterface
      * Registers a new user.
      *
      * @param User $user
+     * @throws EmailAlreadyExistsException
+     * @throws UsernameAlreadyExistsException
      */
     public function register(User $user);
 

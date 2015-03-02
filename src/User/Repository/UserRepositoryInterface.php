@@ -2,10 +2,12 @@
 
 namespace Martial\Warez\User\Repository;
 
+use Doctrine\Common\Collections\Selectable;
+use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\NoResultException;
 use Martial\Warez\User\Entity\User;
 
-interface UserRepositoryInterface
+interface UserRepositoryInterface extends ObjectRepository, Selectable
 {
     /**
      * Finds a user by its email and its password.
