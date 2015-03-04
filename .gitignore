@@ -7,3 +7,4 @@ web/js
 /web/bower_components
 node_modules
 /config/parameters.php
+behat.yml
