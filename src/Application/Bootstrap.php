@@ -9,8 +9,10 @@ use Doctrine\ORM\Tools\Setup;
 use GuzzleHttp\Client as GuzzleClient;
 use Martial\Warez\Front\Controller\HomeController;
 use Martial\Warez\Front\Controller\UserController;
+use Martial\Warez\Security\AuthenticationProvider;
 use Martial\Warez\T411\Api\Client;
 use Martial\Warez\T411\Api\Data\DataTransformer;
+use Martial\Warez\User\UserService;
 use Silex\Application;
 use Silex\Provider\DoctrineServiceProvider;
 use Silex\Provider\FormServiceProvider;
@@ -128,12 +130,31 @@ class Bootstrap
             );
         });
 
+        $app['authentication_provider'] = $app->share(function() use ($app) {
+            return new AuthenticationProvider($app['doctrine.entity_manager']);
+        });
+
+        $app['user.service'] = $app->share(function() use ($app) {
+            return new UserService($app['doctrine.entity_manager'], $app['authentication_provider']);
+        });
+
         $app['home.controller'] = $app->share(function() use ($app) {
-            return new HomeController($app['twig'], $app['form.factory'], $app['session'], $app['url_generator']);
+            return new HomeController(
+                $app['twig'],
+                $app['form.factory'],
+                $app['session'],
+                $app['url_generator']
+            );
         });
 
         $app['user.controller'] = $app->share(function() use ($app) {
-            return new UserController($app['twig'], $app['form.factory'], $app['session'], $app['url_generator']);
+            return new UserController(
+                $app['twig'],
+                $app['form.factory'],
+                $app['session'],
+                $app['url_generator'],
+                $app['user.service']
+            );
         });
     }
 }
