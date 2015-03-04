@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\NoResultException;
 use Martial\Warez\User\Entity\User;
 use Martial\Warez\User\Repository\UserRepositoryInterface;
+use Martial\Warez\User\UserNotFoundException;
 
 class AuthenticationProvider implements AuthenticationProviderInterface
 {
@@ -29,19 +30,21 @@ class AuthenticationProvider implements AuthenticationProviderInterface
      * @param string $password
      * @return User
      * @throws BadCredentialsException
+     * @throws UserNotFoundException
      */
     public function authenticateByEmail($email, $password)
     {
         try {
-            $user = $this->getRepository()->findUserByEmailAndPassword(
-                $email,
-                $this->generatePasswordHash($password)
-            );
+            $user = $this->getRepository()->findUserByEmail($email);
 
-            return $user;
+            if (!password_verify($password, $user->getPassword())) {
+                throw new BadCredentialsException();
+            }
         } catch (NoResultException $e) {
-            throw new BadCredentialsException('', 0, $e);
+            throw new UserNotFoundException('', 0, $e);
         }
+
+        return $user;
     }
 
     /**

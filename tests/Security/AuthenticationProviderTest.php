@@ -4,6 +4,7 @@ namespace Martial\Warez\Tests\Security;
 
 use Doctrine\ORM\NoResultException;
 use Martial\Warez\Security\AuthenticationProvider;
+use Martial\Warez\Security\BadCredentialsException;
 use Martial\Warez\User\Entity\User;
 
 class AuthenticationProviderTest extends \PHPUnit_Framework_TestCase
@@ -41,7 +42,7 @@ class AuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Martial\Warez\Security\BadCredentialsException
+     * @expectedException \Martial\Warez\User\UserNotFoundException
      */
     public function testAuthenticateUserWithBadCredentialsShouldThrowAnException()
     {
@@ -64,14 +65,17 @@ class AuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $this
             ->repo
             ->expects($this->once())
-            ->method('findUserByEmailAndPassword')
-            ->with($this->equalTo($this->user->getEmail()), $this->stringStartsWith('$2y$10'))
+            ->method('findUserByEmail')
+            ->with($this->equalTo($this->user->getEmail()))
             ->will($findResult);
 
-        $user = $this->authenticationService->authenticateByEmail($this->user->getEmail(), $this->clearPassword);
+        try {
+            $user = $this->authenticationService->authenticateByEmail($this->user->getEmail(), $this->clearPassword);
+            if (!in_array(self::BAD_CREDENTIALS, $options)) {
+                $this->assertSame($this->user, $user);
+            }
+        } catch (BadCredentialsException $e) {
 
-        if (!in_array(self::BAD_CREDENTIALS, $options)) {
-            $this->assertSame($this->user, $user);
         }
     }
 

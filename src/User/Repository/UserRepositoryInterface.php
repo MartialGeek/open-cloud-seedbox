@@ -18,4 +18,13 @@ interface UserRepositoryInterface extends ObjectRepository, Selectable
      * @throws NoResultException
      */
     public function findUserByEmailAndPassword($email, $password);
+
+    /**
+     * Finds a user by its email.
+     *
+     * @param string $email
+     * @return User
+     * @throws NoResultException
+     */
+    public function findUserByEmail($email);
 }

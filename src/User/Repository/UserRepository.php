@@ -29,4 +29,21 @@ class UserRepository extends EntityRepository implements UserRepositoryInterface
             ])
             ->getSingleResult();
     }
+
+    /**
+     * Finds a user by its email.
+     *
+     * @param string $email
+     * @return User
+     * @throws NoResultException
+     */
+    public function findUserByEmail($email)
+    {
+        return $this
+            ->createQueryBuilder('u')
+            ->where('u.email = :email')
+            ->getQuery()
+            ->setParameter('email', $email)
+            ->getSingleResult();
+    }
 }

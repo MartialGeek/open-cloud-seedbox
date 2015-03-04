@@ -86,6 +86,7 @@ class UserService implements UserServiceInterface
      * @param string $password
      * @return User
      * @throws BadCredentialsException
+     * @throws UserNotFoundException
      */
     public function authenticateByEmail($email, $password)
     {

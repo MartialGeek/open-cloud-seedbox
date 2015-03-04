@@ -2,6 +2,7 @@
 
 namespace Martial\Warez\User;
 
+use Martial\Warez\Security\BadCredentialsException;
 use Martial\Warez\User\Entity\User;
 
 interface UserServiceInterface
@@ -36,6 +37,7 @@ interface UserServiceInterface
      * @param string $password
      * @return User
      * @throws BadCredentialsException
+     * @throws UserNotFoundException
      */
     public function authenticateByEmail($email, $password);
 
