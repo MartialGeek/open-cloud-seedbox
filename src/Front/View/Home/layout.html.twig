@@ -11,7 +11,17 @@
 </head>
 <body>
 
-{% block body %}{% endblock %}
+{% block body %}
+    {% for flashMessage in app.session.flashbag.get('notice') %}
+        <div class="notice">{{ flashMessage }}</div>
+    {% endfor %}
+
+    {% for flashMessage in app.session.flashbag.get('error') %}
+        <div class="error">{{ flashMessage }}</div>
+    {% endfor %}
+
+    {% block content %}{% endblock %}
+{% endblock %}
 
 {% block javascripts %}
 <script src="/bower_components/jquery/dist/jquery.min.js"></script>
