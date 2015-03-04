@@ -13,6 +13,11 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public $silexApp;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject[]
+     */
+    public $services;
+
+    /**
      * @var array
      */
     public $config;
@@ -40,15 +45,31 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $commandTester->execute(['command' => $command->getName()]);
         $this->assertRegExp('/assets:install/', $commandTester->getDisplay(), 'Command assets:install was not found.');
         $this->assertRegExp('/server:run/', $commandTester->getDisplay(), 'Command server:run was not found.');
+        $this->assertRegExp('/user:create/', $commandTester->getDisplay(), 'Command server:run was not found.');
     }
 
     protected function setUp()
     {
+        $services = [
+            'user.service' => $this->getMock('\Martial\Warez\User\UserServiceInterface')
+        ];
+
+        $this->services = $services;
+
         $this->silexApp = $this
             ->getMockBuilder('\Silex\Application')
+            ->setMethods(['offsetGet'])
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->silexApp
+            ->expects($this->any())
+            ->method('offsetGet')
+            ->will($this->returnCallback(
+                function($key) use($services) {
+                    return $services[$key];
+                }
+            ));
         $this->config = include __DIR__ . '/mockConsoleConfig.php';
         $this->console = new Application($this->silexApp, $this->config);
     }
