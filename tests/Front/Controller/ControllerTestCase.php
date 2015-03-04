@@ -70,15 +70,33 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('\Symfony\Component\HttpFoundation\Request')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->request->request = $this
+            ->getMockBuilder('\Symfony\Component\HttpFoundation\ParameterBag')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->request->query = $this
+            ->getMockBuilder('\Symfony\Component\HttpFoundation\ParameterBag')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->flashBag = $this->getMock('\Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface');
+        $this->createController();
+    }
 
-        $reflectionClass = new \ReflectionClass($this->getControllerClassName());
-        $this->controller = $reflectionClass->newInstance(
+    protected function defineDependencies()
+    {
+        return [
             $this->twig,
             $this->formFactory,
             $this->session,
             $this->urlGenerator
-        );
+        ];
+    }
+
+    protected function createController()
+    {
+        $dependencies = $this->defineDependencies();
+        $reflectionClass = new \ReflectionClass($this->getControllerClassName());
+        $this->controller = $reflectionClass->newInstanceArgs($dependencies);
     }
 
     /**
@@ -173,16 +191,24 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
     /**
      * Simulates an insert in the session.
      *
-     * @param mixed $key
-     * @param mixed $value
+     * @param array $keysAndValues
      */
-    protected function sessionSet($key, $value)
+    protected function sessionSet(array $keysAndValues)
     {
-        $this
+        $params = [];
+
+        foreach ($keysAndValues as $key => $value) {
+            $params[] = [$this->equalTo($key), $this->equalTo($value)];
+        }
+
+        $invocation = $this
             ->session
-            ->expects($this->atLeastOnce())
-            ->method('set')
-            ->with($this->equalTo($key), $this->equalTo($value));
+            ->expects($this->exactly(count($keysAndValues)))
+            ->method('set');
+
+        $invocation
+            ->getMatcher()
+            ->parametersMatcher = new \PHPUnit_Framework_MockObject_Matcher_ConsecutiveParameters($params);
     }
 
     /**
@@ -220,6 +246,40 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
             ->method('generate')
             ->with($this->equalTo($route))
             ->will($this->returnValue($targetUrl));
+    }
+
+    /**
+     * Simulates a value retrieved via the request parameters bag of the Request component.
+     * @param $param
+     * @param $result
+     * @param null $default
+     */
+    protected function getRequestParameter($param, $result, $default = null)
+    {
+        $this
+            ->request
+            ->request
+            ->expects($this->any())
+            ->method('get')
+            ->with($this->equalTo($param), $this->equalTo($default))
+            ->will($this->returnValue($result));
+    }
+
+    /**
+     * Simulates a value retrieved via the request parameters bag of the Request component.
+     * @param $param
+     * @param $result
+     * @param null $default
+     */
+    protected function getQueryParameter($param, $result, $default = null)
+    {
+        $this
+            ->request
+            ->query
+            ->expects($this->any())
+            ->method('get')
+            ->with($this->equalTo($param), $this->equalTo($default))
+            ->will($this->returnValue($result));
     }
 
     /**
