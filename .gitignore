@@ -2,6 +2,8 @@
 vendor/
 var/
 bin/phpunit
+bin/behat
+bin/doctrine*
 web/css
 web/js
 /web/bower_components
