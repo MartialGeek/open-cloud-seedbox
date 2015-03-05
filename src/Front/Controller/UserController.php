@@ -50,7 +50,6 @@ class UserController extends AbstractController
                 $user = $this->userService->authenticateByEmail($requestLogin['email'], $requestLogin['password']);
                 $this->session->set('connected', true);
                 $this->session->set('username', $user->getUsername());
-                $this->session->getFlashBag()->add('notice', 'You are logged in.');
 
                 return new RedirectResponse($this->urlGenerator->generate('homepage'));
             } catch (BadCredentialsException $e) {

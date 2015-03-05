@@ -1,0 +1,26 @@
+@import "foundation/components/global";
+@import "foundation/components/alert-boxes";
+
+@mixin w-alert($type:notice) {
+  $alert-bg: $primary-color;
+
+  @if $type == notice {
+    $alert-bg: $primary-color;
+  } @else if $type == success {
+    $alert-bg: $success-color;
+  } @else if $type == error {
+    $alert-bg: $alert-color;
+  }
+
+  @include alert(
+    $bg: $alert-bg
+  );
+
+  .close {
+    @include alert-close();
+  }
+
+  &.alert-close {
+    opacity: 0;
+  }
+}

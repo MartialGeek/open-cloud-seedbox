@@ -12,15 +12,61 @@
 <body>
 
 {% block body %}
-    {% for flashMessage in app.session.flashbag.get('notice') %}
-        <div class="notice">{{ flashMessage }}</div>
-    {% endfor %}
+    <nav class="top-bar foundation-bar" data-topbar>
+        <ul class="title-area">
+            <li class="name"><h1><a href="{{ path('homepage') }}">Warez companion</a></h1></li>
+        </ul>
+        <section class="top-bar-section">
+            <!-- Right Nav Section -->
+            <ul class="right">
+                {% if app.session.get('connected') %}
+                <li>
+                    <span id="profile-status"><a href="">{{ app.session.get('username') }}</a></span>
+                </li>
+                <li>
+                    <a href="{{ path('logout') }}">Logout</a>
+                </li>
+                {% endif %}
+            </ul>
+        </section>
+    </nav>
 
-    {% for flashMessage in app.session.flashbag.get('error') %}
-        <div class="error">{{ flashMessage }}</div>
-    {% endfor %}
+    <div class="main-content">
+        {% for flashMessage in app.session.flashbag.get('notice') %}
+            <div class="row">
+                <div class="small-12 columns">
+                    <div data-alert class="alert-notice">
+                        {{ flashMessage }}
+                        <a href="#" class="close">&times;</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
 
-    {% block content %}{% endblock %}
+        {% for flashMessage in app.session.flashbag.get('success') %}
+            <div class="row">
+                <div class="small-12 columns">
+                    <div data-alert class="alert-success">
+                        {{ flashMessage }}
+                        <a href="#" class="close">&times;</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+        {% for flashMessage in app.session.flashbag.get('error') %}
+            <div class="row">
+                <div class="small-12 columns">
+                    <div data-alert class="alert-error">
+                        {{ flashMessage }}
+                        <a href="#" class="close">&times;</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+        {% block content %}{% endblock %}
+    </div>
 {% endblock %}
 
 {% block javascripts %}

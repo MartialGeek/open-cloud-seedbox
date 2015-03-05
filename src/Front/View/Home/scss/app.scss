@@ -1,40 +1,39 @@
 @import "settings";
 @import "foundation";
+@import "alert";
 
-// Or selectively include components
-// @import
-//   "foundation/components/accordion",
-//   "foundation/components/alert-boxes",
-//   "foundation/components/block-grid",
-//   "foundation/components/breadcrumbs",
-//   "foundation/components/button-groups",
-//   "foundation/components/buttons",
-//   "foundation/components/clearing",
-//   "foundation/components/dropdown",
-//   "foundation/components/dropdown-buttons",
-//   "foundation/components/flex-video",
-//   "foundation/components/forms",
-//   "foundation/components/grid",
-//   "foundation/components/inline-lists",
-//   "foundation/components/joyride",
-//   "foundation/components/keystrokes",
-//   "foundation/components/labels",
-//   "foundation/components/magellan",
-//   "foundation/components/orbit",
-//   "foundation/components/pagination",
-//   "foundation/components/panels",
-//   "foundation/components/pricing-tables",
-//   "foundation/components/progress-bars",
-//   "foundation/components/reveal",
-//   "foundation/components/side-nav",
-//   "foundation/components/split-buttons",
-//   "foundation/components/sub-nav",
-//   "foundation/components/switches",
-//   "foundation/components/tables",
-//   "foundation/components/tabs",
-//   "foundation/components/thumbs",
-//   "foundation/components/tooltips",
-//   "foundation/components/top-bar",
-//   "foundation/components/type",
-//   "foundation/components/offcanvas",
-//   "foundation/components/visibility";
+img {
+  max-width: 100%;
+  height: auto;
+  width: 100%;
+}
+
+@media only screen and (min-width: 0) and (max-width: 64em) {
+  img, form, .button {
+    padding: 20px;
+  }
+  .button {
+    margin: 20px;
+  }
+}
+
+.row {
+  max-width: 80rem;
+  margin-bottom: 20px;
+}
+
+.alert-notice {
+  @include w-alert(notice);
+}
+
+.alert-error {
+  @include w-alert(error);
+}
+
+.alert-success {
+  @include w-alert(success);
+}
+
+.main-content {
+  padding-top: 2em;
+}
