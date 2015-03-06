@@ -15,16 +15,35 @@
     <nav class="top-bar foundation-bar" data-topbar>
         <ul class="title-area">
             <li class="name"><h1><a href="{{ path('homepage') }}">Warez companion</a></h1></li>
+            <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
         </ul>
         <section class="top-bar-section">
             <!-- Right Nav Section -->
             <ul class="right">
                 {% if app.session.get('connected') %}
-                <li>
-                    <span id="profile-status"><a href="">{{ app.session.get('username') }}</a></span>
+                <li class="has-dropdown">
+                    <a id="profile-status" href="">{{ app.session.get('username') }}</a>
+                    <ul class="dropdown">
+                        <li><a href="">Profile</a></li>
+                        <li><a href="{{ path('logout') }}">Logout</a></li>
+                    </ul>
                 </li>
-                <li>
-                    <a href="{{ path('logout') }}">Logout</a>
+                {% else %}
+                <li class="has-form">
+                    <div class="row collapse medium-collapse">
+                        <form action="{{ path('login') }}" method="post">
+                            <div class="large-4 medium-4 small-4 columns">
+                                {{ form_widget(loginForm.email, {'attr': {'placeholder': 'email'}}) }}
+                            </div>
+                            <div class="large-4 medium-4 small-4 columns">
+                                {{ form_widget(loginForm.password, {'attr': {'placeholder': 'password'}}) }}
+                            </div>
+                            <div class="large-4 medium-4 small-3 columns">
+                                {{ form_rest(loginForm) }}
+                                <input id="connect_btn" type="submit" value="Connect" class="button expand" />
+                            </div>
+                        </form>
+                    </div>
                 </li>
                 {% endif %}
             </ul>

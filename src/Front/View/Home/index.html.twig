@@ -3,13 +3,5 @@
 {% block content %}
     <div class="row">
         <h1>Welcome</h1>
-
-        {% if not app.session.get('connected') %}
-            <form action="{{ path('login') }}" method="post">
-                {{ form_widget(loginForm) }}
-
-                <input id="connect_btn" type="submit" value="Connect" />
-            </form>
-        {% endif %}
     </div>
 {% endblock %}
