@@ -101,7 +101,6 @@ class UserControllerTest extends ControllerTestCase
                 'connected' => true,
                 'username' => $username
             ]);
-            $this->addFlash('notice', 'You are logged in.');
             $this->generateUrl('homepage', '/');
         } elseif ($context === self::LOGIN_FAILED) {
             $this->formIsValid();
