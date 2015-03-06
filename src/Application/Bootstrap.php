@@ -7,9 +7,7 @@ use Doctrine\Common\Cache\FilesystemCache;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
 use GuzzleHttp\Client as GuzzleClient;
-use Martial\Warez\Front\Controller\HomeController;
-use Martial\Warez\Front\Controller\SecurityController;
-use Martial\Warez\Front\Controller\UserController;
+use Martial\Warez\Front\Controller\AbstractController;
 use Martial\Warez\Security\AuthenticationProvider;
 use Martial\Warez\T411\Api\Client;
 use Martial\Warez\T411\Api\Data\DataTransformer;
@@ -140,31 +138,39 @@ class Bootstrap
         });
 
         $app['home.controller'] = $app->share(function() use ($app) {
-            return new HomeController(
-                $app['twig'],
-                $app['form.factory'],
-                $app['session'],
-                $app['url_generator']
-            );
+            return $this->getControllerInstance('\Martial\Warez\Front\Controller\HomeController');
         });
 
         $app['user.controller'] = $app->share(function() use ($app) {
-            return new UserController(
-                $app['twig'],
-                $app['form.factory'],
-                $app['session'],
-                $app['url_generator'],
-                $app['user.service']
+            return $this->getControllerInstance(
+                '\Martial\Warez\Front\Controller\UserController',
+                [$app['user.service']]
             );
         });
 
         $app['security.controller'] = $app->share(function() use ($app) {
-            return new SecurityController(
-                $app['twig'],
-                $app['form.factory'],
-                $app['session'],
-                $app['url_generator']
-            );
+            return $this->getControllerInstance('\Martial\Warez\Front\Controller\SecurityController');
         });
+    }
+
+    /**
+     * Returns an instance of a controller class.
+     *
+     * @param string $controllerClass
+     * @param array $additionalDependencies
+     * @return AbstractController
+     */
+    protected function getControllerInstance($controllerClass, array $additionalDependencies = [])
+    {
+        $reflectionClass = new \ReflectionClass($controllerClass);
+
+        $defaultDependencies = [
+            $this->app['twig'],
+            $this->app['form.factory'],
+            $this->app['session'],
+            $this->app['url_generator']
+        ];
+
+        return $reflectionClass->newInstanceArgs(array_merge($defaultDependencies, $additionalDependencies));
     }
 }
