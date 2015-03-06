@@ -4,6 +4,7 @@ var/
 bin/phpunit
 bin/behat
 bin/doctrine*
+bin/phing
 web/css
 web/js
 /web/bower_components

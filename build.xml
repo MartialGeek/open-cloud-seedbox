@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model
+        xlink:href="/usr/share/php5/PEAR/data/phing/etc/phing-grammar.rng"
+        type="application/xml"
+        schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<project name="Warez build file" basedir="." default="build">
+    <property name="binDir" value="${project.basedir}/bin" />
+
+    <target name="composer_install">
+        <exec command="composer install" checkreturn="true" passthru="true" />
+    </target>
+
+    <target name="technical_tests">
+        <exec executable="${binDir}/phpunit" checkreturn="true" passthru="true">
+            <arg value="-c" />
+            <arg file="phpunit.xml" />
+        </exec>
+    </target>
+
+    <target name="functional_tests">
+        <exec executable="${binDir}/behat" checkreturn="true" passthru="true" />
+    </target>
+
+    <target name="build" depends="composer_install">
+        <phingcall target="technical_tests" />
+        <phingcall target="functional_tests" />
+    </target>
+</project>
