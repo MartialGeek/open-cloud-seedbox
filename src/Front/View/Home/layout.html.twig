@@ -30,20 +30,7 @@
                 </li>
                 {% else %}
                 <li class="has-form">
-                    <div class="row collapse medium-collapse">
-                        <form action="{{ path('login') }}" method="post">
-                            <div class="large-4 medium-4 small-4 columns">
-                                {{ form_widget(loginForm.email, {'attr': {'placeholder': 'email'}}) }}
-                            </div>
-                            <div class="large-4 medium-4 small-4 columns">
-                                {{ form_widget(loginForm.password, {'attr': {'placeholder': 'password'}}) }}
-                            </div>
-                            <div class="large-4 medium-4 small-3 columns">
-                                {{ form_rest(loginForm) }}
-                                <input id="connect_btn" type="submit" value="Connect" class="button expand" />
-                            </div>
-                        </form>
-                    </div>
+                    {{ render(url('form_login')) }}
                 </li>
                 {% endif %}
             </ul>

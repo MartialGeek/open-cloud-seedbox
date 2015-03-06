@@ -20,6 +20,9 @@ return [
         'paths' => [
             'home' => [
                 __DIR__ . '/../src/Front/View/Home'
+            ],
+            'security' => [
+                __DIR__ . '/../src/Front/View/Security'
             ]
         ]
     ],

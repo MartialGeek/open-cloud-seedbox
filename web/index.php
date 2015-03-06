@@ -18,6 +18,10 @@ $app
     ->bind('login');
 
 $app
+    ->get('/form-login', 'security.controller:loginForm')
+    ->bind('form_login');
+
+$app
     ->get('/logout', 'user.controller:logout')
     ->bind('logout');
 

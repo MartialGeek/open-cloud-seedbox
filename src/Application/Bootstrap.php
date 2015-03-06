@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
 use GuzzleHttp\Client as GuzzleClient;
 use Martial\Warez\Front\Controller\HomeController;
+use Martial\Warez\Front\Controller\SecurityController;
 use Martial\Warez\Front\Controller\UserController;
 use Martial\Warez\Security\AuthenticationProvider;
 use Martial\Warez\T411\Api\Client;
@@ -154,6 +155,15 @@ class Bootstrap
                 $app['session'],
                 $app['url_generator'],
                 $app['user.service']
+            );
+        });
+
+        $app['security.controller'] = $app->share(function() use ($app) {
+            return new SecurityController(
+                $app['twig'],
+                $app['form.factory'],
+                $app['session'],
+                $app['url_generator']
             );
         });
     }
