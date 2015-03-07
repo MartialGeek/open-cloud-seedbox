@@ -13,6 +13,7 @@ use Martial\Warez\Security\BlowfishHashPassword;
 use Martial\Warez\Security\OpenSSLEncoder;
 use Martial\Warez\T411\Api\Client;
 use Martial\Warez\T411\Api\Data\DataTransformer;
+use Martial\Warez\User\ProfileService;
 use Martial\Warez\User\UserService;
 use Silex\Application;
 use Silex\Provider\DoctrineServiceProvider;
@@ -166,6 +167,10 @@ class Bootstrap
                 $app['security.authentication_provider'],
                 $app['security.password_hash']
             );
+        });
+
+        $app['profile.service'] = $app->share(function() use ($app) {
+            return new ProfileService($app['security.encoder']);
         });
     }
 
