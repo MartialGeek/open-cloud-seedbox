@@ -84,55 +84,41 @@ class UserControllerTest extends ControllerTestCase
         $this->createForm(new Login());
         $this->handleRequest($this->request);
 
-        if ($context !== self::LOGIN_FORM_INVALID) {
-            switch ($context) {
-                case self::LOGIN_SUCCESS:
-                    $authenticationResult = $this->returnValue($user);
-                    break;
-                case self::LOGIN_FAILED:
-                    $authenticationResult = $this->throwException(new BadCredentialsException());
-                    break;
-                case self::EMAIL_NOT_FOUND:
-                    $authenticationResult = $this->throwException(new UserNotFoundException());
-                    break;
-                default:
-                    throw new \InvalidArgumentException('Undefined context option');
-            }
-
-            $this->getRequestParameter('login', $loginParameters);
-            $this
-                ->userService
-                ->expects($this->once())
-                ->method('authenticateByEmail')
-                ->with($this->equalTo($loginParameters['email']), $this->equalTo($loginParameters['password']))
-                ->will($authenticationResult);
-        }
-
-        if ($context === self::LOGIN_SUCCESS) {
-            $this->formIsValid();
-            $user
-                ->expects($this->once())
-                ->method('getUsername')
-                ->will($this->returnValue($username));
-            $this->sessionSet([
-                'connected' => true,
-                'username' => $username
-            ]);
-            $this->generateUrl('homepage', '/');
-        } elseif ($context === self::LOGIN_FAILED) {
-            $this->formIsValid();
-            $this->createFormView();
-            $this->addFlash('error', 'You have provided a wrong password.');
-            $this->render('@home/index.html.twig', ['loginForm' => $this->formView]);
-        } elseif ($context === self::LOGIN_FORM_INVALID) {
-            $this->formIsNotValid();
-            $this->createFormView();
-            $this->render('@home/index.html.twig', ['loginForm' => $this->formView]);
-        } elseif ($context === self::EMAIL_NOT_FOUND) {
-            $this->formIsValid();
-            $this->createFormView();
-            $this->addFlash('error', 'This email was not found.');
-            $this->render('@home/index.html.twig', ['loginForm' => $this->formView]);
+        switch ($context) {
+            case self::LOGIN_SUCCESS:
+                $this->formIsValid();
+                $user
+                    ->expects($this->once())
+                    ->method('getUsername')
+                    ->will($this->returnValue($username));
+                $this->sessionSet([
+                    'connected' => true,
+                    'username' => $username
+                ]);
+                $this->generateUrl('homepage', '/');
+                $this->authenticateByEmail($loginParameters, $this->returnValue($user));
+                break;
+            case self::LOGIN_FAILED:
+                $this->formIsValid();
+                $this->createFormView();
+                $this->addFlash('error', 'You have provided a wrong password.');
+                $this->render('@home/index.html.twig', ['loginForm' => $this->formView]);
+                $this->authenticateByEmail($loginParameters, $this->throwException(new BadCredentialsException()));
+                break;
+            case self::EMAIL_NOT_FOUND:
+                $this->formIsValid();
+                $this->createFormView();
+                $this->addFlash('error', 'This email was not found.');
+                $this->render('@home/index.html.twig', ['loginForm' => $this->formView]);
+                $this->authenticateByEmail($loginParameters, $this->throwException(new UserNotFoundException()));
+                break;
+            case self::LOGIN_FORM_INVALID:
+                $this->formIsNotValid();
+                $this->createFormView();
+                $this->render('@home/index.html.twig', ['loginForm' => $this->formView]);
+                break;
+            default:
+                throw new \InvalidArgumentException('Undefined context option');
         }
 
         $this->controller->login($this->request);
@@ -144,6 +130,17 @@ class UserControllerTest extends ControllerTestCase
         $dependencies[] = $this->userService;
 
         return $dependencies;
+    }
+
+    protected function authenticateByEmail(array $loginParameters, \PHPUnit_Framework_MockObject_Stub $returnValue)
+    {
+        $this->getRequestParameter('login', $loginParameters);
+        $this
+            ->userService
+            ->expects($this->once())
+            ->method('authenticateByEmail')
+            ->with($this->equalTo($loginParameters['email']), $this->equalTo($loginParameters['password']))
+            ->will($returnValue);
     }
 
     protected function setUp()
