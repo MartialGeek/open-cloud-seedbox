@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\PrePersist;
 use Doctrine\ORM\Mapping\PreUpdate;
 use Doctrine\ORM\Mapping\Table;
@@ -45,6 +46,12 @@ class User
      * @Column(type="string", length=255, nullable=false)
      */
     protected $password;
+
+    /**
+     * @var Profile
+     * @OneToOne(targetEntity="Profile", mappedBy="user")
+     */
+    protected $profile;
 
     /**
      * @var \DateTime
