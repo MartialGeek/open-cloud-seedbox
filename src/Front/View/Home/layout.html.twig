@@ -24,7 +24,7 @@
                 <li class="has-dropdown">
                     <a id="profile-status" href="">{{ app.session.get('username') }}</a>
                     <ul class="dropdown">
-                        <li><a href="">Profile</a></li>
+                        <li><a href="{{ path('user_profile') }}">Profile</a></li>
                         <li><a href="{{ path('logout') }}">Logout</a></li>
                     </ul>
                 </li>

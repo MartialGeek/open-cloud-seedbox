@@ -4,6 +4,7 @@ namespace Martial\Warez\Front\Controller;
 
 use Martial\Warez\Form\Login;
 use Martial\Warez\Security\BadCredentialsException;
+use Martial\Warez\User\ProfileServiceInterface;
 use Martial\Warez\User\UserNotFoundException;
 use Martial\Warez\User\UserServiceInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -21,20 +22,28 @@ class UserController extends AbstractController
     private $userService;
 
     /**
+     * @var ProfileServiceInterface
+     */
+    private $profileService;
+
+    /**
      * @param \Twig_Environment $twig
      * @param FormFactoryInterface $formFactory
      * @param Session $session
      * @param UrlGeneratorInterface $urlGenerator
      * @param UserServiceInterface $userService
+     * @param ProfileServiceInterface $profileService
      */
     public function __construct(
         \Twig_Environment $twig,
         FormFactoryInterface $formFactory,
         Session $session,
         UrlGeneratorInterface $urlGenerator,
-        UserServiceInterface $userService
+        UserServiceInterface $userService,
+        ProfileServiceInterface $profileService
     ) {
         $this->userService = $userService;
+        $this->profileService = $profileService;
         parent::__construct($twig, $formFactory, $session, $urlGenerator);
     }
 
@@ -72,5 +81,10 @@ class UserController extends AbstractController
         $this->session->getFlashBag()->add('notice', 'You are logged out.');
 
         return new RedirectResponse($this->urlGenerator->generate('homepage'));
+    }
+
+    public function profile()
+    {
+        return $this->twig->render('@user/profile.html.twig');
     }
 }
