@@ -7,7 +7,23 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 $config = require __DIR__ . '/../config/app.php';
 $app = new Application();
-Bootstrap::createApplication($app, $config, 'dev');
+$bootstrap = new Bootstrap($app, $config, 'dev');
+
+$bootstrap
+    ->registerControllers([
+        'home.controller' => [
+            'class' => '\Martial\Warez\Front\Controller\HomeController'
+        ],
+        'user.controller' => [
+            'class' => '\Martial\Warez\Front\Controller\UserController',
+            'dependencies' => [
+                $app['user.service']
+            ]
+        ],
+        'security.controller' => [
+            'class' => '\Martial\Warez\Front\Controller\SecurityController'
+        ]
+    ]);
 
 $app
     ->get('/', 'home.controller:index')

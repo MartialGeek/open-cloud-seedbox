@@ -66,6 +66,19 @@ class Bootstrap
         return new self($app, $config, $env);
     }
 
+    public function registerControllers(array $controllers)
+    {
+        $app = $this->app;
+
+        foreach ($controllers as $serviceKey => $definition) {
+            $app[$serviceKey] = $app->share(function() use ($app, $definition) {
+                $dependencies = isset($definition['dependencies']) ? $definition['dependencies'] : [];
+
+                return $this->getControllerInstance($definition['class'], $dependencies);
+            });
+        }
+    }
+
     protected function configureApplication()
     {
         $this->app['env'] = $this->env;
@@ -135,21 +148,6 @@ class Bootstrap
 
         $app['user.service'] = $app->share(function() use ($app) {
             return new UserService($app['doctrine.entity_manager'], $app['authentication_provider']);
-        });
-
-        $app['home.controller'] = $app->share(function() use ($app) {
-            return $this->getControllerInstance('\Martial\Warez\Front\Controller\HomeController');
-        });
-
-        $app['user.controller'] = $app->share(function() use ($app) {
-            return $this->getControllerInstance(
-                '\Martial\Warez\Front\Controller\UserController',
-                [$app['user.service']]
-            );
-        });
-
-        $app['security.controller'] = $app->share(function() use ($app) {
-            return $this->getControllerInstance('\Martial\Warez\Front\Controller\SecurityController');
         });
     }
 
