@@ -5,12 +5,14 @@ namespace Martial\Warez\Tests\Front\Controller;
 use Martial\Warez\Form\Login;
 use Martial\Warez\Front\Controller\UserController;
 use Martial\Warez\Security\BadCredentialsException;
+use Martial\Warez\User\UserNotFoundException;
 
 class UserControllerTest extends ControllerTestCase
 {
     const LOGIN_SUCCESS = 1;
     const LOGIN_FAILED = 2;
     const LOGIN_FORM_INVALID = 3;
+    const EMAIL_NOT_FOUND = 4;
 
     /**
      * @var UserController
@@ -35,6 +37,11 @@ class UserControllerTest extends ControllerTestCase
     public function testLoginFormInvalid()
     {
         $this->login(self::LOGIN_FORM_INVALID);
+    }
+
+    public function testLoginEmailNotFound()
+    {
+        $this->login(self::EMAIL_NOT_FOUND);
     }
 
     public function testLogout()
@@ -78,9 +85,19 @@ class UserControllerTest extends ControllerTestCase
         $this->handleRequest($this->request);
 
         if ($context !== self::LOGIN_FORM_INVALID) {
-            $authenticationResult = $context === self::LOGIN_SUCCESS ?
-                $this->returnValue($user) :
-                $this->throwException(new BadCredentialsException());
+            switch ($context) {
+                case self::LOGIN_SUCCESS:
+                    $authenticationResult = $this->returnValue($user);
+                    break;
+                case self::LOGIN_FAILED:
+                    $authenticationResult = $this->throwException(new BadCredentialsException());
+                    break;
+                case self::EMAIL_NOT_FOUND:
+                    $authenticationResult = $this->throwException(new UserNotFoundException());
+                    break;
+                default:
+                    throw new \InvalidArgumentException('Undefined context option');
+            }
 
             $this->getRequestParameter('login', $loginParameters);
             $this
@@ -105,11 +122,16 @@ class UserControllerTest extends ControllerTestCase
         } elseif ($context === self::LOGIN_FAILED) {
             $this->formIsValid();
             $this->createFormView();
-            $this->addFlash('error', 'You have provided wrong credentials.');
+            $this->addFlash('error', 'You have provided a wrong password.');
             $this->render('@home/index.html.twig', ['loginForm' => $this->formView]);
         } elseif ($context === self::LOGIN_FORM_INVALID) {
             $this->formIsNotValid();
             $this->createFormView();
+            $this->render('@home/index.html.twig', ['loginForm' => $this->formView]);
+        } elseif ($context === self::EMAIL_NOT_FOUND) {
+            $this->formIsValid();
+            $this->createFormView();
+            $this->addFlash('error', 'This email was not found.');
             $this->render('@home/index.html.twig', ['loginForm' => $this->formView]);
         }
 

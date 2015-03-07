@@ -53,7 +53,7 @@ class UserController extends AbstractController
 
                 return new RedirectResponse($this->urlGenerator->generate('homepage'));
             } catch (BadCredentialsException $e) {
-                $this->session->getFlashBag()->add('error', 'You have provided wrong credentials.');
+                $this->session->getFlashBag()->add('error', 'You have provided a wrong password.');
             } catch (UserNotFoundException $e) {
                 $this->session->getFlashBag()->add('error', 'This email was not found.');
             }
