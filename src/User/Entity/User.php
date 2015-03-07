@@ -8,8 +8,9 @@ use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\OneToOne;
+use Doctrine\ORM\Mapping\PrePersist;
+use Doctrine\ORM\Mapping\PreUpdate;
 use Doctrine\ORM\Mapping\Table;
-use Martial\Warez\Doctrine\TimestampableTrait;
 
 /**
  * Class User
@@ -20,8 +21,6 @@ use Martial\Warez\Doctrine\TimestampableTrait;
  */
 class User
 {
-    use TimestampableTrait;
-
     /**
      * @var int
      * @Id
@@ -53,6 +52,18 @@ class User
      * @OneToOne(targetEntity="Profile", mappedBy="user")
      */
     protected $profile;
+
+    /**
+     * @var \DateTime
+     * @Column(type="datetime", name="created_at", nullable=false)
+     */
+    protected $createdAt;
+
+    /**
+     * @var \DateTime
+     * @Column(type="datetime", name="updated_at", nullable=false)
+     */
+    protected $updatedAt;
 
     /**
      * @return int
@@ -147,5 +158,60 @@ class User
         $this->profile = $profile;
 
         return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param \DateTime $createdAt
+     * @return User
+     */
+    public function setCreatedAt(\DateTime $createdAt)
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @param \DateTime $updatedAt
+     * @return User
+     */
+    public function setUpdatedAt(\DateTime $updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @PrePersist
+     */
+    public function onCreate()
+    {
+        $this->createdAt = new \DateTime();
+        $this->updatedAt = new \DateTime();
+    }
+
+    /**
+     * @PreUpdate
+     */
+    public function onUpdate()
+    {
+        $this->updatedAt = new \DateTime();
     }
 }
