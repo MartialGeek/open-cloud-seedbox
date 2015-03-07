@@ -49,5 +49,11 @@ return [
             'cache_dir' => __DIR__ . '/../var/cache/doctrine/cache',
             'proxy_dir' => __DIR__ . '/../var/cache/doctrine/proxy',
         ]
+    ],
+    'security' => [
+        'encoder' => [
+            'password' => $parameters['security_encoder_password'],
+            'salt' => $parameters['security_encoder_salt']
+        ]
     ]
 ];

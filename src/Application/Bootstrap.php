@@ -10,6 +10,7 @@ use GuzzleHttp\Client as GuzzleClient;
 use Martial\Warez\Front\Controller\AbstractController;
 use Martial\Warez\Security\AuthenticationProvider;
 use Martial\Warez\Security\BlowfishHashPassword;
+use Martial\Warez\Security\OpenSSLEncoder;
 use Martial\Warez\T411\Api\Client;
 use Martial\Warez\T411\Api\Data\DataTransformer;
 use Martial\Warez\User\UserService;
@@ -107,6 +108,7 @@ class Bootstrap
     protected function registerServices()
     {
         $app = $this->app;
+        $config = $this->config;
 
         $app['doctrine.entity_manager'] = $app->share(function() {
 
@@ -149,6 +151,13 @@ class Bootstrap
 
         $app['security.authentication_provider'] = $app->share(function() use ($app) {
             return new AuthenticationProvider($app['security.password_hash']);
+        });
+
+        $app['security.encoder'] = $app->share(function() use ($config) {
+            return new OpenSSLEncoder(
+                $config['security']['encoder']['password'],
+                $config['security']['encoder']['salt']
+            );
         });
 
         $app['user.service'] = $app->share(function() use ($app) {

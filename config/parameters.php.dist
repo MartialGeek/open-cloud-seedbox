@@ -5,5 +5,7 @@ return [
     'doctrine_dbname' => '',
     'doctrine_host' => '',
     'doctrine_user' => '',
-    'doctrine_password' => ''
+    'doctrine_password' => '',
+    'security_encoder_password' => '',
+    'security_encoder_salt' => '',
 ];
