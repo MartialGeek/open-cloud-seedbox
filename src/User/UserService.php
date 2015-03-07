@@ -3,10 +3,12 @@
 namespace Martial\Warez\User;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\NoResultException;
 use Martial\Warez\Security\AuthenticationProviderInterface;
+use Martial\Warez\Security\BadCredentialsException;
+use Martial\Warez\Security\PasswordHashInterface;
 use Martial\Warez\User\Entity\User;
 use Martial\Warez\User\Repository\UserRepositoryInterface;
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 class UserService implements UserServiceInterface
 {
@@ -21,13 +23,23 @@ class UserService implements UserServiceInterface
     private $authentication;
 
     /**
+     * @var PasswordHashInterface
+     */
+    private $passwordHash;
+
+    /**
      * @param EntityManager $em
      * @param AuthenticationProviderInterface $authentication
+     * @param PasswordHashInterface $passwordHash
      */
-    public function __construct(EntityManager $em, AuthenticationProviderInterface $authentication)
-    {
+    public function __construct(
+        EntityManager $em,
+        AuthenticationProviderInterface $authentication,
+        PasswordHashInterface $passwordHash
+    ) {
         $this->em = $em;
         $this->authentication = $authentication;
+        $this->passwordHash = $passwordHash;
     }
 
     /**
@@ -51,7 +63,7 @@ class UserService implements UserServiceInterface
             throw new UsernameAlreadyExistsException();
         }
 
-        $hashedPassword = $this->authentication->generatePasswordHash($user->getPassword());
+        $hashedPassword = $this->passwordHash->generateHash($user->getPassword());
         $user->setPassword($hashedPassword);
         $this->em->persist($user);
         $this->em->flush();
@@ -90,7 +102,17 @@ class UserService implements UserServiceInterface
      */
     public function authenticateByEmail($email, $password)
     {
-        return $this->authentication->authenticateByEmail($email, $password);
+        try {
+            $user = $this->getRepository()->findUserByEmail($email);
+        } catch (NoResultException $e) {
+            throw new UserNotFoundException();
+        }
+
+        if (!$this->authentication->hasValidCredentials($user, $password)) {
+            throw new BadCredentialsException();
+        }
+
+        return $user;
     }
 
     /**

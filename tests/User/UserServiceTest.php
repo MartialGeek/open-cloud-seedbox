@@ -2,6 +2,7 @@
 
 namespace Martial\Warez\Tests\User;
 
+use Doctrine\ORM\NoResultException;
 use Martial\Warez\Security\BadCredentialsException;
 use Martial\Warez\User\Entity\User;
 use Martial\Warez\User\UserService;
@@ -27,6 +28,11 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     public $repo;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    public $passwordHash;
 
     /**
      * @var UserService
@@ -109,6 +115,14 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \Martial\Warez\User\UserNotFoundException
+     */
+    public function testAuthenticateUserShouldThrowAnExceptionWhenTheUserWasNotFound()
+    {
+        $this->authenticate([self::USER_NOT_FOUND]);
+    }
+
+    /**
      * @expectedException \Martial\Warez\Security\BadCredentialsException
      */
     public function testAuthenticateUserShouldThrowAnExceptionOnInvalidCredentials()
@@ -156,9 +170,9 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
             $findByEmailInvocation->will($this->returnValue([], []));
 
             $this
-                ->authenticationProvider
+                ->passwordHash
                 ->expects($this->once())
-                ->method('generatePasswordHash')
+                ->method('generateHash')
                 ->with($this->equalTo($this->password))
                 ->will($this->returnValue($this->hashedPassword));
 
@@ -179,24 +193,32 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
 
     protected function authenticate(array $options = [])
     {
-        $authenticationResult = in_array(self::BAD_CREDENTIALS, $options) ?
-            $this->throwException(new BadCredentialsException()) :
+        $findResult = in_array(self::USER_NOT_FOUND, $options) ?
+            $this->throwException(new NoResultException()) :
             $this->returnValue($this->userEntity);
 
+        $hasValidCredentials = !in_array(self::BAD_CREDENTIALS, $options);
+
+        $this->getRepository($this->once());
+
         $this
-            ->authenticationProvider
+            ->repo
             ->expects($this->once())
-            ->method('authenticateByEmail')
-            ->with($this->equalTo($this->userEntity->getEmail()), $this->equalTo($this->userEntity->getPassword()))
-            ->will($authenticationResult);
+            ->method('findUserByEmail')
+            ->with($this->equalTo($this->userEntity->getEmail()))
+            ->will($findResult);
 
-        $user = $this
-            ->userService
-            ->authenticateByEmail($this->userEntity->getEmail(), $this->userEntity->getPassword());
-
-        if (!in_array(self::BAD_CREDENTIALS, $options)) {
-            $this->assertSame($user, $this->userEntity);
+        if (!in_array(self::USER_NOT_FOUND, $options)) {
+            $this
+                ->authenticationProvider
+                ->expects($this->once())
+                ->method('hasValidCredentials')
+                ->with($this->equalTo($this->userEntity), $this->equalTo($this->password))
+                ->will($this->returnValue($hasValidCredentials));
         }
+
+        $user = $this->userService->authenticateByEmail($this->userEntity->getEmail(), $this->password);
+        $this->assertSame($this->userEntity, $user);
     }
 
     protected function find(array $options = [])
@@ -239,8 +261,8 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->repo = $this->getMock('\Martial\Warez\User\Repository\UserRepositoryInterface');
-
-        $this->userService = new UserService($this->em, $this->authenticationProvider);
+        $this->passwordHash = $this->getMock('\Martial\Warez\Security\PasswordHashInterface');
+        $this->userService = new UserService($this->em, $this->authenticationProvider, $this->passwordHash);
 
         $this->password = 'tot0Isth3Best';
         $this->hashedPassword = 'hashedpassword';

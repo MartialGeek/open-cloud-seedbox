@@ -7,20 +7,11 @@ use Martial\Warez\User\Entity\User;
 interface AuthenticationProviderInterface
 {
     /**
-     * Authenticates a user by its email and a non-hashed password or throw an exception.
+     * Checks if a user provided valid credentials.
      *
-     * @param string $email
-     * @param string $password
-     * @return User
-     * @throws BadCredentialsException
+     * @param User $user
+     * @param string $clearPassword
+     * @return bool
      */
-    public function authenticateByEmail($email, $password);
-
-    /**
-     * Generates a hash from the given password.
-     *
-     * @param string $password
-     * @return string
-     */
-    public function generatePasswordHash($password);
+    public function hasValidCredentials(User $user, $clearPassword);
 }

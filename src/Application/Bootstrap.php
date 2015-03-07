@@ -9,6 +9,7 @@ use Doctrine\ORM\Tools\Setup;
 use GuzzleHttp\Client as GuzzleClient;
 use Martial\Warez\Front\Controller\AbstractController;
 use Martial\Warez\Security\AuthenticationProvider;
+use Martial\Warez\Security\BlowfishHashPassword;
 use Martial\Warez\T411\Api\Client;
 use Martial\Warez\T411\Api\Data\DataTransformer;
 use Martial\Warez\User\UserService;
@@ -142,12 +143,20 @@ class Bootstrap
             );
         });
 
-        $app['authentication_provider'] = $app->share(function() use ($app) {
-            return new AuthenticationProvider($app['doctrine.entity_manager']);
+        $app['security.password_hash'] = $app->share(function() {
+            return new BlowfishHashPassword();
+        });
+
+        $app['security.authentication_provider'] = $app->share(function() use ($app) {
+            return new AuthenticationProvider($app['security.password_hash']);
         });
 
         $app['user.service'] = $app->share(function() use ($app) {
-            return new UserService($app['doctrine.entity_manager'], $app['authentication_provider']);
+            return new UserService(
+                $app['doctrine.entity_manager'],
+                $app['security.authentication_provider'],
+                $app['security.password_hash']
+            );
         });
     }
 

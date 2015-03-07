@@ -2,9 +2,7 @@
 
 namespace Martial\Warez\Tests\Security;
 
-use Doctrine\ORM\NoResultException;
 use Martial\Warez\Security\AuthenticationProvider;
-use Martial\Warez\Security\BadCredentialsException;
 use Martial\Warez\User\Entity\User;
 
 class AuthenticationProviderTest extends \PHPUnit_Framework_TestCase
@@ -19,12 +17,7 @@ class AuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    public $em;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    public $repo;
+    public $passwordHash;
 
     /**
      * @var User
@@ -36,56 +29,34 @@ class AuthenticationProviderTest extends \PHPUnit_Framework_TestCase
      */
     public $clearPassword;
 
-    public function testAuthenticateUser()
+    public function testValidCredentialsShouldReturnTrue()
     {
-        $this->authenticate();
+        $this->hasValidCredentials();
     }
 
-    /**
-     * @expectedException \Martial\Warez\User\UserNotFoundException
-     */
-    public function testAuthenticateUserWithBadCredentialsShouldThrowAnException()
+    public function testInvalidCredentialsShouldReturnFalse()
     {
-        $this->authenticate([self::BAD_CREDENTIALS]);
+        $this->hasValidCredentials([self::BAD_CREDENTIALS]);
     }
 
-    protected function authenticate(array $options = [])
+    protected function hasValidCredentials(array $options = [])
     {
-        $findResult = in_array(self::BAD_CREDENTIALS, $options) ?
-            $this->throwException(new NoResultException()) :
-            $this->returnValue($this->user);
+        $isValidCredentials = !in_array(self::BAD_CREDENTIALS, $options);
 
         $this
-            ->em
+            ->passwordHash
             ->expects($this->once())
-            ->method('getRepository')
-            ->with($this->equalTo('\Martial\Warez\User\Entity\User'))
-            ->will($this->returnValue($this->repo));
+            ->method('isValid')
+            ->with($this->equalTo($this->clearPassword), $this->equalTo($this->user->getPassword()))
+            ->will($this->returnValue($isValidCredentials));
 
-        $this
-            ->repo
-            ->expects($this->once())
-            ->method('findUserByEmail')
-            ->with($this->equalTo($this->user->getEmail()))
-            ->will($findResult);
-
-        try {
-            $user = $this->authenticationService->authenticateByEmail($this->user->getEmail(), $this->clearPassword);
-            if (!in_array(self::BAD_CREDENTIALS, $options)) {
-                $this->assertSame($this->user, $user);
-            }
-        } catch (BadCredentialsException $e) {
-
-        }
+        $result = $this->authenticationService->hasValidCredentials($this->user, $this->clearPassword);
+        $this->assertSame($isValidCredentials, $result);
     }
 
     protected function setUp()
     {
-        $this->em = $this
-            ->getMockBuilder('\Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->passwordHash = $this->getMock('\Martial\Warez\Security\PasswordHashInterface');
         $this->clearPassword = 'aSuperP@ssw0rd';
         $this->user = new User();
         $this->user
@@ -96,8 +67,6 @@ class AuthenticationProviderTest extends \PHPUnit_Framework_TestCase
             ->setCreatedAt(new \DateTime('-1 year'))
             ->setUpdatedAt(new \DateTime('-1 week'));
 
-        $this->repo = $this->getMock('\Martial\Warez\User\Repository\UserRepositoryInterface');
-
-        $this->authenticationService = new AuthenticationProvider($this->em);
+        $this->authenticationService = new AuthenticationProvider($this->passwordHash);
     }
 }
