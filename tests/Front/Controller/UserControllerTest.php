@@ -24,6 +24,11 @@ class UserControllerTest extends ControllerTestCase
      */
     public $userService;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    public $profileService;
+
     public function testLoginSuccess()
     {
         $this->login(self::LOGIN_SUCCESS);
@@ -128,6 +133,7 @@ class UserControllerTest extends ControllerTestCase
     {
         $dependencies = parent::defineDependencies();
         $dependencies[] = $this->userService;
+        $dependencies[] = $this->profileService;
 
         return $dependencies;
     }
@@ -146,6 +152,7 @@ class UserControllerTest extends ControllerTestCase
     protected function setUp()
     {
         $this->userService = $this->getMock('\Martial\Warez\User\UserServiceInterface');
+        $this->profileService = $this->getMock('\Martial\Warez\User\ProfileServiceInterface');
         parent::setUp();
     }
 }
