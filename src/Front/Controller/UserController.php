@@ -3,6 +3,7 @@
 namespace Martial\Warez\Front\Controller;
 
 use Martial\Warez\Form\Login;
+use Martial\Warez\Form\Profile;
 use Martial\Warez\Security\BadCredentialsException;
 use Martial\Warez\User\ProfileServiceInterface;
 use Martial\Warez\User\UserNotFoundException;
@@ -85,6 +86,10 @@ class UserController extends AbstractController
 
     public function profile()
     {
-        return $this->twig->render('@user/profile.html.twig');
+        $formProfile = $this->formFactory->create(new Profile());
+
+        return $this->twig->render('@user/profile.html.twig', [
+            'formProfile' => $formProfile->createView()
+        ]);
     }
 }

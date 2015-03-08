@@ -36,13 +36,13 @@ class ProfileServiceTest extends \PHPUnit_Framework_TestCase
         $this
             ->profile
             ->expects($this->once())
-            ->method('getT411Password')
+            ->method('getTrackerPassword')
             ->will($this->returnValue($this->trackerPassword));
 
         $this
             ->profile
             ->expects($this->once())
-            ->method('setT411Password')
+            ->method('setTrackerPassword')
             ->with($this->equalTo($this->encodedTrackerPassword))
             ->will($this->returnValue($this->profile));
 
@@ -61,13 +61,13 @@ class ProfileServiceTest extends \PHPUnit_Framework_TestCase
         $this
             ->profile
             ->expects($this->once())
-            ->method('getT411Password')
+            ->method('getTrackerPassword')
             ->will($this->returnValue($this->encodedTrackerPassword));
 
         $this
             ->profile
             ->expects($this->once())
-            ->method('setT411Password')
+            ->method('setTrackerPassword')
             ->with($this->equalTo($this->trackerPassword))
             ->will($this->returnValue($this->profile));
 

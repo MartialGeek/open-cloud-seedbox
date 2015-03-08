@@ -27,8 +27,8 @@ class ProfileService implements ProfileServiceInterface
      */
     public function encodeTrackerPassword(Profile $profile)
     {
-        $encodedPassword = $this->encoder->encode($profile->getT411Password());
-        $profile->setT411Password($encodedPassword);
+        $encodedPassword = $this->encoder->encode($profile->getTrackerPassword());
+        $profile->setTrackerPassword($encodedPassword);
     }
 
     /**
@@ -38,7 +38,7 @@ class ProfileService implements ProfileServiceInterface
      */
     public function decodeTrackerPassword(Profile $profile)
     {
-        $clearPassword = $this->encoder->decode($profile->getT411Password());
-        $profile->setT411Password($clearPassword);
+        $clearPassword = $this->encoder->decode($profile->getTrackerPassword());
+        $profile->setTrackerPassword($clearPassword);
     }
 }

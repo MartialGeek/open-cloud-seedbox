@@ -30,9 +30,9 @@ class Profile
 
     /**
      * @var string
-     * @Column(type="string", length=255)
+     * @Column(type="string", name="tracker_password", length=255)
      */
-    protected $t411Password;
+    protected $trackerPassword;
 
     /**
      * @var User
@@ -75,18 +75,18 @@ class Profile
     /**
      * @return string
      */
-    public function getT411Password()
+    public function getTrackerPassword()
     {
-        return $this->t411Password;
+        return $this->trackerPassword;
     }
 
     /**
-     * @param string $t411Password
+     * @param string $trackerPassword
      * @return Profile
      */
-    public function setT411Password($t411Password)
+    public function setTrackerPassword($trackerPassword)
     {
-        $this->t411Password = $t411Password;
+        $this->trackerPassword = $trackerPassword;
 
         return $this;
     }

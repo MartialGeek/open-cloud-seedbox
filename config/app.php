@@ -26,6 +26,9 @@ return [
             ],
             'user' => [
                 __DIR__ . '/../src/Front/View/User'
+            ],
+            'form' => [
+                __DIR__ . '/../src/Front/View/Form'
             ]
         ]
     ],
