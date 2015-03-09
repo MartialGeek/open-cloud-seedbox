@@ -253,6 +253,8 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
             $currentTrackerPassword :
             'newTr@ckerP@ssw0rd';
 
+        $trackerUserName = 'Toto';
+
         $profile = $this
             ->getMockBuilder('\Martial\Warez\User\Entity\Profile')
             ->disableOriginalConstructor()
@@ -297,6 +299,17 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
                 ->method('encodeTrackerPassword')
                 ->with($this->equalTo($currentProfile));
         }
+
+        $profile
+            ->expects($this->once())
+            ->method('getTrackerUsername')
+            ->will($this->returnValue($trackerUserName));
+
+        $currentProfile
+            ->expects($this->once())
+            ->method('setTrackerUsername')
+            ->with($this->equalTo($trackerUserName))
+            ->will($this->returnValue($currentProfile));
 
         $this->persist($currentProfile);
         $this->flush();

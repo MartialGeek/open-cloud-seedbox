@@ -161,6 +161,8 @@ class UserService implements UserServiceInterface
             $this->profileService->encodeTrackerPassword($currentProfile);
         }
 
+        $currentProfile->setTrackerUsername($profile->getTrackerUsername());
+
         $this->em->persist($currentProfile);
         $this->em->flush();
     }

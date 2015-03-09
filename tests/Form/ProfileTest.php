@@ -16,9 +16,16 @@ class ProfileTest extends \PHPUnit_Framework_TestCase
         $formBuilder = $this->getMock('\Symfony\Component\Form\FormBuilderInterface');
 
         $formBuilder
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('add')
-            ->with($this->equalTo('trackerPassword'), $this->equalTo('password'))
+            ->withConsecutive(
+                [$this->equalTo('trackerUsername')],
+                [
+                    $this->equalTo('trackerPassword'), $this->equalTo('password'), $this->equalTo([
+                        'required' => false
+                    ])
+                ]
+            )
             ->will($this->returnValue($formBuilder));
 
         $this->form->buildForm($formBuilder, []);

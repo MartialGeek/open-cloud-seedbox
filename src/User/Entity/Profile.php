@@ -37,6 +37,12 @@ class Profile
     protected $trackerPassword;
 
     /**
+     * @var string
+     * @Column(type="string", name="tracker_username", length=255)
+     */
+    protected $trackerUsername;
+
+    /**
      * @var User
      * @OneToOne(targetEntity="User", inversedBy="profile")
      * @JoinColumn(name="user_id", referencedColumnName="id")
@@ -89,6 +95,25 @@ class Profile
     public function setTrackerPassword($trackerPassword)
     {
         $this->trackerPassword = $trackerPassword;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTrackerUsername()
+    {
+        return $this->trackerUsername;
+    }
+
+    /**
+     * @param string $trackerUsername
+     * @return Profile
+     */
+    public function setTrackerUsername($trackerUsername)
+    {
+        $this->trackerUsername = $trackerUsername;
 
         return $this;
     }

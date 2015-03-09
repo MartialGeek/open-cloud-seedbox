@@ -14,7 +14,11 @@ class Profile extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('trackerPassword', 'password');
+        $builder
+            ->add('trackerUsername')
+            ->add('trackerPassword', 'password', [
+                'required' => false
+            ]);
     }
 
     /**
