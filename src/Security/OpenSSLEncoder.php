@@ -25,7 +25,7 @@ class OpenSSLEncoder implements EncoderInterface
      * @param string $salt
      * @param string $cypherMethod
      */
-    public function __construct($password, $salt, $cypherMethod = 'aes-256-cbc')
+    public function __construct($password, $salt, $cypherMethod = 'aes-256-ecb')
     {
         $this->password = $password;
         $this->salt = $salt;
