@@ -10,6 +10,7 @@ use GuzzleHttp\Client as GuzzleClient;
 use Martial\Warez\Front\Controller\AbstractController;
 use Martial\Warez\Security\AuthenticationProvider;
 use Martial\Warez\Security\BlowfishHashPassword;
+use Martial\Warez\Security\Firewall;
 use Martial\Warez\Security\OpenSSLEncoder;
 use Martial\Warez\T411\Api\Client;
 use Martial\Warez\T411\Api\Data\DataTransformer;
@@ -54,8 +55,8 @@ class Bootstrap
         $this->config = $config;
         $this->env = $env;
         $this->registerServiceProviders();
-        $this->configureApplication();
         $this->registerServices();
+        $this->configureApplication();
     }
 
     /**
@@ -90,6 +91,11 @@ class Bootstrap
         foreach ($this->config['twig']['paths'] as $namespace => $paths) {
             $this->app['twig.loader.filesystem']->setPaths($paths, $namespace);
         }
+
+        $this->app['dispatcher']->addListener('kernel.request', [
+            $this->app['security.firewall'],
+            'onKernelRequest'
+        ]);
     }
 
     protected function registerServiceProviders()
@@ -172,6 +178,10 @@ class Bootstrap
 
         $app['profile.service'] = $app->share(function() use ($app) {
             return new ProfileService($app['security.encoder']);
+        });
+
+        $app['security.firewall'] = $app->share(function() use ($app) {
+            return new Firewall($app['session']);
         });
     }
 
