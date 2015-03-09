@@ -7,6 +7,7 @@ use Doctrine\ORM\NoResultException;
 use Martial\Warez\Security\AuthenticationProviderInterface;
 use Martial\Warez\Security\BadCredentialsException;
 use Martial\Warez\Security\PasswordHashInterface;
+use Martial\Warez\User\Entity\Profile;
 use Martial\Warez\User\Entity\User;
 use Martial\Warez\User\Repository\UserRepositoryInterface;
 
@@ -28,18 +29,26 @@ class UserService implements UserServiceInterface
     private $passwordHash;
 
     /**
+     * @var ProfileServiceInterface
+     */
+    private $profileService;
+
+    /**
      * @param EntityManager $em
      * @param AuthenticationProviderInterface $authentication
      * @param PasswordHashInterface $passwordHash
+     * @param ProfileServiceInterface $profileService
      */
     public function __construct(
         EntityManager $em,
         AuthenticationProviderInterface $authentication,
-        PasswordHashInterface $passwordHash
+        PasswordHashInterface $passwordHash,
+        ProfileServiceInterface $profileService
     ) {
         $this->em = $em;
         $this->authentication = $authentication;
         $this->passwordHash = $passwordHash;
+        $this->profileService = $profileService;
     }
 
     /**
@@ -119,7 +128,7 @@ class UserService implements UserServiceInterface
      * Finds a user by its ID.
      *
      * @param int $userId
-     * @return mixed
+     * @return User
      * @throws UserNotFoundException
      */
     public function find($userId)
@@ -131,6 +140,29 @@ class UserService implements UserServiceInterface
         }
 
         return $user;
+    }
+
+    /**
+     * Updates the profile of a user.
+     *
+     * @param int $userId
+     * @param Profile $profile
+     * @return User
+     */
+    public function updateProfile($userId, Profile $profile)
+    {
+        $user = $this->find($userId);
+        $currentProfile = is_null($user->getProfile()) ? new Profile() : $user->getProfile();
+        $currentTrackerPassword = $currentProfile->getTrackerPassword();
+        $newTrackerPassword = $profile->getTrackerPassword();
+
+        if ($currentTrackerPassword != $newTrackerPassword && !is_null($newTrackerPassword)) {
+            $currentProfile->setTrackerPassword($newTrackerPassword);
+            $this->profileService->encodeTrackerPassword($currentProfile);
+        }
+
+        $this->em->persist($currentProfile);
+        $this->em->flush();
     }
 
     /**

@@ -165,7 +165,8 @@ class Bootstrap
             return new UserService(
                 $app['doctrine.entity_manager'],
                 $app['security.authentication_provider'],
-                $app['security.password_hash']
+                $app['security.password_hash'],
+                $app['profile.service']
             );
         });
 

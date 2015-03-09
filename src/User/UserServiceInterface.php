@@ -3,6 +3,7 @@
 namespace Martial\Warez\User;
 
 use Martial\Warez\Security\BadCredentialsException;
+use Martial\Warez\User\Entity\Profile;
 use Martial\Warez\User\Entity\User;
 
 interface UserServiceInterface
@@ -45,8 +46,17 @@ interface UserServiceInterface
      * Finds a user by its ID.
      *
      * @param int $userId
-     * @return mixed
+     * @return User
      * @throws UserNotFoundException
      */
     public function find($userId);
+
+    /**
+     * Updates the profile of a user.
+     *
+     * @param int $userId
+     * @param Profile $profile
+     * @return User
+     */
+    public function updateProfile($userId, Profile $profile);
 }

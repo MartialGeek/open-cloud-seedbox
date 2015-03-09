@@ -5,7 +5,6 @@ namespace Martial\Warez\Front\Controller;
 use Martial\Warez\Form\Login;
 use Martial\Warez\Form\Profile;
 use Martial\Warez\Security\BadCredentialsException;
-use Martial\Warez\User\ProfileServiceInterface;
 use Martial\Warez\User\UserNotFoundException;
 use Martial\Warez\User\UserServiceInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -23,28 +22,20 @@ class UserController extends AbstractController
     private $userService;
 
     /**
-     * @var ProfileServiceInterface
-     */
-    private $profileService;
-
-    /**
      * @param \Twig_Environment $twig
      * @param FormFactoryInterface $formFactory
      * @param Session $session
      * @param UrlGeneratorInterface $urlGenerator
      * @param UserServiceInterface $userService
-     * @param ProfileServiceInterface $profileService
      */
     public function __construct(
         \Twig_Environment $twig,
         FormFactoryInterface $formFactory,
         Session $session,
         UrlGeneratorInterface $urlGenerator,
-        UserServiceInterface $userService,
-        ProfileServiceInterface $profileService
+        UserServiceInterface $userService
     ) {
         $this->userService = $userService;
-        $this->profileService = $profileService;
         parent::__construct($twig, $formFactory, $session, $urlGenerator);
     }
 
@@ -60,6 +51,7 @@ class UserController extends AbstractController
                 $user = $this->userService->authenticateByEmail($requestLogin['email'], $requestLogin['password']);
                 $this->session->set('connected', true);
                 $this->session->set('username', $user->getUsername());
+                $this->session->set('user_id', $user->getId());
 
                 return new RedirectResponse($this->urlGenerator->generate('homepage'));
             } catch (BadCredentialsException $e) {
@@ -86,7 +78,31 @@ class UserController extends AbstractController
 
     public function profile()
     {
+        $profile = $this
+            ->userService
+            ->find($this->session->get('user_id'))
+            ->getProfile();
+
+        $profile->setTrackerPassword(null);
+
+        $formProfile = $this->formFactory->create(new Profile(), $profile);
+
+        return $this->twig->render('@user/profile.html.twig', [
+            'formProfile' => $formProfile->createView()
+        ]);
+    }
+
+    public function profileUpdate(Request $request)
+    {
         $formProfile = $this->formFactory->create(new Profile());
+        $formProfile->handleRequest($request);
+
+        if ($formProfile->isValid()) {
+            $this->userService->updateProfile($this->session->get('user_id'), $formProfile->getData());
+            $this->session->getFlashBag()->add('success', 'Profile successfully updated.');
+
+            return new RedirectResponse($this->urlGenerator->generate('user_profile'));
+        }
 
         return $this->twig->render('@user/profile.html.twig', [
             'formProfile' => $formProfile->createView()

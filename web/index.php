@@ -17,8 +17,7 @@ $bootstrap
         'user.controller' => [
             'class' => '\Martial\Warez\Front\Controller\UserController',
             'dependencies' => [
-                $app['user.service'],
-                $app['profile.service']
+                $app['user.service']
             ]
         ],
         'security.controller' => [
@@ -33,6 +32,10 @@ $app
 $app
     ->get('/user/profile', 'user.controller:profile')
     ->bind('user_profile');
+
+$app
+    ->post('/user/profile/update', 'user.controller:profileUpdate')
+    ->bind('user_profile_update');
 
 $app
     ->post('/login', 'user.controller:login')

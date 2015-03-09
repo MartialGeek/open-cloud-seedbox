@@ -96,9 +96,14 @@ class UserControllerTest extends ControllerTestCase
                     ->expects($this->once())
                     ->method('getUsername')
                     ->will($this->returnValue($username));
+                $user
+                    ->expects($this->once())
+                    ->method('getId')
+                    ->will($this->returnValue(123));
                 $this->sessionSet([
                     'connected' => true,
-                    'username' => $username
+                    'username' => $username,
+                    'user_id' => 123
                 ]);
                 $this->generateUrl('homepage', '/');
                 $this->authenticateByEmail($loginParameters, $this->returnValue($user));

@@ -3,7 +3,6 @@
 namespace Martial\Warez\Tests\User;
 
 use Doctrine\ORM\NoResultException;
-use Martial\Warez\Security\BadCredentialsException;
 use Martial\Warez\User\Entity\User;
 use Martial\Warez\User\UserService;
 
@@ -13,6 +12,7 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
     const USERNAME_ALREADY_EXISTS = 'username_already_exists';
     const BAD_CREDENTIALS = 'bad_credentials';
     const USER_NOT_FOUND = 'user_not_found';
+    const UPDATE_PROFILE_SAME_TRACKER_PASSWORD = 'update_profile_same_tracker_password';
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -33,6 +33,11 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     public $passwordHash;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    public $profileService;
 
     /**
      * @var UserService
@@ -94,18 +99,8 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
     public function testUpdateUserAccount()
     {
         $this->userEntity->setId(1234);
-
-        $this
-            ->em
-            ->expects($this->once())
-            ->method('persist')
-            ->with($this->equalTo($this->userEntity));
-
-        $this
-            ->em
-            ->expects($this->once())
-            ->method('flush');
-
+        $this->persist($this->userEntity);
+        $this->flush();
         $this->userService->updateAccount($this->userEntity);
     }
 
@@ -141,6 +136,16 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
     public function testFindUserShouldThrowAnExceptionWhenAUserWasNotFound()
     {
         $this->find([self::USER_NOT_FOUND]);
+    }
+
+    public function testUpdateProfile()
+    {
+        $this->updateProfile();
+    }
+
+    public function testUpdateProfileWithSameTrackerPassword()
+    {
+        $this->updateProfile([self::UPDATE_PROFILE_SAME_TRACKER_PASSWORD]);
     }
 
     protected function register(array $options = [])
@@ -241,6 +246,64 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    protected function updateProfile(array $options = [])
+    {
+        $currentTrackerPassword = 'trackerP@ssw0rd';
+        $updatedTrackerPassword = in_array(self::UPDATE_PROFILE_SAME_TRACKER_PASSWORD, $options) ?
+            $currentTrackerPassword :
+            'newTr@ckerP@ssw0rd';
+
+        $profile = $this
+            ->getMockBuilder('\Martial\Warez\User\Entity\Profile')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $currentProfile = $this
+            ->getMockBuilder('\Martial\Warez\User\Entity\Profile')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->userEntity->setId(123);
+        $this->userEntity->setProfile($currentProfile);
+
+        $this->getRepository($this->once());
+        $this
+            ->repo
+            ->expects($this->once())
+            ->method('find')
+            ->with($this->equalTo($this->userEntity->getId()))
+            ->will($this->returnValue($this->userEntity));
+
+        $profile
+            ->expects($this->once())
+            ->method('getTrackerPassword')
+            ->will($this->returnValue($updatedTrackerPassword));
+
+        $currentProfile
+            ->expects($this->once())
+            ->method('getTrackerPassword')
+            ->will($this->returnValue($currentTrackerPassword));
+
+        if (!in_array(self::UPDATE_PROFILE_SAME_TRACKER_PASSWORD, $options)) {
+            $currentProfile
+                ->expects($this->once())
+                ->method('setTrackerPassword')
+                ->with($this->equalTo($updatedTrackerPassword))
+                ->will($this->returnValue($currentProfile));
+
+            $this
+                ->profileService
+                ->expects($this->once())
+                ->method('encodeTrackerPassword')
+                ->with($this->equalTo($currentProfile));
+        }
+
+        $this->persist($currentProfile);
+        $this->flush();
+
+        $this->userService->updateProfile($this->userEntity->getId(), $profile);
+    }
+
     protected function getRepository(\PHPUnit_Framework_MockObject_Matcher_Invocation $numberOfCalls)
     {
         $this
@@ -249,6 +312,23 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->with($this->equalTo('\Martial\Warez\User\Entity\User'))
             ->will($this->returnValue($this->repo));
+    }
+
+    protected function persist($entity)
+    {
+        $this
+            ->em
+            ->expects($this->once())
+            ->method('persist')
+            ->with($this->equalTo($entity));
+    }
+
+    protected function flush()
+    {
+        $this
+            ->em
+            ->expects($this->once())
+            ->method('flush');
     }
 
     protected function setUp()
@@ -262,7 +342,13 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
 
         $this->repo = $this->getMock('\Martial\Warez\User\Repository\UserRepositoryInterface');
         $this->passwordHash = $this->getMock('\Martial\Warez\Security\PasswordHashInterface');
-        $this->userService = new UserService($this->em, $this->authenticationProvider, $this->passwordHash);
+        $this->profileService = $this->getMock('\Martial\Warez\User\ProfileServiceInterface');
+        $this->userService = new UserService(
+            $this->em,
+            $this->authenticationProvider,
+            $this->passwordHash,
+            $this->profileService
+        );
 
         $this->password = 'tot0Isth3Best';
         $this->hashedPassword = 'hashedpassword';

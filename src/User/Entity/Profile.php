@@ -5,6 +5,7 @@ namespace Martial\Warez\User\Entity;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
+use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\OneToOne;
@@ -17,6 +18,7 @@ use Doctrine\ORM\Mapping\Table;
  * @package Martial\Warez\User\Entity
  * @Entity
  * @Table(name="profile")
+ * @HasLifecycleCallbacks
  */
 class Profile
 {
