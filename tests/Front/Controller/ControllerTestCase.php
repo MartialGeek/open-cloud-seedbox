@@ -110,14 +110,15 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
      * Simulates a call to the method create of the form factory component.
      *
      * @param FormTypeInterface $formType
+     * @param mixed $data
      */
-    protected function createForm(FormTypeInterface $formType)
+    protected function createForm(FormTypeInterface $formType, $data = null)
     {
         $this
             ->formFactory
             ->expects($this->once())
             ->method('create')
-            ->with($this->equalTo($formType))
+            ->with($this->equalTo($formType), $this->equalTo($data))
             ->will($this->returnValue($this->form));
     }
 
@@ -195,20 +196,51 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
      */
     protected function sessionSet(array $keysAndValues)
     {
+        $this->session('set', $keysAndValues);
+    }
+
+    /**
+     * Simulates a data retrieving from the session.
+     *
+     * @param array $keysAndReturnedValues
+     */
+    protected function sessionGet(array $keysAndReturnedValues)
+    {
+        $this->session('get', $keysAndReturnedValues);
+    }
+
+    private function session($action, array $keysAndValues)
+    {
+        $supportedActions = ['get', 'set'];
+
+        if (!in_array($action, $supportedActions)) {
+            throw new \InvalidArgumentException('Unsupported session action "' . $action . '"');
+        }
+
         $params = [];
+        $returnedValues = [];
 
         foreach ($keysAndValues as $key => $value) {
-            $params[] = [$this->equalTo($key), $this->equalTo($value)];
+            if ('set' == $action) {
+                $params[] = [$this->equalTo($key), $this->equalTo($value)];
+            } else {
+                $params[] = [$this->equalTo($key)];
+                $returnedValues[] = $value;
+            }
         }
 
         $invocation = $this
             ->session
             ->expects($this->exactly(count($keysAndValues)))
-            ->method('set');
+            ->method($action);
 
         $invocation
             ->getMatcher()
             ->parametersMatcher = new \PHPUnit_Framework_MockObject_Matcher_ConsecutiveParameters($params);
+
+        if ('get' == $action) {
+            $invocation->will(new \PHPUnit_Framework_MockObject_Stub_ConsecutiveCalls($returnedValues));
+        }
     }
 
     /**
