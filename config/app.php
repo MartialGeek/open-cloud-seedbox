@@ -61,5 +61,8 @@ return [
             'password' => $parameters['security_encoder_password'],
             'salt' => $parameters['security_encoder_salt']
         ]
+    ],
+    'tracker' => [
+        'base_url' => 'https://api.t411.io'
     ]
 ];

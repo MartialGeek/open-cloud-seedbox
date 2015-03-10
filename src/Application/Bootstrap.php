@@ -135,9 +135,9 @@ class Bootstrap
             return EntityManager::create($this->config['doctrine']['dbal']['db.options'], $config);
         });
         
-        $app['t411.api.http_client'] = $app->share(function() {
+        $app['t411.api.http_client'] = $app->share(function() use ($config) {
             return new GuzzleClient([
-                'base_url' => 'https://api.t411.me'
+                'base_url' => $config['tracker']['base_url']
             ]);
         });
 
