@@ -56,7 +56,7 @@ interface UserServiceInterface
      *
      * @param int $userId
      * @param Profile $profile
-     * @return User
+     * @return Profile
      */
     public function updateProfile($userId, Profile $profile);
 }

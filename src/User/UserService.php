@@ -147,7 +147,7 @@ class UserService implements UserServiceInterface
      *
      * @param int $userId
      * @param Profile $profile
-     * @return User
+     * @return Profile
      */
     public function updateProfile($userId, Profile $profile)
     {
@@ -165,6 +165,8 @@ class UserService implements UserServiceInterface
 
         $this->em->persist($currentProfile);
         $this->em->flush();
+
+        return $profile;
     }
 
     /**
