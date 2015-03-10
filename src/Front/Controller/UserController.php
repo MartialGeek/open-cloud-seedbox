@@ -100,6 +100,7 @@ class UserController extends AbstractController
         if ($formProfile->isValid()) {
             $this->userService->updateProfile($this->session->get('user_id'), $formProfile->getData());
             $this->session->getFlashBag()->add('success', 'Profile successfully updated.');
+            $this->session->remove('api_token');
 
             return new RedirectResponse($this->urlGenerator->generate('user_profile'));
         }

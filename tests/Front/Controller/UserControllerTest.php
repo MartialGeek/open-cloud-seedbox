@@ -205,6 +205,7 @@ class UserControllerTest extends ControllerTestCase
             $this->formIsValid();
             $userId = 123;
             $this->sessionGet(['user_id' => $userId]);
+            $this->sessionRemove(['api_token']);
 
             $profile = $this
                 ->getMockBuilder('\Martial\Warez\User\Entity\Profile')

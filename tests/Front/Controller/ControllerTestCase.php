@@ -209,9 +209,19 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
         $this->session('get', $keysAndReturnedValues);
     }
 
+    /**
+     * Simulates a removing from the session.
+     *
+     * @param array $keys
+     */
+    protected function sessionRemove(array $keys)
+    {
+        $this->session('remove', $keys);
+    }
+
     private function session($action, array $keysAndValues)
     {
-        $supportedActions = ['get', 'set'];
+        $supportedActions = ['get', 'set', 'remove'];
 
         if (!in_array($action, $supportedActions)) {
             throw new \InvalidArgumentException('Unsupported session action "' . $action . '"');
@@ -223,6 +233,8 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
         foreach ($keysAndValues as $key => $value) {
             if ('set' == $action) {
                 $params[] = [$this->equalTo($key), $this->equalTo($value)];
+            } elseif ('remove' == $action) {
+                $params[] = [$this->equalTo($value)];
             } else {
                 $params[] = [$this->equalTo($key)];
                 $returnedValues[] = $value;
