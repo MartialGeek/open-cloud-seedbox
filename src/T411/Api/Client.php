@@ -112,6 +112,14 @@ class Client implements ClientInterface
      */
     public function search(TokenInterface $token, $query, $offset = null, $limit = null)
     {
+        if (!is_null($offset)) {
+            $query .= '&offset=' . $offset;
+        }
+
+        if (!is_null($limit)) {
+            $query .= '&limit=' . $limit;
+        }
+
         $response = $this->httpClient->get(
             '/torrents/search/' . $query,
             [

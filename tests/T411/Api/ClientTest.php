@@ -213,18 +213,20 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $token = $this->getMock('\Martial\Warez\T411\Api\Authentication\TokenInterface');
         $tokenStr = uniqid();
         $keyWord = 'avatar';
+        $offset = 2;
+        $limit = 20;
         $apiResponse = require __DIR__ . '/mockTorrentsResponse.php';
 
         $this->extractToken($token, $tokenStr);
-
-        $this->requestApi('get', '/torrents/search/' . $keyWord, $this->equalTo([
+        $query = $keyWord . '&offset=' . $offset . '&limit=' . $limit;
+        $this->requestApi('get', '/torrents/search/' . $query, $this->equalTo([
             'headers' => ['Authorization' => $tokenStr]
         ]));
 
         $this->decodeResponse($apiResponse);
         $transformedData = $this->getMock('\Martial\Warez\T411\Api\Torrent\TorrentSearchResultInterface');
         $this->transformData('extractTorrentsFromApiResponse', $apiResponse, $transformedData);
-        $torrentSearchResult = $this->client->search($token, $keyWord);
+        $torrentSearchResult = $this->client->search($token, $keyWord, $offset, $limit);
         $this->assertSame($transformedData, $torrentSearchResult);
     }
 
