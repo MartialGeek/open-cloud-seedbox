@@ -50,6 +50,7 @@ class DataTransformerTest extends \PHPUnit_Framework_TestCase
             $this->assertEmpty($torrentResult->getTorrents());
         } else {
             $torrentResult = $this->transformer->extractTorrentsFromApiResponse($apiResponse);
+            $this->assertNotEmpty($torrentResult->getTorrents());
             $this->assertContainsOnly(
                 '\Martial\Warez\T411\Api\Torrent\TorrentInterface',
                 $torrentResult->getTorrents()

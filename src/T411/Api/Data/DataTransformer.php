@@ -87,6 +87,8 @@ class DataTransformer implements DataTransformerInterface
             $torrent->setAdditionDate(new \DateTime($rawTorrentData['added']));
             $torrent->setSize($rawTorrentData['size']);
             $torrent->setTimesCompleted($rawTorrentData['times_completed']);
+
+            $torrents[] = $torrent;
         }
 
         $torrentSearchResult->setTorrents($torrents);
