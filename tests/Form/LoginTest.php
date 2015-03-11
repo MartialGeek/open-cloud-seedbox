@@ -3,18 +3,22 @@
 namespace Martial\Warez\Tests\Form;
 
 use Martial\Warez\Form\Login;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class LoginTest extends \PHPUnit_Framework_TestCase
+class LoginTest extends FormTestCase
 {
-    public function testLoginForm()
-    {
-        $formBuilder = $this->getMock('\Symfony\Component\Form\FormBuilderInterface');
-        $form = new Login();
+    /**
+     * @var Login
+     */
+    public $form;
 
-        $formBuilder
+    public function testBuildForm()
+    {
+        $this
+            ->formBuilder
             ->expects($this->exactly(2))
             ->method('add')
             ->withConsecutive(
@@ -35,9 +39,32 @@ class LoginTest extends \PHPUnit_Framework_TestCase
                     ]])
                 ]
             )
-            ->will($this->returnValue($formBuilder));
+            ->will($this->returnValue($this->formBuilder));
 
-        $form->buildForm($formBuilder, []);
-        $this->assertSame('login', $form->getName());
+        $this->getForm()->buildForm($this->formBuilder, []);
+    }
+
+    /**
+     * Returns the name of the form.
+     *
+     * @return string
+     */
+    protected function getFormName()
+    {
+        return 'login';
+    }
+
+    /**
+     * Returns an instance of your form.
+     *
+     * @return FormTypeInterface
+     */
+    protected function getForm()
+    {
+        if (is_null($this->form)) {
+            $this->form = new Login();
+        }
+
+        return $this->form;
     }
 }

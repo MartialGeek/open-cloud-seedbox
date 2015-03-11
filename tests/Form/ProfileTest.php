@@ -3,8 +3,9 @@
 namespace Martial\Warez\Tests\Form;
 
 use Martial\Warez\Form\Profile;
+use Symfony\Component\Form\FormTypeInterface;
 
-class ProfileTest extends \PHPUnit_Framework_TestCase
+class ProfileTest extends FormTestCase
 {
     /**
      * @var Profile
@@ -13,9 +14,8 @@ class ProfileTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildForm()
     {
-        $formBuilder = $this->getMock('\Symfony\Component\Form\FormBuilderInterface');
-
-        $formBuilder
+        $this
+            ->formBuilder
             ->expects($this->exactly(2))
             ->method('add')
             ->withConsecutive(
@@ -26,31 +26,44 @@ class ProfileTest extends \PHPUnit_Framework_TestCase
                     ])
                 ]
             )
-            ->will($this->returnValue($formBuilder));
+            ->will($this->returnValue($this->formBuilder));
 
-        $this->form->buildForm($formBuilder, []);
+        $this->getForm()->buildForm($this->formBuilder, []);
     }
 
     public function testDefaultOptions()
     {
-        $resolver = $this->getMock('\Symfony\Component\OptionsResolver\OptionsResolverInterface');
-
-        $resolver
+        $this
+            ->resolver
             ->expects($this->once())
             ->method('setDefaults')
             ->with($this->equalTo(['data_class' => '\Martial\Warez\User\Entity\Profile']))
-            ->will($this->returnValue($resolver));
+            ->will($this->returnValue($this->resolver));
 
-        $this->form->setDefaultOptions($resolver);
+        $this->getForm()->setDefaultOptions($this->resolver);
     }
 
-    public function testGetName()
+    /**
+     * Returns the name of the form.
+     *
+     * @return string
+     */
+    protected function getFormName()
     {
-        $this->assertSame('profile', $this->form->getName());
+        return 'profile';
     }
 
-    protected function setUp()
+    /**
+     * Returns an instance of your form.
+     *
+     * @return FormTypeInterface
+     */
+    protected function getForm()
     {
-        $this->form = new Profile();
+        if (is_null($this->form)) {
+            $this->form = new Profile();
+        }
+
+        return $this->form;
     }
 }
