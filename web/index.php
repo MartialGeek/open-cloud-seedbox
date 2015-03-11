@@ -22,6 +22,14 @@ $bootstrap
         ],
         'security.controller' => [
             'class' => '\Martial\Warez\Front\Controller\SecurityController'
+        ],
+        'tracker.controller' => [
+            'class' => '\Martial\Warez\Front\Controller\TrackerController',
+            'dependencies' => [
+                $app['t411.api.client'],
+                $app['user.service'],
+                $app['profile.service']
+            ]
         ]
     ]);
 
@@ -48,5 +56,9 @@ $app
 $app
     ->get('/logout', 'user.controller:logout')
     ->bind('logout');
+
+$app
+    ->get('/tracker/search', 'tracker.controller:search')
+    ->bind('tracker_search');
 
 $app->run();
