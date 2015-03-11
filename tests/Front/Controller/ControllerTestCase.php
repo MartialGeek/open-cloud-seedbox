@@ -45,6 +45,16 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
+    public $requestParameterBag;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    public $queryParameterBag;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     public $flashBag;
 
     /**
@@ -70,14 +80,16 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('\Symfony\Component\HttpFoundation\Request')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->request->request = $this
+        $this->requestParameterBag = $this
             ->getMockBuilder('\Symfony\Component\HttpFoundation\ParameterBag')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->request->query = $this
+        $this->queryParameterBag = $this
             ->getMockBuilder('\Symfony\Component\HttpFoundation\ParameterBag')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->request->request = $this->requestParameterBag;
+        $this->request->query = $this->queryParameterBag;
         $this->flashBag = $this->getMock('\Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface');
         $this->createController();
     }
@@ -111,14 +123,15 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
      *
      * @param FormTypeInterface $formType
      * @param mixed $data
+     * @param array $options
      */
-    protected function createForm(FormTypeInterface $formType, $data = null)
+    protected function createForm(FormTypeInterface $formType, $data = null, $options = [])
     {
         $this
             ->formFactory
             ->expects($this->once())
             ->method('create')
-            ->with($this->equalTo($formType), $this->equalTo($data))
+            ->with($this->equalTo($formType), $this->equalTo($data), $this->equalTo($options))
             ->will($this->returnValue($this->form));
     }
 
@@ -176,9 +189,7 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
         $args = [$this->equalTo($templatePath)];
 
         if (!empty($viewArgs)) {
-            foreach ($viewArgs as $key => $value) {
-                $args[] = $this->equalTo([$key => $value]);
-            }
+            $args[] = $this->equalTo($viewArgs);
         }
 
         $invocation = $this
@@ -219,9 +230,19 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
         $this->session('remove', $keys);
     }
 
+    /**
+     * Simulates a call to know if a key is defined in the session.
+     *
+     * @param array $keysAndReturnedValues
+     */
+    protected function sessionHas(array $keysAndReturnedValues)
+    {
+        $this->session('has', $keysAndReturnedValues);
+    }
+
     private function session($action, array $keysAndValues)
     {
-        $supportedActions = ['get', 'set', 'remove'];
+        $supportedActions = ['get', 'set', 'remove', 'has'];
 
         if (!in_array($action, $supportedActions)) {
             throw new \InvalidArgumentException('Unsupported session action "' . $action . '"');
@@ -250,7 +271,7 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
             ->getMatcher()
             ->parametersMatcher = new \PHPUnit_Framework_MockObject_Matcher_ConsecutiveParameters($params);
 
-        if ('get' == $action) {
+        if ('get' == $action || 'has' == $action) {
             $invocation->will(new \PHPUnit_Framework_MockObject_Stub_ConsecutiveCalls($returnedValues));
         }
     }
@@ -294,6 +315,7 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * Simulates a value retrieved via the request parameters bag of the Request component.
+     *
      * @param $param
      * @param $result
      * @param null $default
@@ -301,8 +323,7 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
     protected function getRequestParameter($param, $result, $default = null)
     {
         $this
-            ->request
-            ->request
+            ->requestParameterBag
             ->expects($this->any())
             ->method('get')
             ->with($this->equalTo($param), $this->equalTo($default))
@@ -311,6 +332,7 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * Simulates a value retrieved via the request parameters bag of the Request component.
+     *
      * @param $param
      * @param $result
      * @param null $default
@@ -318,12 +340,27 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
     protected function getQueryParameter($param, $result, $default = null)
     {
         $this
-            ->request
-            ->query
+            ->queryParameterBag
             ->expects($this->any())
             ->method('get')
             ->with($this->equalTo($param), $this->equalTo($default))
             ->will($this->returnValue($result));
+    }
+
+    /**
+     * Simulates a call to know if a query parameter is defined in the request.
+     *
+     * @param string $param
+     * @param bool $isDefined
+     */
+    protected function hasQueryParameter($param, $isDefined = true)
+    {
+        $this
+            ->queryParameterBag
+            ->expects($this->any())
+            ->method('has')
+            ->with($this->equalTo($param))
+            ->will($this->returnValue($isDefined));
     }
 
     /**
