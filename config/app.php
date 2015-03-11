@@ -29,6 +29,9 @@ return [
             ],
             'form' => [
                 __DIR__ . '/../src/Front/View/Form'
+            ],
+            'tracker' => [
+                __DIR__  . '/../src/Front/View/Tracker'
             ]
         ]
     ],

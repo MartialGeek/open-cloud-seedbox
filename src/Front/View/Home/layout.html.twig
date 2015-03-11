@@ -21,17 +21,23 @@
             <!-- Right Nav Section -->
             <ul class="right">
                 {% if app.session.get('connected') %}
-                <li class="has-dropdown">
-                    <a id="profile-status" href="">{{ app.session.get('username') }}</a>
-                    <ul class="dropdown">
-                        <li><a href="{{ path('user_profile') }}">Profile</a></li>
-                        <li><a href="{{ path('logout') }}">Logout</a></li>
-                    </ul>
-                </li>
+                    {%  set currentPage = app.request.attributes.get('_route') %}
+                    <li{% if currentPage == 'tracker_search' %} class="active"{% endif %}>
+                        <a href="{{ path('tracker_search') }}">Search torrents</a>
+                    </li>
+                    <li class="has-dropdown">
+                        <a id="profile-status" href="{{ path('user_profile') }}">{{ app.session.get('username') }}</a>
+                        <ul class="dropdown">
+                            <li{% if currentPage == 'user_profile' %} class="active"{% endif %}>
+                                <a href="{{ path('user_profile') }}">Profile</a>
+                            </li>
+                            <li><a href="{{ path('logout') }}">Logout</a></li>
+                        </ul>
+                    </li>
                 {% else %}
-                <li class="has-form">
-                    {{ render(url('form_login')) }}
-                </li>
+                    <li class="has-form">
+                        {{ render(url('form_login')) }}
+                    </li>
                 {% endif %}
             </ul>
         </section>

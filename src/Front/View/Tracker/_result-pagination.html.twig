@@ -1,0 +1,35 @@
+{% set currentPage = offset + 1 %}
+{% set numberOfPages = (total / limit)|round(0, 'floor') %}
+
+<div class="row">
+    <div class="pagination-centered">
+        <ul class="pagination">
+            <li class="arrow{% if currentPage == 1 %} unavailable"{% endif %}>
+                <a href="{{ path('tracker_search', {
+                    'tracker_search': query,
+                    'offset': 0,
+                    'limit': limit
+                }) }}">&laquo;
+                </a>
+            </li>
+            {% for i in 1..numberOfPages %}
+                <li{% if i == currentPage %} class="current"{% endif %}>
+                    <a href="{{ path('tracker_search', {
+                        'tracker_search': query,
+                        'offset': i - 1,
+                        'limit': limit
+                    }) }}">{{ i }}
+                    </a>
+                </li>
+            {% endfor %}
+            <li class="arrow{% if currentPage == numberOfPages %} unavailable"{% endif %}">
+                <a href="{{ path('tracker_search', {
+                    'tracker_search': query,
+                    'offset': numberOfPages - 1,
+                    'limit': limit
+                }) }}">&raquo;
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
