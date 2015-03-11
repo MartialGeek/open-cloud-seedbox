@@ -240,42 +240,6 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
         $this->session('has', $keysAndReturnedValues);
     }
 
-    private function session($action, array $keysAndValues)
-    {
-        $supportedActions = ['get', 'set', 'remove', 'has'];
-
-        if (!in_array($action, $supportedActions)) {
-            throw new \InvalidArgumentException('Unsupported session action "' . $action . '"');
-        }
-
-        $params = [];
-        $returnedValues = [];
-
-        foreach ($keysAndValues as $key => $value) {
-            if ('set' == $action) {
-                $params[] = [$this->equalTo($key), $this->equalTo($value)];
-            } elseif ('remove' == $action) {
-                $params[] = [$this->equalTo($value)];
-            } else {
-                $params[] = [$this->equalTo($key)];
-                $returnedValues[] = $value;
-            }
-        }
-
-        $invocation = $this
-            ->session
-            ->expects($this->exactly(count($keysAndValues)))
-            ->method($action);
-
-        $invocation
-            ->getMatcher()
-            ->parametersMatcher = new \PHPUnit_Framework_MockObject_Matcher_ConsecutiveParameters($params);
-
-        if ('get' == $action || 'has' == $action) {
-            $invocation->will(new \PHPUnit_Framework_MockObject_Stub_ConsecutiveCalls($returnedValues));
-        }
-    }
-
     /**
      * Simulates a new flash message.
      *
@@ -375,5 +339,47 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('isValid')
             ->will($this->returnValue($valid));
+    }
+
+    /**
+     * Drives the session behavior.
+     *
+     * @param string $action
+     * @param array $keysAndValues
+     */
+    private function session($action, array $keysAndValues)
+    {
+        $supportedActions = ['get', 'set', 'remove', 'has'];
+
+        if (!in_array($action, $supportedActions)) {
+            throw new \InvalidArgumentException('Unsupported session action "' . $action . '"');
+        }
+
+        $params = [];
+        $returnedValues = [];
+
+        foreach ($keysAndValues as $key => $value) {
+            if ('set' == $action) {
+                $params[] = [$this->equalTo($key), $this->equalTo($value)];
+            } elseif ('remove' == $action) {
+                $params[] = [$this->equalTo($value)];
+            } else {
+                $params[] = [$this->equalTo($key)];
+                $returnedValues[] = $value;
+            }
+        }
+
+        $invocation = $this
+            ->session
+            ->expects($this->exactly(count($keysAndValues)))
+            ->method($action);
+
+        $invocation
+            ->getMatcher()
+            ->parametersMatcher = new \PHPUnit_Framework_MockObject_Matcher_ConsecutiveParameters($params);
+
+        if ('get' == $action || 'has' == $action) {
+            $invocation->will(new \PHPUnit_Framework_MockObject_Stub_ConsecutiveCalls($returnedValues));
+        }
     }
 }
