@@ -26,6 +26,7 @@ use Silex\Provider\TranslationServiceProvider;
 use Silex\Provider\TwigServiceProvider;
 use Silex\Provider\UrlGeneratorServiceProvider;
 use Silex\Provider\ValidatorServiceProvider;
+use Symfony\Component\Filesystem\Filesystem;
 
 class Bootstrap
 {
@@ -134,6 +135,10 @@ class Bootstrap
 
             return EntityManager::create($this->config['doctrine']['dbal']['db.options'], $config);
         });
+
+        $app['filesystem'] = $app->share(function() {
+            return new Filesystem();
+        });
         
         $app['t411.api.http_client'] = $app->share(function() use ($config) {
             return new GuzzleClient([
@@ -145,10 +150,12 @@ class Bootstrap
             return new DataTransformer();
         });
 
-        $app['t411.api.client'] = $app->share(function() use ($app) {
+        $app['t411.api.client'] = $app->share(function() use ($app, $config) {
             return new Client(
                 $app['t411.api.http_client'],
-                $app['t411.api.data.data_transformer']
+                $app['t411.api.data.data_transformer'],
+                $app['filesystem'],
+                $config['tracker']['client']
             );
         });
 

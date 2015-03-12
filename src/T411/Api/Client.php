@@ -14,6 +14,8 @@ use Martial\Warez\T411\Api\Authentication\WrongPasswordException;
 use Martial\Warez\T411\Api\Category\CategoryInterface;
 use Martial\Warez\T411\Api\Data\DataTransformerInterface;
 use Martial\Warez\T411\Api\Torrent\TorrentSearchResultInterface;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\File;
 
 class Client implements ClientInterface
 {
@@ -27,10 +29,32 @@ class Client implements ClientInterface
      */
     private $dataTransformer;
 
-    public function __construct(HttpClientInterface $httpClient, DataTransformerInterface $dataTransformer)
-    {
+    /**
+     * @var Filesystem
+     */
+    private $fs;
+
+    /**
+     * @var array
+     */
+    private $config;
+
+    /**
+     * @param HttpClientInterface $httpClient
+     * @param DataTransformerInterface $dataTransformer
+     * @param Filesystem $fs
+     * @param array $config
+     */
+    public function __construct(
+        HttpClientInterface $httpClient,
+        DataTransformerInterface $dataTransformer,
+        Filesystem $fs,
+        array $config
+    ) {
         $this->httpClient = $httpClient;
         $this->dataTransformer = $dataTransformer;
+        $this->fs = $fs;
+        $this->config = $config;
     }
 
     /**
@@ -128,5 +152,27 @@ class Client implements ClientInterface
         )->json();
 
         return $this->dataTransformer->extractTorrentsFromApiResponse($response);
+    }
+
+    /**
+     * Downloads a torrent file.
+     *
+     * @param TokenInterface $token
+     * @param int $torrentId
+     * @return File
+     */
+    public function download(TokenInterface $token, $torrentId)
+    {
+        $response = $this->httpClient->get(
+            '/torrents/download/' . $torrentId,
+            [
+                'headers' => ['Authorization' => $token->getToken()]
+            ]
+        );
+
+        $filename = $this->config['torrent_files_path'] . '/' . uniqid() . '.torrent';
+        $this->fs->dumpFile($filename, $response, 0660);
+
+        return new File($filename, false);
     }
 }

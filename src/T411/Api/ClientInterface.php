@@ -11,6 +11,7 @@ use Martial\Warez\T411\Api\Authentication\UserNotFoundException;
 use Martial\Warez\T411\Api\Authentication\WrongPasswordException;
 use Martial\Warez\T411\Api\Category\CategoryInterface;
 use Martial\Warez\T411\Api\Torrent\TorrentInterface;
+use Symfony\Component\HttpFoundation\File\File;
 
 interface ClientInterface
 {
@@ -47,4 +48,13 @@ interface ClientInterface
      * @return TorrentInterface[]
      */
     public function search(TokenInterface $token, $query, $offset = null, $limit = null);
+
+    /**
+     * Downloads a torrent file.
+     *
+     * @param TokenInterface $token
+     * @param int $torrentId
+     * @return File
+     */
+    public function download(TokenInterface $token, $torrentId);
 }

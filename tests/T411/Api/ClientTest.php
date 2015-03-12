@@ -32,6 +32,16 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     public $apiResponse;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    public $fs;
+
+    /**
+     * @var array
+     */
+    public $config;
+
+    /**
      * @var Client
      */
     public $client;
@@ -115,12 +125,19 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->search();
     }
 
+    public function testDownloadShouldReturnAFile()
+    {
+        $this->download();
+    }
+
     protected function setUp()
     {
         $this->httpClient = $this->getMock('\GuzzleHttp\ClientInterface');
         $this->apiResponse = $this->getMock('\GuzzleHttp\Message\ResponseInterface');
         $this->dataTransformer = $this->getMock('\Martial\Warez\T411\Api\Data\DataTransformerInterface');
-        $this->client = new Client($this->httpClient, $this->dataTransformer);
+        $this->fs = $this->getMock('\Symfony\Component\Filesystem\Filesystem');
+        $this->config = ['torrent_files_path' => '/path/to/torrents'];
+        $this->client = new Client($this->httpClient, $this->dataTransformer, $this->fs, $this->config);
     }
 
     /**
@@ -188,7 +205,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
      */
     protected function getCategories()
     {
-        $token = $this->getMock('\Martial\Warez\T411\Api\Authentication\TokenInterface');
+        $token = $this->getToken();
         $tokenStr = uniqid();
         $apiResponse = include __DIR__ . '/mockCategoriesResponse.php';
 
@@ -210,7 +227,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     protected function search()
     {
-        $token = $this->getMock('\Martial\Warez\T411\Api\Authentication\TokenInterface');
+        $token = $this->getToken();
         $tokenStr = uniqid();
         $keyWord = 'avatar';
         $offset = 2;
@@ -228,6 +245,31 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->transformData('extractTorrentsFromApiResponse', $apiResponse, $transformedData);
         $torrentSearchResult = $this->client->search($token, $keyWord, $offset, $limit);
         $this->assertSame($transformedData, $torrentSearchResult);
+    }
+
+    protected function download()
+    {
+        $torrentId = 23456;
+        $token = $this->getToken();
+        $tokenStr = uniqid();
+
+        $this->extractToken($token, $tokenStr);
+        $this->requestApi('get', '/torrents/download/' . $torrentId, $this->equalTo([
+            'headers' => ['Authorization' => $tokenStr]
+        ]));
+
+        $this
+            ->fs
+            ->expects($this->once())
+            ->method('dumpFile')
+            ->with(
+                $this->stringStartsWith($this->config['torrent_files_path']),
+                $this->equalTo($this->apiResponse),
+                $this->equalTo(0660)
+            );
+
+        $torrent = $this->client->download($token, $torrentId);
+        $this->assertInstanceOf('\Symfony\Component\HttpFoundation\File\File', $torrent);
     }
 
     /**
@@ -289,5 +331,13 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             ->method($method)
             ->with($this->equalTo($apiResponse))
             ->will($this->returnValue($returnedValue));
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function getToken()
+    {
+        return $this->getMock('\Martial\Warez\T411\Api\Authentication\TokenInterface');
     }
 }

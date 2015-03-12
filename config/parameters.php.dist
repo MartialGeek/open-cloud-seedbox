@@ -8,4 +8,5 @@ return [
     'doctrine_password' => '',
     'security_encoder_password' => '',
     'security_encoder_salt' => '',
+    'torrent_files_path' => '/home/warez/torrents'
 ];
