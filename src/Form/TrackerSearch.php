@@ -29,8 +29,8 @@ class TrackerSearch extends AbstractType
         }
 
         $builder
-            ->add('query', 'text')
-            ->add('category', 'choice', [
+            ->add('terms', 'text')
+            ->add('category_id', 'choice', [
                 'choices' => $categories
             ]);
     }

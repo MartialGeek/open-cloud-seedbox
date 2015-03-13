@@ -63,10 +63,9 @@ class TrackerController extends AbstractController
         if ($request->query->has('tracker_search')) {
             $queryParameterSearch = $request->query->get('tracker_search');
             $searchForm->setData($queryParameterSearch);
-            $query = $queryParameterSearch['query'] . '&cid=' . $queryParameterSearch['category'];
-            $offset = $request->query->get('offset', 0);
-            $limit = $request->query->get('limit', 20);
-            $result = $this->client->search($token, $query, $offset, $limit);
+            $queryParameterSearch['offset'] = $request->query->get('offset', 0);
+            $queryParameterSearch['limit'] = $request->query->get('limit', 20);
+            $result = $this->client->search($token, $queryParameterSearch);
         }
 
         return $this->twig->render('@tracker/search.html.twig', [

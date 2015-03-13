@@ -13,6 +13,7 @@ use Martial\Warez\T411\Api\Authentication\UserNotFoundException;
 use Martial\Warez\T411\Api\Authentication\WrongPasswordException;
 use Martial\Warez\T411\Api\Category\CategoryInterface;
 use Martial\Warez\T411\Api\Data\DataTransformerInterface;
+use Martial\Warez\T411\Api\Search\QueryFactoryInterface;
 use Martial\Warez\T411\Api\Torrent\TorrentSearchResultInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
@@ -35,6 +36,11 @@ class Client implements ClientInterface
     private $fs;
 
     /**
+     * @var QueryFactoryInterface
+     */
+    private $queryFactory;
+
+    /**
      * @var array
      */
     private $config;
@@ -43,17 +49,20 @@ class Client implements ClientInterface
      * @param HttpClientInterface $httpClient
      * @param DataTransformerInterface $dataTransformer
      * @param Filesystem $fs
+     * @param QueryFactoryInterface $queryFactory
      * @param array $config
      */
     public function __construct(
         HttpClientInterface $httpClient,
         DataTransformerInterface $dataTransformer,
         Filesystem $fs,
+        QueryFactoryInterface $queryFactory,
         array $config
     ) {
         $this->httpClient = $httpClient;
         $this->dataTransformer = $dataTransformer;
         $this->fs = $fs;
+        $this->queryFactory = $queryFactory;
         $this->config = $config;
     }
 
@@ -126,26 +135,24 @@ class Client implements ClientInterface
     }
 
     /**
-     * Retrieves a list of torrents matching the searched query.
+     * Retrieves a list of torrents matching the query parameters. Supported parameters are:
+     * <ul>
+     * <li>terms</li>
+     * <li>category_id</li>
+     * <li>offset</li>
+     * <li>limit</li>
+     * </ul>
      *
      * @param TokenInterface $token
-     * @param string $query
-     * @param int $offset
-     * @param int $limit
-     * @return TorrentSearchResultInterface
+     * @param array $queryParams
+     * @return TorrentSearchResultInterface[]
      */
-    public function search(TokenInterface $token, $query, $offset = null, $limit = null)
+    public function search(TokenInterface $token, array $queryParams)
     {
-        if (!is_null($offset)) {
-            $query .= '&offset=' . $offset;
-        }
-
-        if (!is_null($limit)) {
-            $query .= '&limit=' . $limit;
-        }
+        $query = $this->queryFactory->create($queryParams);
 
         $response = $this->httpClient->get(
-            '/torrents/search/' . $query,
+            '/torrents/search/' . $query->build(),
             [
                 'headers' => ['Authorization' => $token->getToken()]
             ]

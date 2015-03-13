@@ -10,7 +10,8 @@ use Martial\Warez\T411\Api\Authentication\TokenInterface;
 use Martial\Warez\T411\Api\Authentication\UserNotFoundException;
 use Martial\Warez\T411\Api\Authentication\WrongPasswordException;
 use Martial\Warez\T411\Api\Category\CategoryInterface;
-use Martial\Warez\T411\Api\Torrent\TorrentInterface;
+use Martial\Warez\T411\Api\Search\QueryInterface;
+use Martial\Warez\T411\Api\Torrent\TorrentSearchResultInterface;
 use Symfony\Component\HttpFoundation\File\File;
 
 interface ClientInterface
@@ -39,15 +40,19 @@ interface ClientInterface
     public function getCategories(TokenInterface $token);
 
     /**
-     * Retrieves a list of torrents matching the searched query.
+     * Retrieves a list of torrents matching the query parameters. Supported parameters are:
+     * <ul>
+     * <li>terms</li>
+     * <li>category_id</li>
+     * <li>offset</li>
+     * <li>limit</li>
+     * </ul>
      *
      * @param TokenInterface $token
-     * @param string $query
-     * @param int $offset
-     * @param int $limit
-     * @return TorrentInterface[]
+     * @param array $queryParams
+     * @return TorrentSearchResultInterface[]
      */
-    public function search(TokenInterface $token, $query, $offset = null, $limit = null);
+    public function search(TokenInterface $token, array $queryParams);
 
     /**
      * Downloads a torrent file.

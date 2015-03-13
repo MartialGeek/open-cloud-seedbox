@@ -14,6 +14,7 @@ use Martial\Warez\Security\Firewall;
 use Martial\Warez\Security\OpenSSLEncoder;
 use Martial\Warez\T411\Api\Client;
 use Martial\Warez\T411\Api\Data\DataTransformer;
+use Martial\Warez\T411\Api\Search\QueryFactory;
 use Martial\Warez\User\ProfileService;
 use Martial\Warez\User\UserService;
 use Silex\Application;
@@ -150,11 +151,16 @@ class Bootstrap
             return new DataTransformer();
         });
 
+        $app['t411.api.query_factory'] = $app->share(function() {
+            return new QueryFactory();
+        });
+
         $app['t411.api.client'] = $app->share(function() use ($app, $config) {
             return new Client(
                 $app['t411.api.http_client'],
                 $app['t411.api.data.data_transformer'],
                 $app['filesystem'],
+                $app['t411.api.query_factory'],
                 $config['tracker']['client']
             );
         });

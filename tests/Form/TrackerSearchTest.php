@@ -47,8 +47,8 @@ class TrackerSearchTest extends FormTestCase
             ->expects($this->exactly(2))
             ->method('add')
             ->withConsecutive(
-                [$this->equalTo('query'), $this->equalTo('text')],
-                [$this->equalTo('category'), $this->equalTo('choice'), $this->equalTo([
+                [$this->equalTo('terms'), $this->equalTo('text')],
+                [$this->equalTo('category_id'), $this->equalTo('choice'), $this->equalTo([
                     'choices' => $categories
                 ])]
             )

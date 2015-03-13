@@ -37,6 +37,11 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     public $fs;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    public $queryFactory;
+
+    /**
      * @var array
      */
     public $config;
@@ -136,8 +141,15 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->apiResponse = $this->getMock('\GuzzleHttp\Message\ResponseInterface');
         $this->dataTransformer = $this->getMock('\Martial\Warez\T411\Api\Data\DataTransformerInterface');
         $this->fs = $this->getMock('\Symfony\Component\Filesystem\Filesystem');
+        $this->queryFactory = $this->getMock('\Martial\Warez\T411\Api\Search\QueryFactoryInterface');
         $this->config = ['torrent_files_path' => '/path/to/torrents'];
-        $this->client = new Client($this->httpClient, $this->dataTransformer, $this->fs, $this->config);
+        $this->client = new Client(
+            $this->httpClient,
+            $this->dataTransformer,
+            $this->fs,
+            $this->queryFactory,
+            $this->config
+        );
     }
 
     /**
@@ -229,21 +241,41 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     {
         $token = $this->getToken();
         $tokenStr = uniqid();
-        $keyWord = 'avatar';
-        $offset = 2;
-        $limit = 20;
         $apiResponse = require __DIR__ . '/mockTorrentsResponse.php';
 
+        $params = [
+            'terms' => 'What an awesome movie!',
+            'category_id' => 12,
+            'offset' => 2,
+            'limit' => 20
+        ];
+
+        $query = $this->getMock('\Martial\Warez\T411\Api\Search\QueryInterface');
+        $queryString = urlencode(strtolower($params['terms'])) .
+            '&offset=' . $params['offset'] . '&limit=' . $params['limit'];
+
+        $this
+            ->queryFactory
+            ->expects($this->once())
+            ->method('create')
+            ->with($this->equalTo($params))
+            ->willReturn($query);
+
+        $query
+            ->expects($this->once())
+            ->method('build')
+            ->willReturn($queryString);
+
         $this->extractToken($token, $tokenStr);
-        $query = $keyWord . '&offset=' . $offset . '&limit=' . $limit;
-        $this->requestApi('get', '/torrents/search/' . $query, $this->equalTo([
+
+        $this->requestApi('get', '/torrents/search/' . $queryString, $this->equalTo([
             'headers' => ['Authorization' => $tokenStr]
         ]));
 
         $this->decodeResponse($apiResponse);
         $transformedData = $this->getMock('\Martial\Warez\T411\Api\Torrent\TorrentSearchResultInterface');
         $this->transformData('extractTorrentsFromApiResponse', $apiResponse, $transformedData);
-        $torrentSearchResult = $this->client->search($token, $keyWord, $offset, $limit);
+        $torrentSearchResult = $this->client->search($token, $params);
         $this->assertSame($transformedData, $torrentSearchResult);
     }
 

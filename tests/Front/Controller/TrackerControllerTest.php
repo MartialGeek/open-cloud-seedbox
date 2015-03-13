@@ -91,13 +91,20 @@ class TrackerControllerTest extends ControllerTestCase
         $this->createFormView();
 
         if ($options['has_search']) {
-            $queryParameterSearch = [
-                'query' => 'avatar',
-                'category' => 631
-            ];
-
             $offset = 0;
             $limit = 20;
+
+            $apiSearch = [
+                'terms' => 'avatar',
+                'category_id' => 631,
+                'offset' => $offset,
+                'limit' => $limit
+            ];
+
+            $getParameters = [
+                'terms' => $apiSearch['terms'],
+                'category_id' => $apiSearch['category_id']
+            ];
 
             $this
                 ->queryParameterBag
@@ -108,15 +115,16 @@ class TrackerControllerTest extends ControllerTestCase
                     [$this->equalTo('offset')],
                     [$this->equalTo('limit')]
                 )
-                ->willReturnOnConsecutiveCalls($queryParameterSearch, $offset, $limit);
+                ->willReturnOnConsecutiveCalls($getParameters, $offset, $limit);
 
             $this
                 ->form
                 ->expects($this->once())
                 ->method('setData')
-                ->with($this->equalTo($queryParameterSearch));
-
-            $query = $queryParameterSearch['query'] . '&cid=' . $queryParameterSearch['category'];
+                ->with($this->equalTo([
+                    'terms' => $apiSearch['terms'],
+                    'category_id' => $apiSearch['category_id']
+                ]));
 
             $this
                 ->client
@@ -124,9 +132,7 @@ class TrackerControllerTest extends ControllerTestCase
                 ->method('search')
                 ->with(
                     $this->equalTo($this->trackerToken),
-                    $this->equalTo($query),
-                    $this->equalTo($offset),
-                    $this->equalTo($limit)
+                    $this->equalTo($apiSearch)
                 )
                 ->willReturn($trackerResult);
         }
