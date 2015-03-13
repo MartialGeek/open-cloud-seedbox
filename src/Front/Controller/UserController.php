@@ -78,13 +78,8 @@ class UserController extends AbstractController
 
     public function profile()
     {
-        $profile = $this
-            ->userService
-            ->find($this->session->get('user_id'))
-            ->getProfile();
-
+        $profile = $this->userService->getProfile($this->session->get('user_id'));
         $profile->setTrackerPassword(null);
-
         $formProfile = $this->formFactory->create(new Profile(), $profile);
 
         return $this->twig->render('@user/profile.html.twig', [

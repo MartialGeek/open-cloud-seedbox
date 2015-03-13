@@ -162,9 +162,29 @@ class UserService implements UserServiceInterface
         }
 
         $currentProfile->setTrackerUsername($profile->getTrackerUsername());
+        $currentProfile->setUser($user);
 
         $this->em->persist($currentProfile);
         $this->em->flush();
+
+        return $profile;
+    }
+
+    /**
+     * Retrieves the profile of a user.
+     *
+     * @param int $userId
+     * @return Profile
+     */
+    public function getProfile($userId)
+    {
+        $user = $this->find($userId);
+        $profile = $user->getProfile();
+
+        if (is_null($profile)) {
+            $profile = new Profile();
+            $profile->setUser($user);
+        }
 
         return $profile;
     }

@@ -80,14 +80,8 @@ class UserControllerTest extends ControllerTestCase
         $this
             ->userService
             ->expects($this->once())
-            ->method('find')
-            ->with($this->equalTo($userId))
-            ->will($this->returnValue($this->user));
-
-        $this
-            ->user
-            ->expects($this->once())
             ->method('getProfile')
+            ->with($this->equalTo($userId))
             ->will($this->returnValue($profile));
 
         $profile

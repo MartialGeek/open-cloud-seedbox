@@ -148,6 +148,11 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
         $this->updateProfile([self::UPDATE_PROFILE_SAME_TRACKER_PASSWORD]);
     }
 
+    public function testGetProfile()
+    {
+        $this->getProfile();
+    }
+
     protected function register(array $options = [])
     {
         $this->getRepository($this->any());
@@ -229,16 +234,7 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
     protected function find(array $options = [])
     {
         $findResult = in_array(self::USER_NOT_FOUND, $options) ? null : $this->userEntity;
-
-        $this->getRepository($this->once());
-
-        $this
-            ->repo
-            ->expects($this->once())
-            ->method('find')
-            ->with($this->equalTo($this->userEntity->getId()))
-            ->will($this->returnValue($findResult));
-
+        $this->findUserFromRepo($findResult);
         $user = $this->userService->find($this->userEntity->getId());
 
         if (!in_array(self::USER_NOT_FOUND, $options)) {
@@ -317,6 +313,13 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
         $this->userService->updateProfile($this->userEntity->getId(), $profile);
     }
 
+    protected function getProfile()
+    {
+        $this->findUserFromRepo($this->userEntity);
+        $profile = $this->userService->getProfile($this->userEntity->getId());
+        $this->assertInstanceOf('\Martial\Warez\User\Entity\Profile', $profile);
+    }
+
     protected function getRepository(\PHPUnit_Framework_MockObject_Matcher_Invocation $numberOfCalls)
     {
         $this
@@ -325,6 +328,18 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->with($this->equalTo('\Martial\Warez\User\Entity\User'))
             ->will($this->returnValue($this->repo));
+    }
+
+    protected function findUserFromRepo($result)
+    {
+        $this->getRepository($this->once());
+
+        $this
+            ->repo
+            ->expects($this->once())
+            ->method('find')
+            ->with($this->equalTo($this->userEntity->getId()))
+            ->will($this->returnValue($result));
     }
 
     protected function persist($entity)

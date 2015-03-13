@@ -59,4 +59,12 @@ interface UserServiceInterface
      * @return Profile
      */
     public function updateProfile($userId, Profile $profile);
+
+    /**
+     * Retrieves the profile of a user.
+     *
+     * @param int $userId
+     * @return Profile
+     */
+    public function getProfile($userId);
 }
