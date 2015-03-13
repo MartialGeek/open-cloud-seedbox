@@ -9,29 +9,28 @@ $config = require __DIR__ . '/../config/app.php';
 $app = new Application();
 $bootstrap = new Bootstrap($app, $config, 'dev');
 
-$bootstrap
-    ->registerControllers([
-        'home.controller' => [
-            'class' => '\Martial\Warez\Front\Controller\HomeController'
-        ],
-        'user.controller' => [
-            'class' => '\Martial\Warez\Front\Controller\UserController',
-            'dependencies' => [
-                $app['user.service']
-            ]
-        ],
-        'security.controller' => [
-            'class' => '\Martial\Warez\Front\Controller\SecurityController'
-        ],
-        'tracker.controller' => [
-            'class' => '\Martial\Warez\Front\Controller\TrackerController',
-            'dependencies' => [
-                $app['t411.api.client'],
-                $app['user.service'],
-                $app['profile.service']
-            ]
+$bootstrap->registerControllers([
+    'home.controller' => [
+        'class' => '\Martial\Warez\Front\Controller\HomeController'
+    ],
+    'user.controller' => [
+        'class' => '\Martial\Warez\Front\Controller\UserController',
+        'dependencies' => [
+            $app['user.service']
         ]
-    ]);
+    ],
+    'security.controller' => [
+        'class' => '\Martial\Warez\Front\Controller\SecurityController'
+    ],
+    'tracker.controller' => [
+        'class' => '\Martial\Warez\Front\Controller\TrackerController',
+        'dependencies' => [
+            $app['t411.api.client'],
+            $app['user.service'],
+            $app['profile.service']
+        ]
+    ]
+]);
 
 $app
     ->get('/', 'home.controller:index')
