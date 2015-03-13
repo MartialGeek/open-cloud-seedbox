@@ -33,14 +33,23 @@ class UserRepositoryTest extends \PHPUnit_Framework_TestCase
 
     public function testFindUserByEmailAndPassword()
     {
-        $this->findUserByEmailAndPassword();
-    }
-
-    protected function findUserByEmailAndPassword()
-    {
         $email = 'toto@gmail.com';
         $password = sha1($email);
 
+        $this->findUser($email, $password);
+        $this->repo->findUserByEmailAndPassword($email, $password);
+    }
+
+    public function testFindUserByEmail()
+    {
+        $email = 'toto@gmail.com';
+
+        $this->findUser($email);
+        $this->repo->findUserByEmail($email);
+    }
+
+    protected function findUser($email, $password = null)
+    {
         $this
             ->em
             ->expects($this->once())
@@ -68,12 +77,14 @@ class UserRepositoryTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('u.email = :email'))
             ->will($this->returnValue($this->queryBuilder));
 
-        $this
-            ->queryBuilder
-            ->expects($this->once())
-            ->method('andWhere')
-            ->with($this->equalTo('u.password = :password'))
-            ->will($this->returnValue($this->queryBuilder));
+        if (!is_null($password)) {
+            $this
+                ->queryBuilder
+                ->expects($this->once())
+                ->method('andWhere')
+                ->with($this->equalTo('u.password = :password'))
+                ->will($this->returnValue($this->queryBuilder));
+        }
 
         $this
             ->queryBuilder
@@ -81,22 +92,28 @@ class UserRepositoryTest extends \PHPUnit_Framework_TestCase
             ->method('getQuery')
             ->will($this->returnValue($this->query));
 
-        $this
+        $method = !is_null($password) ? 'setParameters' : 'setParameter';
+
+        $invocation = $this
             ->query
             ->expects($this->once())
-            ->method('setParameters')
-            ->with($this->equalTo([
+            ->method($method);
+
+        if (!is_null($password)) {
+            $invocation->with($this->equalTo([
                 'email' => $email,
                 'password' => $password
-            ]))
-            ->will($this->returnValue($this->query));
+            ]));
+        } else {
+            $invocation->with($this->equalTo('email'), $this->equalTo($email));
+        }
+
+        $invocation->will($this->returnValue($this->query));
 
         $this
             ->query
             ->expects($this->once())
             ->method('getSingleResult');
-
-        $this->repo->findUserByEmailAndPassword($email, $password);
     }
 
     protected function setUp()
