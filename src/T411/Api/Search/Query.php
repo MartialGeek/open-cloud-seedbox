@@ -32,7 +32,7 @@ class Query implements QueryInterface
      */
     public function build()
     {
-        $query = urlencode(strtolower($this->terms));
+        $query = str_replace(' ', '.', strtolower($this->terms));
 
         if (!is_null($this->categoryId)) {
             $query .= '&cid=' . $this->categoryId;

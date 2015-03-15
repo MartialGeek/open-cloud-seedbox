@@ -18,7 +18,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     protected function buildQuery($terms, $categoryId = null, $offset = null, $limit = null)
     {
-        $expectedQuery = urlencode(strtolower($terms));
+        $expectedQuery = str_replace(' ', '.', strtolower($terms));
 
         if (!is_null($categoryId)) {
             $expectedQuery .= '&cid=' . $categoryId;
