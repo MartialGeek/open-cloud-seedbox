@@ -177,8 +177,10 @@ class Client implements ClientInterface
             ]
         );
 
-        $filename = $this->config['torrent_files_path'] . '/' . uniqid() . '.torrent';
-        $this->fs->dumpFile($filename, $response, 0660);
+        $contentDispositionHeader = $response->getHeader('Content-Disposition');
+        preg_match('/filename="(.*)"/', $contentDispositionHeader, $matches);
+        $filename = $this->config['torrent_files_path'] . '/' . $matches[1];
+        $this->fs->dumpFile($filename, $response->getBody()->getContents(), 0660);
 
         return new File($filename, false);
     }

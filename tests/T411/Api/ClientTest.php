@@ -290,18 +290,42 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             'headers' => ['Authorization' => $tokenStr]
         ]));
 
+        $stream = $this->getMock('\GuzzleHttp\Stream\StreamInterface');
+        $ubuntuTorrentFilename = 'ubuntu-14.04-desktop-amd64.iso.torrent';
+        $torrent = file_get_contents(__DIR__ . '/../../Resources/T411/' . $ubuntuTorrentFilename);
+        $contentDisposition = 'attachment; filename="' . $ubuntuTorrentFilename . '"';
+
+        $this
+            ->apiResponse
+            ->expects($this->once())
+            ->method('getHeader')
+            ->with($this->equalTo('Content-Disposition'))
+            ->will($this->returnValue($contentDisposition));
+
+        $this
+            ->apiResponse
+            ->expects($this->once())
+            ->method('getBody')
+            ->willReturn($stream);
+
+        $stream
+            ->expects($this->once())
+            ->method('getContents')
+            ->willReturn($torrent);
+
         $this
             ->fs
             ->expects($this->once())
             ->method('dumpFile')
             ->with(
                 $this->stringStartsWith($this->config['torrent_files_path']),
-                $this->equalTo($this->apiResponse),
+                $this->equalTo($torrent),
                 $this->equalTo(0660)
             );
 
-        $torrent = $this->client->download($token, $torrentId);
-        $this->assertInstanceOf('\Symfony\Component\HttpFoundation\File\File', $torrent);
+        $result = $this->client->download($token, $torrentId);
+        $this->assertInstanceOf('\Symfony\Component\HttpFoundation\File\File', $result);
+        $this->assertSame($result->getFilename(), $ubuntuTorrentFilename);
     }
 
     /**
