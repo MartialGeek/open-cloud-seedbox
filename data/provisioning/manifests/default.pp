@@ -33,6 +33,13 @@ package { $php_packages:
     notify  => Service['nginx']
 }
 
+file { '/var/log/php5-fpm.log':
+    ensure  => present,
+    group   => 'adm',
+    mode    => 0644,
+    require => Package['php5-fpm']
+}
+
 exec { 'install_composer':
     command => '/usr/bin/curl -sS https://getcomposer.org/installer | sudo /usr/bin/php -- --install-dir=/usr/local/bin --filename=composer',
     require => Package['php5-cli'],
@@ -48,9 +55,17 @@ exec { 'add_composer_path':
 }
 
 nginx::resource::vhost { 'warez.dev':
-    www_root    => $root,
-    index_files => ['index.php'],
-    try_files   => ['$uri', '$uri/', '/index.php$query_string']
+    www_root             => $root,
+    use_default_location => false,
+    index_files          => ['index.php']
+}
+
+nginx::resource::location { 'warez_root':
+    vhost               => 'warez.dev',
+    location            => '/',
+    location_custom_cfg => {
+        try_files   => '$uri $uri/ /index.php$query_string'
+    }
 }
 
 nginx::resource::location { 'warez_php':
@@ -65,4 +80,10 @@ nginx::resource::location { 'warez_php':
 
 package { $misc_packages:
     ensure => installed
+}
+
+user { 'vagrant':
+    ensure => present,
+    groups => ['vagrant', 'adm', 'www-data'],
+    require => Package['nginx']
 }
