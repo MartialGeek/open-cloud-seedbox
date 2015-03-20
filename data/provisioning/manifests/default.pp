@@ -1,6 +1,5 @@
 Exec['apt_update'] -> Package <| |>
 
-include '::mysql::server'
 include nginx
 
 $root = '/var/www/warez/web'
@@ -76,6 +75,17 @@ nginx::resource::location { 'warez_php':
         'SCRIPT_FILENAME' => '$realpath_root$fastcgi_script_name',
         'DOCUMENT_ROOT'   => '$realpath_root'
     }
+}
+
+class { 'mysql::server':
+    root_password => 'warezisfun'
+}
+
+mysql::db { 'warez':
+    user     => 'warez',
+    password => 'warez',
+    host     => 'localhost',
+    grant    => ['ALL'],
 }
 
 package { $misc_packages:
