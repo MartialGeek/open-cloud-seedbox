@@ -24,12 +24,46 @@ $misc_packages = [
     'curl'
 ]
 
-$env_path_line = 'PATH=$HOME/.composer/vendor/bin:$PATH'
+$env_path_line = 'PATH=$HOME/.composer/vendor/bin:/opt/nodejs/bin:$PATH'
 $profile_bash_script = '/home/vagrant/.profile'
 
 package { $php_packages:
     ensure  => installed,
     notify  => Service['nginx']
+}
+
+exec { 'download_nodejs':
+    command     => '/usr/bin/curl http://nodejs.org/dist/v0.12.0/node-v0.12.0-linux-x64.tar.gz -o /tmp/nodejs.tar.gz',
+    require     => Package['curl'],
+    notify      => Exec['untar_nodejs'],
+    unless      => '/usr/bin/test -f /opt/nodejs/bin/node'
+}
+
+file { '/opt/nodejs':
+    ensure => directory
+}
+
+exec { 'untar_nodejs':
+    command     => '/bin/tar xvf /tmp/nodejs.tar.gz --strip-components 1',
+    cwd         => '/opt/nodejs',
+    require     => File['/opt/nodejs'],
+    refreshonly => true
+}
+
+file { '/tmp/nodejs.tar.gz':
+    ensure  => absent,
+    require => Exec['untar_nodejs']
+}
+
+exec { 'install_sass':
+    command => '/usr/bin/gem install sass',
+    unless  => '/usr/bin/which sass',
+}
+
+exec { 'install_grunt':
+    command => '/opt/nodejs/bin/npm install -g grunt-cli',
+    require => Exec['download_nodejs'],
+    unless => '/opt/nodejs/bin/npm list -g | /bin/grep grunt-cli'
 }
 
 file { '/var/log/php5-fpm.log':
