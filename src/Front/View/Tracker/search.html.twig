@@ -50,7 +50,9 @@
                         (torrent.size / 1000000)|round(2, 'floor') ~ ' MB'
                     %}
                     <tr>
-                        <td>{{ torrent.name }}</td>
+                        <td>
+                            <a data-action="torrent-add" href="{{ path('tracker_download', {'torrentId': torrent.id}) }}">{{ torrent.name }}</a>
+                        </td>
                         <td>{{ torrent.isVerified }}</td>
                         <td>{{ torrent.category.name }}</td>
                         <td>{{ torrentSize }}</td>
@@ -59,6 +61,10 @@
                         <td>{{ torrent.numberOfComments }}</td>
                         <td>{{ torrent.timesCompleted }}</td>
                         <td>{{ torrent.additionDate|date('Y-m-d') }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="9">No torrents found.</td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -73,4 +79,15 @@
         {% endif %}
     </div>
 </div>
+
+<div id="download-modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+    <h2 id="modalTitle">Add torrent to the queue...</h2>
+    <p id="download-modal-content">Your download will begin soon... <img src="/img/loader.gif" alt="loader" /></p>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="/js/tracker/search.js"></script>
 {% endblock %}

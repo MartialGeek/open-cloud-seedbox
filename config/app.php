@@ -9,7 +9,8 @@ return [
     'project_root' => CONFIG_PROJECT_ROOT,
     'assets' => [
         'source_paths' => [
-            CONFIG_PROJECT_ROOT . '/src/Front/View/Home/js'
+            CONFIG_PROJECT_ROOT . '/src/Front/View/Home/js',
+            CONFIG_PROJECT_ROOT . '/src/Front/View/Home/img'
         ],
         'destination_path' => CONFIG_PROJECT_ROOT . '/web'
     ],
@@ -32,6 +33,9 @@ return [
             ],
             'tracker' => [
                 __DIR__  . '/../src/Front/View/Tracker'
+            ],
+            'transmission' => [
+                __DIR__  . '/../src/Front/View/Transmission'
             ]
         ]
     ],
@@ -70,5 +74,12 @@ return [
         'client' => [
             'torrent_files_path' => $parameters['torrent_files_path']
         ]
+    ],
+    'transmission' => [
+        'login' => $parameters['transmission_login'],
+        'password' => $parameters['transmission_password'],
+        'host' => $parameters['transmission_host'],
+        'port' => $parameters['transmission_port'],
+        'rpc_uri' => $parameters['transmission_rpc_uri'],
     ]
 ];

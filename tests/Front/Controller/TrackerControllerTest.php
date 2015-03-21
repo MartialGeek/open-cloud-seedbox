@@ -42,6 +42,11 @@ class TrackerControllerTest extends ControllerTestCase
      */
     public $trackerToken;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    public $torrentClient;
+
     public function testSearchActionWithAuthenticatedUser()
     {
         $this->search([
@@ -197,11 +202,13 @@ class TrackerControllerTest extends ControllerTestCase
         $this->client = $this->getMock('\Martial\Warez\T411\Api\ClientInterface');
         $this->userService = $this->getMock('\Martial\Warez\User\UserServiceInterface');
         $this->profileService = $this->getMock('\Martial\Warez\User\ProfileServiceInterface');
+        $this->torrentClient = $this->getMock('\Martial\Warez\Download\TorrentClientInterface');
 
         $dependencies = parent::defineDependencies();
         $dependencies[] = $this->client;
         $dependencies[] = $this->userService;
         $dependencies[] = $this->profileService;
+        $dependencies[] = $this->torrentClient;
 
         return $dependencies;
     }

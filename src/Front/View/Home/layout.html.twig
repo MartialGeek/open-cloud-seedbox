@@ -25,6 +25,9 @@
                     <li{% if currentPage == 'tracker_search' %} class="active"{% endif %}>
                         <a href="{{ path('tracker_search') }}">Search torrents</a>
                     </li>
+                    <li{% if currentPage == 'transmission_torrents' %} class="active"{% endif %}>
+                        <a href="{{ path('transmission_torrents') }}">Downloads</a>
+                    </li>
                     <li class="has-dropdown">
                         <a id="profile-status" href="{{ path('user_profile') }}">{{ app.session.get('username') }}</a>
                         <ul class="dropdown">

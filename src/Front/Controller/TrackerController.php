@@ -2,12 +2,15 @@
 
 namespace Martial\Warez\Front\Controller;
 
+use Martial\Warez\Download\TorrentClientException;
+use Martial\Warez\Download\TorrentClientInterface;
 use Martial\Warez\Form\TrackerSearch;
 use Martial\Warez\T411\Api\ClientInterface;
 use Martial\Warez\User\ProfileServiceInterface;
 use Martial\Warez\User\UserServiceInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -29,6 +32,11 @@ class TrackerController extends AbstractController
     private $profileService;
 
     /**
+     * @var TorrentClientInterface
+     */
+    private $torrentClient;
+
+    /**
      * @param \Twig_Environment $twig
      * @param FormFactoryInterface $formFactory
      * @param Session $session
@@ -36,6 +44,7 @@ class TrackerController extends AbstractController
      * @param ClientInterface $client
      * @param UserServiceInterface $userService
      * @param ProfileServiceInterface $profileService
+     * @param TorrentClientInterface $torrentClient
      */
     public function __construct(
         \Twig_Environment $twig,
@@ -44,11 +53,13 @@ class TrackerController extends AbstractController
         UrlGeneratorInterface $urlGenerator,
         ClientInterface $client,
         UserServiceInterface $userService,
-        ProfileServiceInterface $profileService
+        ProfileServiceInterface $profileService,
+        TorrentClientInterface $torrentClient
     ) {
         $this->client = $client;
         $this->userService = $userService;
         $this->profileService = $profileService;
+        $this->torrentClient = $torrentClient;
         parent::__construct($twig, $formFactory, $session, $urlGenerator);
     }
 
@@ -72,6 +83,23 @@ class TrackerController extends AbstractController
             'result' => $result,
             'searchForm' => $searchForm->createView()
         ]);
+    }
+
+    public function download($torrentId)
+    {
+        $this->checkTrackerAuthentication();
+        $torrent = $this->client->download($this->session->get('api_token'), $torrentId);
+        $sessionId = $this->session->has('transmission_session_id') ?
+            $this->session->get('transmission_session_id') :
+            $this->torrentClient->getSessionId();
+
+        try {
+            $this->torrentClient->addToQueue($sessionId, $torrent);
+        } catch (TorrentClientException $e) {
+            return new Response($e->getMessage(), 500);
+        }
+
+        return new Response('', 200);
     }
 
     private function checkTrackerAuthentication()

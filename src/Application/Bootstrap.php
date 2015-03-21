@@ -7,6 +7,7 @@ use Doctrine\Common\Cache\FilesystemCache;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
 use GuzzleHttp\Client as GuzzleClient;
+use Martial\Warez\Download\TransmissionManager;
 use Martial\Warez\Front\Controller\AbstractController;
 use Martial\Warez\Security\AuthenticationProvider;
 use Martial\Warez\Security\BlowfishHashPassword;
@@ -195,6 +196,22 @@ class Bootstrap
 
         $app['security.firewall'] = $app->share(function() use ($app) {
             return new Firewall($app['session']);
+        });
+
+        $app['transmission.http_client'] = $app->share(function() use ($config) {
+            $url = sprintf(
+                'http://%s:%d',
+                $config['transmission']['host'],
+                $config['transmission']['port']
+            );
+
+            return new GuzzleClient([
+                'base_url' => $url
+            ]);
+        });
+
+        $app['transmission.manager'] = $app->share(function() use ($app, $config) {
+            return new TransmissionManager($app['transmission.http_client'], $config['transmission']);
         });
     }
 

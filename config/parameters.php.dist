@@ -8,5 +8,10 @@ return [
     'doctrine_password' => '',
     'security_encoder_password' => '',
     'security_encoder_salt' => '',
-    'torrent_files_path' => '/home/warez/torrents'
+    'torrent_files_path' => '/home/warez/torrents',
+    'transmission_login' => '',
+    'transmission_password' => '',
+    'transmission_host' => '',
+    'transmission_port' => '',
+    'transmission_rpc_uri' => '',
 ];
