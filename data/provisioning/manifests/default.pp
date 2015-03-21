@@ -131,3 +131,9 @@ user { 'vagrant':
     groups => ['vagrant', 'adm', 'www-data'],
     require => Package['nginx']
 }
+
+user { 'debian-transmission':
+    ensure => present,
+    groups => ['debian-transmission', 'www-data'],
+    require => Package['transmission-daemon']
+}
