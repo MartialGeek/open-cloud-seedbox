@@ -62,7 +62,7 @@ exec { 'install_sass':
 
 exec { 'install_grunt':
     command => '/opt/nodejs/bin/npm install -g grunt-cli',
-    require => Exec['download_nodejs'],
+    require => Exec['untar_nodejs'],
     unless => '/opt/nodejs/bin/npm list -g | /bin/grep grunt-cli'
 }
 
