@@ -97,7 +97,7 @@ nginx::resource::location { 'warez_root':
     vhost               => 'warez.dev',
     location            => '/',
     location_custom_cfg => {
-        try_files   => '$uri $uri/ /index.php$query_string'
+        try_files   => '$uri $uri/ /index.php?$query_string'
     }
 }
 
