@@ -9,6 +9,8 @@ use Doctrine\ORM\Tools\Setup;
 use GuzzleHttp\Client as GuzzleClient;
 use Martial\Warez\Download\TransmissionManager;
 use Martial\Warez\Front\Controller\AbstractController;
+use Martial\Warez\Front\Twig\FileExtension;
+use Martial\Warez\Front\Twig\TransmissionExtension;
 use Martial\Warez\Security\AuthenticationProvider;
 use Martial\Warez\Security\BlowfishHashPassword;
 use Martial\Warez\Security\Firewall;
@@ -99,6 +101,9 @@ class Bootstrap
             $this->app['security.firewall'],
             'onKernelRequest'
         ]);
+
+        $this->app['twig']->addExtension(new TransmissionExtension());
+        $this->app['twig']->addExtension(new FileExtension());
     }
 
     protected function registerServiceProviders()
