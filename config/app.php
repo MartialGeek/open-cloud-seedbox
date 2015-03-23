@@ -70,5 +70,13 @@ return [
         'client' => [
             'torrent_files_path' => $parameters['torrent_files_path']
         ]
+    ],
+    'upload' => [
+        'transport' => [
+            'host' => $parameters['upload_transport_host'],
+            'port' => $parameters['upload_transport_port'],
+        ],
+        'adapter' => $parameters['upload_adapter'],
+        'adapter_config' => $parameters['upload_adapter_config']
     ]
 ];

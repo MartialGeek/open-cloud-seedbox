@@ -180,8 +180,6 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
         $this->httpClient = $this->getMock('\GuzzleHttp\ClientInterface');
         $this->urlResolver = $this->getMock('\Martial\Warez\Upload\UploadUrlResolverInterface');
         $this->config = [
-            'host' => '45.56.56.87',
-            'port' => 8888,
             'app_id' => 'net.warez-manager',
             'app_name' => 'Warez Manager',
             'app_version' => '1.0',

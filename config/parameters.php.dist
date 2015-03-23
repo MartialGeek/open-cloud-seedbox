@@ -8,5 +8,14 @@ return [
     'doctrine_password' => '',
     'security_encoder_password' => '',
     'security_encoder_salt' => '',
-    'torrent_files_path' => '/home/warez/torrents'
+    'torrent_files_path' => '/home/warez/torrents',
+    'upload_transport_host' => 'http://mafreebox.freebox.fr',
+    'upload_transport_port' => 8888,
+    'upload_adapter' => 'freebox',
+    'upload_adapter_config' => [
+        'app_id' => 'net.warez-manager',
+        'app_name' => 'Warez Manager',
+        'app_version' => '1.0',
+        'device_name' => 'seedbox'
+    ]
 ];

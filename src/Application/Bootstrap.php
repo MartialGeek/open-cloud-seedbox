@@ -15,6 +15,8 @@ use Martial\Warez\Security\OpenSSLEncoder;
 use Martial\Warez\T411\Api\Client;
 use Martial\Warez\T411\Api\Data\DataTransformer;
 use Martial\Warez\T411\Api\Search\QueryFactory;
+use Martial\Warez\Upload\UploadAdapterFactory;
+use Martial\Warez\Upload\UploadUrlResolver;
 use Martial\Warez\User\ProfileService;
 use Martial\Warez\User\UserService;
 use Silex\Application;
@@ -195,6 +197,27 @@ class Bootstrap
 
         $app['security.firewall'] = $app->share(function() use ($app) {
             return new Firewall($app['session']);
+        });
+
+        $app['upload.http_client'] = $app->share(function() use ($app, $config) {
+            return new GuzzleClient([
+                'base_url' => $config['upload']['transport']['host'] . ':' . $config['upload']['transport']['port']
+            ]);
+        });
+
+        $app['upload.url_resolver'] = $app->share(function() {
+            return new UploadUrlResolver();
+        });
+
+        $app['upload.adapter_factory'] = $app->share(function() use ($app, $config) {
+            return new UploadAdapterFactory($app['upload.http_client'], $app['upload.url_resolver']);
+        });
+
+        $app['upload.freebox_adapter'] = $app->share(function() use ($app, $config) {
+            return $app['upload.adapter_factory']->get(
+                $config['upload']['adapter'],
+                $config['upload']['adapter_config']
+            );
         });
     }
 
