@@ -5,6 +5,7 @@ namespace Martial\Warez\Upload\Freebox;
 use GuzzleHttp\ClientInterface;
 use Martial\Warez\Upload\UploadException;
 use Martial\Warez\Upload\UploadInterface;
+use Martial\Warez\Upload\UploadUrlResolverInterface;
 use Symfony\Component\HttpFoundation\File\File;
 
 class FreeboxUploaderAdapter implements UploadInterface
@@ -13,6 +14,11 @@ class FreeboxUploaderAdapter implements UploadInterface
      * @var ClientInterface
      */
     private $httpClient;
+
+    /**
+     * @var UploadUrlResolverInterface
+     */
+    private $urlResolver;
 
     /**
      * @var array
@@ -26,11 +32,13 @@ class FreeboxUploaderAdapter implements UploadInterface
 
     /**
      * @param ClientInterface $client
+     * @param UploadUrlResolverInterface $resolver
      * @param array $config
      */
-    public function __construct(ClientInterface $client, array $config)
+    public function __construct(ClientInterface $client, UploadUrlResolverInterface $resolver, array $config)
     {
         $this->httpClient = $client;
+        $this->urlResolver = $resolver;
         $this->config = $config;
     }
     /**
@@ -43,6 +51,24 @@ class FreeboxUploaderAdapter implements UploadInterface
     {
         if (is_null($this->sessionToken)) {
             $this->authenticate();
+        }
+
+        $downloadUrl = $this->urlResolver->resolve($file);
+
+        $addDownloadData = $this
+            ->httpClient
+            ->post('/api/v3/downloads/add', [
+                'body' => [
+                    'download_url' => $downloadUrl
+                ],
+                'headers' => [
+                    'X-Fbx-App-Auth' => $this->sessionToken
+                ]
+            ])
+            ->json();
+
+        if (!$addDownloadData['success']) {
+            // TODO: Implement the behavior when the request failed.
         }
     }
 

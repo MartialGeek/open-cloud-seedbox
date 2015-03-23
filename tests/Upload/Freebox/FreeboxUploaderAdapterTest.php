@@ -13,6 +13,11 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
     public $httpClient;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    public $urlResolver;
+
+    /**
      * @var array
      */
     public $config;
@@ -24,10 +29,14 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
 
     public function testUploadFile()
     {
+        $uploadedFile = new File('/tmp/file', false);
+        $uploadUrl = 'http://www.warez.io/files/download/your-file.avi';
+
         $authorizeResponse = $this->createResponse();
         $authorizeTrackIdResponse = $this->createResponse();
         $challengeResponse = $this->createResponse();
         $sessionResponse = $this->createResponse();
+        $addDownloadResponse = $this->createResponse();
 
         $authorizeResponseData = [
             'success' => true,
@@ -62,7 +71,13 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
                     'downloaded' => true
                 ]
             ]
+        ];
 
+        $addDownloadResponseData = [
+            'success' => true,
+            'result' => [
+                'id' => 42
+            ]
         ];
 
         $this
@@ -89,8 +104,15 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
             ->willReturn($challengeResponseData);
 
         $this
+            ->urlResolver
+            ->expects($this->once())
+            ->method('resolve')
+            ->with($this->equalTo($uploadedFile))
+            ->willReturn($uploadUrl);
+
+        $this
             ->httpClient
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(3))
             ->method('post')
             ->withConsecutive(
                 [
@@ -116,11 +138,23 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
                             )
                         ]
                     ])
+                ],
+                [
+                    $this->equalTo('/api/v3/downloads/add'),
+                    $this->equalTo([
+                        'body' => [
+                            'download_url' => $uploadUrl
+                        ],
+                        'headers' => [
+                            'X-Fbx-App-Auth' => $sessionResponseData['result']['session_token']
+                        ]
+                    ])
                 ]
             )
             ->willReturnOnConsecutiveCalls(
                 $authorizeResponse,
-                $sessionResponse
+                $sessionResponse,
+                $addDownloadResponse
             );
 
         $authorizeResponse
@@ -133,12 +167,18 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
             ->method('json')
             ->willReturn($sessionResponseData);
 
-        $this->freeboxAdapter->upload(new File('/tmp/file', false));
+        $addDownloadResponse
+            ->expects($this->once())
+            ->method('json')
+            ->willReturn($addDownloadResponseData);
+
+        $this->freeboxAdapter->upload($uploadedFile);
     }
 
     protected function setUp()
     {
         $this->httpClient = $this->getMock('\GuzzleHttp\ClientInterface');
+        $this->urlResolver = $this->getMock('\Martial\Warez\Upload\UploadUrlResolverInterface');
         $this->config = [
             'host' => '45.56.56.87',
             'port' => 8888,
@@ -148,7 +188,7 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
             'device_name' => 'seedbox'
         ];
 
-        $this->freeboxAdapter = new FreeboxUploaderAdapter($this->httpClient, $this->config);
+        $this->freeboxAdapter = new FreeboxUploaderAdapter($this->httpClient, $this->urlResolver, $this->config);
     }
 
     /**
