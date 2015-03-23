@@ -8,6 +8,14 @@ use Symfony\Component\HttpFoundation\File\File;
 
 class TransmissionManager implements TorrentClientInterface
 {
+    const TORRENT_STATUS_STOPPED = 0;
+    const TORRENT_STATUS_CHECK_WAITING = 1;
+    const TORRENT_STATUS_CHECKING = 2;
+    const TORRENT_STATUS_DOWNLOAD_WAITING = 3;
+    const TORRENT_STATUS_DOWNLOADING = 4;
+    const TORRENT_STATUS_SEED_WAITING = 5;
+    const TORRENT_STATUS_SEEDING = 6;
+
     /**
      * @var ClientInterface
      */
@@ -50,26 +58,52 @@ class TransmissionManager implements TorrentClientInterface
         }
     }
 
-    public function removeFromQueue()
+    /**
+     * Removes the given torrent ID from the queue.
+     *
+     * @param string $sessionId
+     * @param int $torrentId
+     */
+    public function removeFromQueue($sessionId, $torrentId)
     {
         // TODO: Implement removeFromQueue() method.
     }
 
     /**
+     * Returns an array of the torrents in the queue.
+     *
      * @param string $sessionId
      * @return array
      */
     public function getTorrentList($sessionId)
     {
-        $body = '{"method": "torrent-get", "arguments": {"fields": ["id", "name"]}}';
+        $body = '{"method": "torrent-get", "arguments": {"fields": ' . $this->getTorrentFields() . '}}';
+
         $response = $this->sendRequest($sessionId, $body)->json();
 
         return $response['arguments']['torrents'];
     }
 
-    public function getTorrentData()
+    /**
+     * Returns an array of data related to the given torrent ID.
+     *
+     * @param string $sessionId
+     * @param int $torrentId
+     * @return array
+     */
+    public function getTorrentData($sessionId, $torrentId)
     {
-        // TODO: Implement getTorrentData() method.
+        $body = '{
+            "method": "torrent-get",
+            "arguments": {
+                "ids": [' . $torrentId . '],
+                "fields": ' . $this->getTorrentFields() .
+            '}
+        }';
+
+        $response = $this->sendRequest($sessionId, $body)->json();
+
+        return $response['arguments']['torrents'][0];
     }
 
     /**
@@ -91,8 +125,10 @@ class TransmissionManager implements TorrentClientInterface
     }
 
     /**
-     * @param $sessionId
-     * @param $body
+     * Sends the request to the Transmission API.
+     *
+     * @param string $sessionId
+     * @param string $body
      * @return \GuzzleHttp\Message\ResponseInterface
      */
     protected function sendRequest($sessionId, $body)
@@ -106,5 +142,37 @@ class TransmissionManager implements TorrentClientInterface
                     'X-Transmission-Session-Id' => $sessionId
                 ]
             ]);
+    }
+
+    /**
+     * Returns a JSON array of the torrent's fields.
+     *
+     * @return string
+     */
+    protected function getTorrentFields()
+    {
+        return '[
+            "id",
+            "name",
+            "addedDate",
+            "downloadedEver",
+            "isFinished",
+            "isStalled",
+            "leftUntilDone",
+            "peers",
+            "percentDone",
+            "queuePosition",
+            "rateDownload",
+            "rateUpload",
+            "secondsDownloading",
+            "secondsSeeding",
+            "startDate",
+            "status",
+            "trackers",
+            "totalSize",
+            "torrentFile",
+            "uploadedEver",
+            "wanted"
+        ]';
     }
 }

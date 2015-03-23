@@ -2,19 +2,26 @@
 
 namespace Martial\Warez\Front\Controller;
 
-use GuzzleHttp\Exception\RequestException;
 use Martial\Warez\Download\TorrentClientInterface;
+use Martial\Warez\Download\TransmissionSessionTrait;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class TransmissionController extends AbstractController
 {
+    use TransmissionSessionTrait;
+
     /**
      * @var TorrentClientInterface
      */
     private $torrentClient;
+
+    /**
+     * @var string
+     */
+    private $transmissionSessionId;
 
     /**
      * @param \Twig_Environment $twig
@@ -30,18 +37,22 @@ class TransmissionController extends AbstractController
         UrlGeneratorInterface $urlGenerator,
         TorrentClientInterface $torrentClient
     ) {
-        $this->torrentClient = $torrentClient;
         parent::__construct($twig, $formFactory, $session, $urlGenerator);
+        $this->torrentClient = $torrentClient;
+        $this->transmissionSessionId = $this->getSessionId($this->session, $this->torrentClient);
     }
 
     public function torrentList()
     {
-        $sessionId = $this->session->has('transmission_session_id') ?
-            $this->session->get('transmission_session_id') :
-            $this->torrentClient->getSessionId();
-
         return $this->twig->render('@transmission/torrent-list.html.twig', [
-            'torrents' => $this->torrentClient->getTorrentList($sessionId)
+            'torrents' => $this->torrentClient->getTorrentList($this->transmissionSessionId)
         ]);
+    }
+
+    public function torrentData($torrentId)
+    {
+        $data = $this->torrentClient->getTorrentData($this->transmissionSessionId, $torrentId);
+
+        return new JsonResponse($data);
     }
 }

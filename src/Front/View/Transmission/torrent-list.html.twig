@@ -1,5 +1,43 @@
 {% extends '@home/layout.html.twig' %}
 
 {% block content %}
-    {{ dump(torrents) }}
+    <table id="torrent-queue">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Downloaded</th>
+            <th>Total size</th>
+            <th>Status</th>
+            <th>Added date</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for torrent in torrents %}
+            <tr data-torrent-id="{{ torrent.id }}"
+                data-torrent-data-url="{{ path('transmission_torrent_data', {'torrentId': torrent.id}) }}">
+                <td data-torrent-field="name">
+                    {{ torrent.name }}
+                    <div class="progress">
+                        <span class="meter" data-torrent-percent-done="{{ torrent.percentDone * 100 }}"></span>
+                    </div>
+                </td>
+                <td data-torrent-field="download-ever">{{ convertToHumanReadable(torrent.downloadedEver) }}</td>
+                <td data-torrent-field="total-size">{{ convertToHumanReadable(torrent.totalSize) }}</td>
+                <td data-torrent-field="status">{{ torrentStatusLabel(torrent.status) }}</td>
+                <td data-torrent-field="added-date">{{ torrent.addedDate|date('Y-m-d') }}</td>
+                <td>{% if torrent.percentDone == 1 %}<a href="" class="action-upload-torrent">Upload to local storage</a>{% endif %}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">No torrents in the queue.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="/js/transmission/torrent-list.js"></script>
 {% endblock %}

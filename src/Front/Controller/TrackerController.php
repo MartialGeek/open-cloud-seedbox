@@ -4,6 +4,7 @@ namespace Martial\Warez\Front\Controller;
 
 use Martial\Warez\Download\TorrentClientException;
 use Martial\Warez\Download\TorrentClientInterface;
+use Martial\Warez\Download\TransmissionSessionTrait;
 use Martial\Warez\Form\TrackerSearch;
 use Martial\Warez\T411\Api\ClientInterface;
 use Martial\Warez\User\ProfileServiceInterface;
@@ -16,6 +17,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class TrackerController extends AbstractController
 {
+    use TransmissionSessionTrait;
+
     /**
      * @var ClientInterface
      */
@@ -89,9 +92,7 @@ class TrackerController extends AbstractController
     {
         $this->checkTrackerAuthentication();
         $torrent = $this->client->download($this->session->get('api_token'), $torrentId);
-        $sessionId = $this->session->has('transmission_session_id') ?
-            $this->session->get('transmission_session_id') :
-            $this->torrentClient->getSessionId();
+        $sessionId = $this->getSessionId($this->session, $this->torrentClient);
 
         try {
             $this->torrentClient->addToQueue($sessionId, $torrent);

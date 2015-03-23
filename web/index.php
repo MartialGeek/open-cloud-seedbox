@@ -75,4 +75,8 @@ $app
     ->get('/transmission/torrents', 'transmission.controller:torrentList')
     ->bind('transmission_torrents');
 
+$app
+    ->get('/transmission/torrent/{torrentId}', 'transmission.controller:torrentData')
+    ->bind('transmission_torrent_data');
+
 $app->run();

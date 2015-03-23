@@ -15,15 +15,30 @@ interface TorrentClientInterface
      */
     public function addToQueue($sessionId, File $torrent);
 
-    public function removeFromQueue();
+    /**
+     * Removes the given torrent ID from the queue.
+     *
+     * @param string $sessionId
+     * @param int $torrentId
+     */
+    public function removeFromQueue($sessionId, $torrentId);
 
     /**
+     * Returns an array of the torrents in the queue.
+     *
      * @param string $sessionId
      * @return array
      */
     public function getTorrentList($sessionId);
 
-    public function getTorrentData();
+    /**
+     * Returns an array of data related to the given torrent ID.
+     *
+     * @param string $sessionId
+     * @param int $torrentId
+     * @return array
+     */
+    public function getTorrentData($sessionId, $torrentId);
 
     /**
      * Returns the session ID.
