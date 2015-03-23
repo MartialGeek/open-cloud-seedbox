@@ -21,7 +21,8 @@ $php_packages = [
 $misc_packages = [
     'transmission-daemon',
     'memcached',
-    'curl'
+    'curl',
+    'git'
 ]
 
 $env_path_line = 'PATH=$HOME/.composer/vendor/bin:/opt/nodejs/bin:$PATH'
