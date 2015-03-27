@@ -33,7 +33,7 @@ class TransmissionManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTorrentList()
     {
-        $body = '{"method": "torrent-get", "arguments": {"fields": ["id", "name"]}}';
+        $body = '{"method": "torrent-get", "arguments": {"fields": '. $this->getTorrentFields() .'}}';
         $responseJSON = file_get_contents(__DIR__ . '/../Resources/Transmission/getTorrents.json');
         $responseArray = json_decode($responseJSON, true);
 
@@ -75,5 +75,32 @@ class TransmissionManagerTest extends \PHPUnit_Framework_TestCase
         $this->transmissionManager = new TransmissionManager($this->httpClient, $this->config);
         $this->sessionId = uniqid();
         $this->response = $this->getMock('\GuzzleHttp\Message\ResponseInterface');
+    }
+
+    protected function getTorrentFields()
+    {
+        return '[
+            "id",
+            "name",
+            "addedDate",
+            "downloadedEver",
+            "isFinished",
+            "isStalled",
+            "leftUntilDone",
+            "peers",
+            "percentDone",
+            "queuePosition",
+            "rateDownload",
+            "rateUpload",
+            "secondsDownloading",
+            "secondsSeeding",
+            "startDate",
+            "status",
+            "trackers",
+            "totalSize",
+            "torrentFile",
+            "uploadedEver",
+            "wanted"
+        ]';
     }
 }
