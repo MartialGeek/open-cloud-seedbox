@@ -223,7 +223,7 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
                 ->authenticationProvider
                 ->expects($this->once())
                 ->method('hasValidCredentials')
-                ->with($this->equalTo($this->userEntity), $this->equalTo($this->password))
+                ->with($this->equalTo($this->userEntity->getPassword()), $this->equalTo($this->password))
                 ->will($this->returnValue($hasValidCredentials));
         }
 

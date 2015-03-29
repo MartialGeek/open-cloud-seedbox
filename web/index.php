@@ -27,7 +27,14 @@ $bootstrap->registerControllers([
         'dependencies' => [
             $app['t411.api.client'],
             $app['user.service'],
-            $app['profile.service']
+            $app['profile.service'],
+            $app['transmission.manager']
+        ]
+    ],
+    'transmission.controller' => [
+        'class' => '\Martial\Warez\Front\Controller\TransmissionController',
+        'dependencies' => [
+            $app['transmission.manager']
         ]
     ]
 ]);
@@ -59,5 +66,17 @@ $app
 $app
     ->get('/tracker/search', 'tracker.controller:search')
     ->bind('tracker_search');
+
+$app
+    ->get('/tracker/download/{torrentId}', 'tracker.controller:download')
+    ->bind('tracker_download');
+
+$app
+    ->get('/transmission/torrents', 'transmission.controller:torrentList')
+    ->bind('transmission_torrents');
+
+$app
+    ->get('/transmission/torrent/{torrentId}', 'transmission.controller:torrentData')
+    ->bind('transmission_torrent_data');
 
 $app->run();

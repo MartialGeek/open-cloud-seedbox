@@ -18,4 +18,10 @@ return [
         'app_version' => '1.0',
         'device_name' => 'seedbox'
     ]
+    'torrent_files_path' => '/home/warez/torrents',
+    'transmission_login' => '',
+    'transmission_password' => '',
+    'transmission_host' => '',
+    'transmission_port' => '',
+    'transmission_rpc_uri' => '',
 ];

@@ -7,7 +7,10 @@ use Doctrine\Common\Cache\FilesystemCache;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
 use GuzzleHttp\Client as GuzzleClient;
+use Martial\Warez\Download\TransmissionManager;
 use Martial\Warez\Front\Controller\AbstractController;
+use Martial\Warez\Front\Twig\FileExtension;
+use Martial\Warez\Front\Twig\TransmissionExtension;
 use Martial\Warez\Security\AuthenticationProvider;
 use Martial\Warez\Security\BlowfishHashPassword;
 use Martial\Warez\Security\Firewall;
@@ -100,6 +103,9 @@ class Bootstrap
             $this->app['security.firewall'],
             'onKernelRequest'
         ]);
+
+        $this->app['twig']->addExtension(new TransmissionExtension());
+        $this->app['twig']->addExtension(new FileExtension());
     }
 
     protected function registerServiceProviders()
@@ -218,6 +224,22 @@ class Bootstrap
                 $config['upload']['adapter'],
                 $config['upload']['adapter_config']
             );
+        });
+
+        $app['transmission.http_client'] = $app->share(function() use ($config) {
+            $url = sprintf(
+                'http://%s:%d',
+                $config['transmission']['host'],
+                $config['transmission']['port']
+            );
+
+            return new GuzzleClient([
+                'base_url' => $url
+            ]);
+        });
+
+        $app['transmission.manager'] = $app->share(function() use ($app, $config) {
+            return new TransmissionManager($app['transmission.http_client'], $config['transmission']);
         });
     }
 

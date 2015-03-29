@@ -50,7 +50,7 @@ class AuthenticationProviderTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo($this->clearPassword), $this->equalTo($this->user->getPassword()))
             ->will($this->returnValue($isValidCredentials));
 
-        $result = $this->authenticationService->hasValidCredentials($this->user, $this->clearPassword);
+        $result = $this->authenticationService->hasValidCredentials($this->user->getPassword(), $this->clearPassword);
         $this->assertSame($isValidCredentials, $result);
     }
 

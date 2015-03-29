@@ -17,7 +17,7 @@ class QueryFactoryTest extends \PHPUnit_Framework_TestCase
         ];
 
         $factory = new QueryFactory();
-        $expectedQueryString = urlencode(strtolower($params['terms'])) .
+        $expectedQueryString = str_replace(' ', '.', strtolower($params['terms'])) .
             '&cid=' . $params['category_id'] . '&offset=' . $params['offset'] . '&limit=' . $params['limit'];
 
         $query = $factory->create($params);

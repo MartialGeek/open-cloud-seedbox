@@ -117,7 +117,7 @@ class UserService implements UserServiceInterface
             throw new UserNotFoundException();
         }
 
-        if (!$this->authentication->hasValidCredentials($user, $password)) {
+        if (!$this->authentication->hasValidCredentials($user->getPassword(), $password)) {
             throw new BadCredentialsException();
         }
 

@@ -63,7 +63,7 @@ exec { 'install_sass':
 
 exec { 'install_grunt':
     command => '/opt/nodejs/bin/npm install -g grunt-cli',
-    require => Exec['download_nodejs'],
+    require => Exec['untar_nodejs'],
     unless => '/opt/nodejs/bin/npm list -g | /bin/grep grunt-cli'
 }
 
@@ -98,7 +98,7 @@ nginx::resource::location { 'warez_root':
     vhost               => 'warez.dev',
     location            => '/',
     location_custom_cfg => {
-        try_files   => '$uri $uri/ /index.php$query_string'
+        try_files   => '$uri $uri/ /index.php?$query_string'
     }
 }
 
@@ -131,4 +131,10 @@ user { 'vagrant':
     ensure => present,
     groups => ['vagrant', 'adm', 'www-data'],
     require => Package['nginx']
+}
+
+user { 'debian-transmission':
+    ensure => present,
+    groups => ['debian-transmission', 'www-data'],
+    require => Package['transmission-daemon']
 }
