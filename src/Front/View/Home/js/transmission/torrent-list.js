@@ -27,6 +27,12 @@ $(function() {
         var row = this;
 
         setInterval(function() {
+            var percentDone = $(row).find('[data-torrent-percent-done]').attr('data-torrent-percent-done');
+
+            if (percentDone == 100) {
+                return;
+            }
+
             var dataUrl = $(row).attr('data-torrent-data-url');
 
             $.get(dataUrl, function(data) {
