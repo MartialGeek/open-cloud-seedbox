@@ -13,3 +13,5 @@ node_modules
 /config/parameters.php
 behat.yml
 .vagrant/
+/config/deploy.rb
+/config/deploy/*.rb
