@@ -1,11 +1,13 @@
 <?php
 
 define('CONFIG_PROJECT_ROOT', __DIR__ . '/..');
-define('CONFIG_PROJECT_ENV', 'dev');
 
 $parameters = require __DIR__ . '/parameters.php';
 
 return [
+    'application' => [
+        'env' => $parameters['app_env']
+    ],
     'project_root' => CONFIG_PROJECT_ROOT,
     'assets' => [
         'source_paths' => [
@@ -40,7 +42,7 @@ return [
         ]
     ],
     'monolog' => [
-        'monolog.logfile' => __DIR__ . '/../var/log/' . CONFIG_PROJECT_ENV . '.log'
+        'monolog.logfile' => __DIR__ . '/../var/log/' . $parameters['app_env'] . '.log'
     ],
     'translator' => [
         'translator.domains' => []

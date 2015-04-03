@@ -52,13 +52,12 @@ class Bootstrap
     /**
      * @param Application $app
      * @param array $config
-     * @param string $env
      */
-    public function __construct(Application $app, array $config, $env = 'prod')
+    public function __construct(Application $app, array $config)
     {
         $this->app = $app;
         $this->config = $config;
-        $this->env = $env;
+        $this->env = $config['application']['env'];
         $this->registerServiceProviders();
         $this->registerServices();
         $this->configureApplication();

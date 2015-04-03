@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'app_env' => 'prod',
     'doctrine_driver' => '',
     'doctrine_dbname' => '',
     'doctrine_host' => '',
