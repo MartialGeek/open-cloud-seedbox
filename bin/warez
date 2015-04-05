@@ -8,7 +8,9 @@ use Silex\Application as SilexApplication;
 require __DIR__ . '/../vendor/autoload.php';
 
 $config = require __DIR__ . '/../config/app.php';
+$config['application']['env'] = 'prod';
+
 $silex = new SilexApplication();
-Bootstrap::createApplication($silex, $config, 'prod');
+Bootstrap::createApplication($silex, $config);
 $app = new Application($silex, $config);
 $app->run();
