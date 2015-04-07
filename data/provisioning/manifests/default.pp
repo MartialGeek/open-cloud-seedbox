@@ -67,6 +67,12 @@ exec { 'install_grunt':
     unless => '/opt/nodejs/bin/npm list -g | /bin/grep grunt-cli'
 }
 
+exec { 'install_bower':
+    command => '/opt/nodejs/bin/npm install -g bower',
+    require => Exec['untar_nodejs'],
+    unless => '/opt/nodejs/bin/npm list -g | /bin/grep bower'
+}
+
 file { '/var/log/php5-fpm.log':
     ensure  => present,
     group   => 'adm',
