@@ -83,13 +83,44 @@ return [
     'doctrine_password' => 'warez', // The password was configured by the provisioning
     'security_encoder_password' => 'aSuperP@ssW0rD', // Used to encrypt your tracker password
     'security_encoder_salt' => '',  // Keep this value empty
-    'torrent_files_path' => '/tmp/warez', // This path was created by the provisioning
+    'torrent_files_path' => '/tmp/warez', // This path was created by the provisioning (must be writable by the group debian-transmission)
     'transmission_login' => 'warez', // The transmission RPC username
     'transmission_password' => 'warez', // The transmission RPC password
     'transmission_host' => 'localhost',
     'transmission_port' => '9091',
     'transmission_rpc_uri' => '/transmission/rpc', // The default RPC uri
 ];
+```
+
+### Install the vendors
+
+Install the PHP, nodejs and bower libraries:
+
+```sh
+cd /var/www/warez
+composer install
+npm install
+bower install
+```
+
+### Compile and symlink the assets
+
+The CSS framework used for the project is [Foundation](http://foundation.zurb.com/). Compile the assets by running the grunt build command:
+
+```sh
+grunt build
+```
+
+Then, when you work on the application stylesheets, you should ask to grunt for watching your assets changes:
+
+```sh
+grunt
+```
+
+Then install the assets in the web path:
+
+```sh
+./bin/warez assets:install
 ```
 
 ### Update the database schema
