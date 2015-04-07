@@ -49,23 +49,11 @@ the IP. The domain name must be "warez.dev".
 172.xx.xx.xx   warez.dev
 ```
 
-### Update the database schema
-
-Open a SSH connection and run the Doctrine CLI tool.
-
-```sh
-vagrant ssh
-cd /var/www/warez
-./bin/doctrine orm:schema-tool:update --force
-```
-
-Now create a user.
-
-```sh
-./bin/warez user:create username email password
-```
-
 ### Configure your tracker account
 
-Now run your browser and open the URL [http://warez.dev](http://warez.dev). Sign in with the credentials of the user you
-have just created. Open your profile page and enter your tracker credentials in the form.  
+Now run your browser and open the URL [http://warez.dev](http://warez.dev). Sign in with the dev user:
+
+- email: nice-user@warez.io
+- password: warezisfun
+
+Open your profile page and enter your tracker credentials in the form.  

@@ -95,7 +95,7 @@ file { '/home/vagrant/.profile':
 } ->
 exec { 'add_composer_path':
     command => "/bin/echo '${env_path_line}' >> ${$profile_bash_script}",
-    unless => "/bin/grep '${$env_path_line}'' ${$profile_bash_script}"
+    unless => "/bin/grep '${$env_path_line}' ${$profile_bash_script}"
 }
 
 nginx::resource::vhost { 'warez.dev':
@@ -166,7 +166,16 @@ file { '/etc/transmission-daemon/settings.json':
     owner   => 'debian-transmission',
     group   => 'debian-transmission',
     mode    => 0600,
-    notify  => Service['transmission-daemon']
+    notify  => Service['transmission-daemon'],
+    require => File['/home/vagrant/.composer/auth.json']
+}
+
+file { '/home/vagrant/.composer/auth.json':
+    ensure  => present,
+    content => file('/var/www/warez/data/provisioning/files/composer-auth.json'),
+    owner   => 'vagrant',
+    group   => 'vagrant',
+    mode    => 0600
 }
 
 exec { 'install_composer_dependencies':
@@ -181,19 +190,24 @@ exec { 'install_npm_dependencies':
     command => '/opt/nodejs/bin/npm install',
     require => Exec['untar_nodejs'],
     cwd     => $project_path,
-    user        => 'vagrant'
+    user    => 'vagrant',
+    timeout => 1200
 }
 
 exec { 'install_bower_dependencies':
-    command => '/opt/nodejs/bin/bower install',
-    require => Exec['install_bower'],
-    cwd     => $project_path,
-    user    => 'vagrant'
+    command     => '/opt/nodejs/bin/bower install --config.interactive=false',
+    require     => Exec['install_bower'],
+    cwd         => $project_path,
+    environment => 'HOME=/home/vagrant',
+    user        => 'vagrant'
 }
 
 exec { 'build_assets':
     command => '/opt/nodejs/bin/grunt build',
-    require => Exec['install_grunt'],
+    require => [
+        Exec['install_grunt'],
+        Exec['install_npm_dependencies']
+    ],
     cwd     => $project_path,
     user    => 'vagrant'
 }
@@ -203,4 +217,29 @@ exec { 'symlink_assets':
     require => Exec['build_assets'],
     cwd     => $project_path,
     user    => 'vagrant'
+}
+
+exec { 'update_sql_schema':
+    command => "${project_path}/bin/doctrine orm:schema-tool:update --force",
+    require => [
+        File['/var/www/warez/config/parameters.php'],
+        Exec['install_composer_dependencies'],
+        Mysql::Db['warez'],
+    ],
+    cwd     => $project_path,
+    user    => 'vagrant'
+}
+
+exec { 'create_warez_user':
+    command => "${project_path}/bin/warez user:create NiceUser nice-user@warez.io warezisfun",
+    require => Exec['update_sql_schema'],
+    cwd     => $project_path,
+    user    => 'vagrant',
+    notify  => Exec['touch /home/vagrant/.warez_user_created'],
+    unless  => 'ls /home/vagrant/.warez_user_created'
+}
+
+exec { 'touch /home/vagrant/.warez_user_created':
+    user        => 'vagrant',
+    refreshonly => true
 }
