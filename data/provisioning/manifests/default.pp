@@ -2,8 +2,6 @@ Exec['apt_update'] -> Package <| |>
 
 include nginx
 
-$root = '/var/www/warez/web'
-
 $php_packages = [
   'php5-common',
   'php5-cli',
@@ -25,8 +23,14 @@ $misc_packages = [
     'git'
 ]
 
+$project_path  = "/var/www/warez"
+$document_root = "${$project_path}/web"
 $env_path_line = 'PATH=$HOME/.composer/vendor/bin:/opt/nodejs/bin:$PATH'
 $profile_bash_script = '/home/vagrant/.profile'
+
+Exec {
+    path => '/opt/nodejs/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+}
 
 package { $php_packages:
     ensure  => installed,
@@ -91,11 +95,11 @@ file { '/home/vagrant/.profile':
 } ->
 exec { 'add_composer_path':
     command => "/bin/echo '${env_path_line}' >> ${$profile_bash_script}",
-    unless => "/bin/grep '${$env_path_line}' ${$profile_bash_script}"
+    unless => "/bin/grep '${$env_path_line}'' ${$profile_bash_script}"
 }
 
 nginx::resource::vhost { 'warez.dev':
-    www_root             => $root,
+    www_root             => $document_root,
     use_default_location => false,
     index_files          => ['index.php']
 }
@@ -143,4 +147,60 @@ user { 'debian-transmission':
     ensure => present,
     groups => ['debian-transmission', 'www-data'],
     require => Package['transmission-daemon']
+}
+
+file { '/var/www/warez/config/parameters.php':
+    ensure  => present,
+    content => file('/var/www/warez/data/provisioning/files/parameters.php'),
+
+}
+
+service { 'transmission-daemon':
+    ensure => stopped,
+    require => Package['transmission-daemon']
+}
+
+file { '/etc/transmission-daemon/settings.json':
+    ensure  => present,
+    content => file('/var/www/warez/data/provisioning/files/transmission-settings.json'),
+    owner   => 'debian-transmission',
+    group   => 'debian-transmission',
+    mode    => 0600,
+    notify  => Service['transmission-daemon']
+}
+
+exec { 'install_composer_dependencies':
+    command     => '/usr/local/bin/composer install',
+    require     => Exec['install_composer'],
+    cwd         => $project_path,
+    environment => 'HOME=/home/vagrant',
+    user        => 'vagrant'
+}
+
+exec { 'install_npm_dependencies':
+    command => '/opt/nodejs/bin/npm install',
+    require => Exec['untar_nodejs'],
+    cwd     => $project_path,
+    user        => 'vagrant'
+}
+
+exec { 'install_bower_dependencies':
+    command => '/opt/nodejs/bin/bower install',
+    require => Exec['install_bower'],
+    cwd     => $project_path,
+    user    => 'vagrant'
+}
+
+exec { 'build_assets':
+    command => '/opt/nodejs/bin/grunt build',
+    require => Exec['install_grunt'],
+    cwd     => $project_path,
+    user    => 'vagrant'
+}
+
+exec { 'symlink_assets':
+    command => "${project_path}/bin/warez assets:install",
+    require => Exec['build_assets'],
+    cwd     => $project_path,
+    user    => 'vagrant'
 }
