@@ -194,7 +194,8 @@ exec { 'install_composer_dependencies':
     ],
     cwd         => $project_path,
     environment => 'HOME=/home/vagrant',
-    user        => 'vagrant'
+    user        => 'vagrant',
+    timeout => 1200
 }
 
 exec { 'install_npm_dependencies':
