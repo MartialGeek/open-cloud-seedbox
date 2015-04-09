@@ -18,6 +18,7 @@ use Martial\Warez\Security\OpenSSLEncoder;
 use Martial\Warez\T411\Api\Client;
 use Martial\Warez\T411\Api\Data\DataTransformer;
 use Martial\Warez\T411\Api\Search\QueryFactory;
+use Martial\Warez\Upload\Freebox\FreeboxAuthenticationProvider;
 use Martial\Warez\Upload\UploadAdapterFactory;
 use Martial\Warez\Upload\UploadUrlResolver;
 use Martial\Warez\User\ProfileService;
@@ -223,6 +224,10 @@ class Bootstrap
                 $config['upload']['adapter'],
                 $config['upload']['adapter_config']
             );
+        });
+
+        $app['upload.freebox_authentication_provider'] = $app->share(function() use ($app) {
+            return new FreeboxAuthenticationProvider($app['upload.http_client']);
         });
 
         $app['transmission.http_client'] = $app->share(function() use ($config) {
