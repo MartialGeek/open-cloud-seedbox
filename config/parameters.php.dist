@@ -9,7 +9,6 @@ return [
     'doctrine_password' => '',
     'security_encoder_password' => '',
     'security_encoder_salt' => '',
-    'torrent_files_path' => '/home/warez/torrents',
     'upload_transport_host' => 'http://mafreebox.freebox.fr',
     'upload_transport_port' => 8888,
     'upload_adapter' => 'freebox',
