@@ -66,6 +66,7 @@ interface FreeboxAuthenticationProviderInterface
      *
      * @param array $params
      * @return array
+     * @throws FreeboxAuthenticationException
      */
     public function getApplicationToken(array $params);
 
@@ -84,6 +85,7 @@ interface FreeboxAuthenticationProviderInterface
      *
      * @param int $trackId
      * @return array
+     * @throws FreeboxAuthenticationException
      */
     public function getAuthorizationStatus($trackId);
 
@@ -101,6 +103,7 @@ interface FreeboxAuthenticationProviderInterface
      * </code>
      *
      * @return array
+     * @throws FreeboxAuthenticationException
      */
     public function getChallengeValue();
 
@@ -129,6 +132,7 @@ interface FreeboxAuthenticationProviderInterface
      *
      * @param array $params
      * @return array
+     * @throws FreeboxAuthenticationException
      */
     public function openSession(array $params);
 }
