@@ -2,8 +2,6 @@ Exec['apt_update'] -> Package <| |>
 
 include nginx
 
-$root = '/var/www/warez/web'
-
 $php_packages = [
   'php5-common',
   'php5-cli',
@@ -25,8 +23,14 @@ $misc_packages = [
     'git'
 ]
 
+$project_path  = "/var/www/warez"
+$document_root = "${$project_path}/web"
 $env_path_line = 'PATH=$HOME/.composer/vendor/bin:/opt/nodejs/bin:$PATH'
 $profile_bash_script = '/home/vagrant/.profile'
+
+Exec {
+    path => '/opt/nodejs/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+}
 
 package { $php_packages:
     ensure  => installed,
@@ -34,10 +38,10 @@ package { $php_packages:
 }
 
 exec { 'download_nodejs':
-    command     => '/usr/bin/curl http://nodejs.org/dist/v0.12.0/node-v0.12.0-linux-x64.tar.gz -o /tmp/nodejs.tar.gz',
+    command     => 'curl http://nodejs.org/dist/v0.12.0/node-v0.12.0-linux-x64.tar.gz -o /tmp/nodejs.tar.gz',
     require     => Package['curl'],
     notify      => Exec['untar_nodejs'],
-    unless      => '/usr/bin/test -f /opt/nodejs/bin/node'
+    unless      => 'test -f /opt/nodejs/bin/node'
 }
 
 file { '/opt/nodejs':
@@ -45,7 +49,7 @@ file { '/opt/nodejs':
 }
 
 exec { 'untar_nodejs':
-    command     => '/bin/tar xvf /tmp/nodejs.tar.gz --strip-components 1',
+    command     => 'tar xvf /tmp/nodejs.tar.gz --strip-components 1',
     cwd         => '/opt/nodejs',
     require     => File['/opt/nodejs'],
     refreshonly => true
@@ -57,14 +61,20 @@ file { '/tmp/nodejs.tar.gz':
 }
 
 exec { 'install_sass':
-    command => '/usr/bin/gem install sass',
-    unless  => '/usr/bin/which sass',
+    command => 'gem install sass',
+    unless  => 'which sass',
 }
 
 exec { 'install_grunt':
-    command => '/opt/nodejs/bin/npm install -g grunt-cli',
+    command => 'npm install -g grunt-cli',
     require => Exec['untar_nodejs'],
-    unless => '/opt/nodejs/bin/npm list -g | /bin/grep grunt-cli'
+    unless => 'npm list -g | grep grunt-cli'
+}
+
+exec { 'install_bower':
+    command => 'npm install -g bower',
+    require => Exec['untar_nodejs'],
+    unless => 'npm list -g | grep bower'
 }
 
 file { '/var/log/php5-fpm.log':
@@ -75,21 +85,21 @@ file { '/var/log/php5-fpm.log':
 }
 
 exec { 'install_composer':
-    command => '/usr/bin/curl -sS https://getcomposer.org/installer | sudo /usr/bin/php -- --install-dir=/usr/local/bin --filename=composer',
+    command => 'curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer',
     require => Package['php5-cli'],
-    unless => '/bin/ls /usr/local/bin/composer'
+    unless => 'ls /usr/local/bin/composer'
 }
 
 file { '/home/vagrant/.profile':
     ensure => present
 } ->
 exec { 'add_composer_path':
-    command => "/bin/echo '${env_path_line}' >> ${$profile_bash_script}",
-    unless => "/bin/grep '${$env_path_line}' ${$profile_bash_script}"
+    command => "echo '${env_path_line}' >> ${$profile_bash_script}",
+    unless => "grep '${$env_path_line}' ${$profile_bash_script}"
 }
 
 nginx::resource::vhost { 'warez.dev':
-    www_root             => $root,
+    www_root             => $document_root,
     use_default_location => false,
     index_files          => ['index.php']
 }
@@ -137,4 +147,111 @@ user { 'debian-transmission':
     ensure => present,
     groups => ['debian-transmission', 'www-data'],
     require => Package['transmission-daemon']
+}
+
+file { '/var/www/warez/config/parameters.php':
+    ensure  => present,
+    content => file('/var/www/warez/data/provisioning/files/parameters.php'),
+
+}
+
+service { 'transmission-daemon':
+    ensure => stopped,
+    require => Package['transmission-daemon']
+}
+
+file { '/etc/transmission-daemon/settings.json':
+    ensure  => present,
+    content => file('/var/www/warez/data/provisioning/files/transmission-settings.json'),
+    owner   => 'debian-transmission',
+    group   => 'debian-transmission',
+    mode    => 0600,
+    notify  => Service['transmission-daemon'],
+    require => File['/home/vagrant/.composer/auth.json']
+}
+
+file { '/home/vagrant/.composer':
+    ensure => directory,
+    owner  => 'vagrant',
+    group  => 'vagrant',
+    mode   => 0775
+}
+
+file { '/home/vagrant/.composer/auth.json':
+    ensure  => present,
+    content => file('/var/www/warez/data/provisioning/files/composer-auth.json'),
+    owner   => 'vagrant',
+    group   => 'vagrant',
+    mode    => 0600,
+    require => File['/home/vagrant/.composer']
+}
+
+exec { 'install_composer_dependencies':
+    command     => 'composer install',
+    require     => [
+        Exec['install_composer'],
+        File['/home/vagrant/.composer/auth.json']
+    ],
+    cwd         => $project_path,
+    environment => 'HOME=/home/vagrant',
+    user        => 'vagrant',
+    timeout => 1200
+}
+
+exec { 'install_npm_dependencies':
+    command => 'npm install',
+    require => Exec['untar_nodejs'],
+    cwd     => $project_path,
+    user    => 'vagrant',
+    timeout => 1200
+}
+
+exec { 'install_bower_dependencies':
+    command     => 'bower install --config.interactive=false',
+    require     => Exec['install_bower'],
+    cwd         => $project_path,
+    environment => 'HOME=/home/vagrant',
+    user        => 'vagrant'
+}
+
+exec { 'build_assets':
+    command => 'grunt build',
+    require => [
+        Exec['install_grunt'],
+        Exec['install_npm_dependencies']
+    ],
+    cwd     => $project_path,
+    user    => 'vagrant'
+}
+
+exec { 'symlink_assets':
+    command => "${project_path}/bin/warez assets:install",
+    require => Exec['build_assets'],
+    cwd     => $project_path,
+    user    => 'vagrant'
+}
+
+exec { 'update_sql_schema':
+    command => "${project_path}/bin/doctrine orm:schema-tool:update --force",
+    require => [
+        File['/var/www/warez/config/parameters.php'],
+        Exec['install_composer_dependencies'],
+        Mysql::Db['warez'],
+    ],
+    cwd     => $project_path,
+    user    => 'vagrant'
+}
+
+exec { 'create_warez_user':
+    command => "${project_path}/bin/warez user:create NiceUser nice-user@warez.io warezisfun",
+    require => Exec['update_sql_schema'],
+    cwd     => $project_path,
+    user    => 'vagrant',
+    notify  => Exec['touch /home/vagrant/.warez_user_created'],
+    unless  => 'ls /home/vagrant/.warez_user_created'
+}
+
+exec { 'touch /home/vagrant/.warez_user_created':
+    user        => 'vagrant',
+    refreshonly => true
 }
