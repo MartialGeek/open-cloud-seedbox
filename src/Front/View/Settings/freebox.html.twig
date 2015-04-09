@@ -1,0 +1,9 @@
+{% block settingsSection %}
+    <h2>Freebox settings</h2>
+
+    <form action="{{ path('settings_update', {'key': 'freebox'}) }}" method="post">
+        {{ form_widget(form) }}
+
+        <input type="submit" class="button" value="Update" />
+    </form>
+{% endblock %}

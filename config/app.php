@@ -38,6 +38,9 @@ return [
             ],
             'transmission' => [
                 __DIR__  . '/../src/Front/View/Transmission'
+            ],
+            'settings' => [
+                __DIR__ . '/../src/Front/View/Settings'
             ]
         ]
     ],
@@ -59,7 +62,8 @@ return [
         ],
         'orm' => [
             'paths' => [
-                __DIR__ . '/../src/User/Entity'
+                __DIR__ . '/../src/User/Entity',
+                __DIR__ . '/../src/Settings/Entity'
             ],
             'cache_dir' => __DIR__ . '/../var/cache/doctrine/cache',
             'proxy_dir' => __DIR__ . '/../var/cache/doctrine/proxy',

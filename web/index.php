@@ -36,12 +36,27 @@ $bootstrap->registerControllers([
         'dependencies' => [
             $app['transmission.manager']
         ]
+    ],
+    'settings.controller' => [
+        'class' => '\Martial\Warez\Front\Controller\SettingsController',
+        'dependencies' => [
+            $app['settings.container'],
+            $app['user.service']
+        ]
     ]
 ]);
 
 $app
     ->get('/', 'home.controller:index')
     ->bind('homepage');
+
+$app
+    ->get('/settings', 'settings.controller:displaySections')
+    ->bind('settings');
+
+$app
+    ->post('/settings/{key}', 'settings.controller:updateSettings')
+    ->bind('settings_update');
 
 $app
     ->get('/user/profile', 'user.controller:profile')
