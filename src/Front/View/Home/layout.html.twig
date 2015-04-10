@@ -28,11 +28,14 @@
                     <li{% if currentPage == 'transmission_torrents' %} class="active"{% endif %}>
                         <a href="{{ path('transmission_torrents') }}">Downloads</a>
                     </li>
-                    <li class="has-dropdown">
+                    <li class="has-dropdown{% if currentPage == 'user_profile' or currentPage == 'settings' %} active"{% endif %}">
                         <a id="profile-status" href="{{ path('user_profile') }}">{{ app.session.get('username') }}</a>
                         <ul class="dropdown">
                             <li{% if currentPage == 'user_profile' %} class="active"{% endif %}>
                                 <a href="{{ path('user_profile') }}">Profile</a>
+                            </li>
+                            <li{% if currentPage == 'settings' %} class="active"{% endif %}>
+                                <a href="{{ path('settings') }}">Settings</a>
                             </li>
                             <li><a href="{{ path('logout') }}">Logout</a></li>
                         </ul>
