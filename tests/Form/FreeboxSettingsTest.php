@@ -11,13 +11,15 @@ class FreeboxSettingsTest extends FormTestCase
     {
         $this
             ->formBuilder
-            ->expects($this->exactly(5))
+            ->expects($this->exactly(7))
             ->method('add')
             ->withConsecutive(
                 [
                     $this->equalTo('id'),
                     $this->equalTo('hidden')
                 ],
+                [$this->equalTo('transportHost')],
+                [$this->equalTo('transportPort')],
                 [$this->equalTo('appId')],
                 [$this->equalTo('appName')],
                 [$this->equalTo('appVersion')],

@@ -26,6 +26,18 @@ class FreeboxSettings
 
     /**
      * @var string
+     * @Column(type="string", length=255, name="transport_host")
+     */
+    private $transportHost;
+
+    /**
+     * @var string
+     * @Column(type="string", length=255, name="transport_port")
+     */
+    private $transportPort;
+
+    /**
+     * @var string
      * @Column(type="string", length=255, name="app_id")
      */
     private $appId;
@@ -71,6 +83,41 @@ class FreeboxSettings
         $this->id = $id;
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTransportHost()
+    {
+        return $this->transportHost;
+    }
+
+    /**
+     * @param mixed $transportHost
+     * @return self
+     */
+    public function setTransportHost($transportHost)
+    {
+        $this->transportHost = $transportHost;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTransportPort()
+    {
+        return $this->transportPort;
+    }
+
+    /**
+     * @param string $transportPort
+     */
+    public function setTransportPort($transportPort)
+    {
+        $this->transportPort = $transportPort;
     }
 
     /**

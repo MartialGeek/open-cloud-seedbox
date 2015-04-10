@@ -12,6 +12,8 @@ class FreeboxSettings extends AbstractType
     {
         $builder
             ->add('id', 'hidden')
+            ->add('transportHost')
+            ->add('transportPort')
             ->add('appId')
             ->add('appName')
             ->add('appVersion')
