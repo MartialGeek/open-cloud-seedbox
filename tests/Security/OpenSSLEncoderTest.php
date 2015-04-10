@@ -13,6 +13,7 @@ class OpenSSLEncoderTest extends \PHPUnit_Framework_TestCase
         $data = 'A raw string';
         $encoder = new OpenSSLEncoder($password, $salt);
         $encodedData = $encoder->encode($data);
+        $this->assertNotSame($data, $encodedData);
         $this->assertSame($data, $encoder->decode($encodedData));
     }
 }
