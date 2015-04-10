@@ -47,6 +47,11 @@ class FreeboxSettingsTest extends \PHPUnit_Framework_TestCase
         $this->updateSettings(false);
     }
 
+    public function testUpdateNonExistentSettings()
+    {
+        $this->updateSettings(true, false);
+    }
+
     public function testGetViewWithoutExistingForm()
     {
         $this->getView();
@@ -57,7 +62,7 @@ class FreeboxSettingsTest extends \PHPUnit_Framework_TestCase
         $this->getView(true);
     }
 
-    protected function updateSettings($isValidForm = true)
+    protected function updateSettings($isValidForm = true, $settingsAlreadyExists = true)
     {
         $currentSettings = $this->getFreeboxSettings();
 
@@ -66,9 +71,9 @@ class FreeboxSettingsTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->getSettings($currentSettings);
+        $this->getSettings($currentSettings, $settingsAlreadyExists);
         $form = $this->getMock('\Symfony\Component\Form\FormInterface');
-        $this->createForm($currentSettings, $form);
+        $this->createForm($currentSettings, $form, $settingsAlreadyExists);
 
         $form
             ->expects($this->once())
@@ -82,11 +87,15 @@ class FreeboxSettingsTest extends \PHPUnit_Framework_TestCase
             ->willReturn($isValidForm);
 
         if ($isValidForm) {
+            $entity = $settingsAlreadyExists ?
+                $this->equalTo($currentSettings) :
+                $this->isInstanceOf('\Martial\Warez\Settings\Entity\FreeboxSettings');
+
             $this
                 ->em
                 ->expects($this->once())
                 ->method('persist')
-                ->with($this->equalTo($currentSettings));
+                ->with($entity);
 
             $this
                 ->em
@@ -174,9 +183,11 @@ class FreeboxSettingsTest extends \PHPUnit_Framework_TestCase
             ->getMock();
     }
 
-    protected function getSettings(\PHPUnit_Framework_MockObject_MockObject $currentSettings)
+    protected function getSettings(\PHPUnit_Framework_MockObject_MockObject $currentSettings, $isFound = true)
     {
         $userId = 123;
+        $result = $isFound ? $currentSettings : null;
+        $callsGetId = $isFound ? $this->once() : $this->exactly(2);
 
         $this
             ->em
@@ -187,7 +198,7 @@ class FreeboxSettingsTest extends \PHPUnit_Framework_TestCase
 
         $this
             ->user
-            ->expects($this->once())
+            ->expects($callsGetId)
             ->method('getId')
             ->willReturn($userId);
 
@@ -196,20 +207,25 @@ class FreeboxSettingsTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('findOneBy')
             ->with($this->equalTo(['userId' => $userId]))
-            ->willReturn($currentSettings);
+            ->willReturn($result);
     }
 
     protected function createForm(
         \PHPUnit_Framework_MockObject_MockObject $currentSettings,
-        \PHPUnit_Framework_MockObject_MockObject $form
+        \PHPUnit_Framework_MockObject_MockObject $form,
+        $settingsAlreadyExists = true
     ) {
+        $settings =$settingsAlreadyExists ?
+            $this->equalTo($currentSettings) :
+            $this->isInstanceOf('\Martial\Warez\Settings\Entity\FreeboxSettings');
+
         $this
             ->formFactory
             ->expects($this->once())
             ->method('create')
             ->with(
                 $this->isInstanceOf('\Martial\Warez\Form\FreeboxSettings'),
-                $this->equalTo($currentSettings)
+                $settings
             )
             ->willReturn($form);
     }

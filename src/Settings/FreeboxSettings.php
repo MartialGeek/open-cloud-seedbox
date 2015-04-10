@@ -4,6 +4,7 @@ namespace Martial\Warez\Settings;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Martial\Warez\Form\FreeboxSettings as FreeboxSettingsForm;
+use Martial\Warez\Settings\Entity\FreeboxSettings as FreeboxSettingsEntity;
 use Martial\Warez\User\Entity\User;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -47,6 +48,12 @@ class FreeboxSettings implements SettingsInterface
     public function updateSettings(User $user, $settings)
     {
         $currentSettings = $this->getSettings($user);
+
+        if (is_null($currentSettings)) {
+            $currentSettings = new FreeboxSettingsEntity();
+            $currentSettings->setUserId($user->getId());
+        }
+
         $form = $this->formFactory->create(new FreeboxSettingsForm(), $currentSettings);
         $form->handleRequest($settings);
 
