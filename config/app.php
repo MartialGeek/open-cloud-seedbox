@@ -82,12 +82,7 @@ return [
         ]
     ],
     'upload' => [
-        'transport' => [
-            'host' => $parameters['upload_transport_host'],
-            'port' => $parameters['upload_transport_port'],
-        ],
-        'adapter' => $parameters['upload_adapter'],
-        'adapter_config' => $parameters['upload_adapter_config']
+        'adapter' => $parameters['upload_adapter']
     ],
     'transmission' => [
         'login' => $parameters['transmission_login'],
