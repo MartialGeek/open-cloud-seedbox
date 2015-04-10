@@ -66,6 +66,11 @@ class SettingsControllerTest extends ControllerTestCase
         $this->updateSettings();
     }
 
+    public function testUpdateSettingsWithErrors()
+    {
+        $this->updateSettings(false);
+    }
+
     protected function defineDependencies()
     {
         $dependencies = parent::defineDependencies();
@@ -134,6 +139,7 @@ class SettingsControllerTest extends ControllerTestCase
     {
         $settingsKey = 'freebox';
         $freeboxSettings = $this->settings[$settingsKey];
+        $settingsUpdatingException = new SettingsUpdatingException();
 
         $this
             ->settingsContainer
@@ -144,31 +150,34 @@ class SettingsControllerTest extends ControllerTestCase
 
         $this->getUser();
 
-        $updateResult = $validForm ? null : new SettingsUpdatingException();
+        $updateResult = $validForm ? $this->returnValue(null) : $this->throwException($settingsUpdatingException);
 
         if (!$validForm) {
-            $updateResult->setForm($this->form);
+            $settingsUpdatingException->setForm($this->form);
         }
 
         $freeboxSettings
             ->expects($this->once())
             ->method('updateSettings')
             ->with($this->equalTo($this->user), $this->request)
-            ->willReturn($updateResult);
+            ->will($updateResult);
 
         if ($validForm) {
             $this->addFlash('success', 'Settings successfully update.');
             $this->generateUrl('settings', '/settings');
         } else {
             $this->addFlash('error', 'An error occurred.');
+            $this->getAllSettings();
+            $i = 0;
 
             foreach ($this->settings as $key => $settings) {
-                $form = $key == $settingsKey ? $updateResult->getForm() : null;
+                $form = $key == $settingsKey ? $settingsUpdatingException->getForm() : null;
                 $settings
                     ->expects($this->once())
                     ->method('getView')
                     ->with($this->equalTo($this->user), $this->equalTo($form))
-                    ->willReturn($this->views[$key]);
+                    ->willReturn($this->views[$i]);
+                $i++;
             }
 
             $this->render('@settings/display-sections.html.twig', [
