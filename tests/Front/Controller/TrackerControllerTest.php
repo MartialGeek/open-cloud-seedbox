@@ -2,6 +2,7 @@
 
 namespace Martial\Warez\Tests\Front\Controller;
 
+use Martial\Warez\Download\TorrentClientException;
 use Martial\Warez\Form\TrackerSearch;
 use Martial\Warez\Front\Controller\TrackerController;
 
@@ -63,6 +64,16 @@ class TrackerControllerTest extends ControllerTestCase
         ]);
     }
 
+    public function testDownloadWithoutErrors()
+    {
+        $this->download();
+    }
+
+    public function testDownloadWithErrors()
+    {
+        $this->download(true);
+    }
+
     protected function search(array $options = [])
     {
         $userId = 12;
@@ -79,6 +90,7 @@ class TrackerControllerTest extends ControllerTestCase
         }
 
         $this->sessionGet($sessionGet);
+        $this->sessionHas(['api_token' => $options['is_user_authenticated']]);
         $this->checkTrackerAuthentication($userId, $trackerUsername, $trackerPassword, $options['is_user_authenticated']);
         $this->hasQueryParameter('tracker_search', $options['has_search']);
 
@@ -150,10 +162,61 @@ class TrackerControllerTest extends ControllerTestCase
         $this->controller->search($this->request);
     }
 
+    protected function download($withErrors = false)
+    {
+        $userId = 12;
+        $torrentId = 45612;
+        $trackerUsername = 'Toto';
+        $trackerPassword = sha1($trackerUsername);
+        $isAuthenticated = true;
+        $transmissionSessionId = uniqid();
+
+        $torrent = $this
+            ->getMockBuilder('\Symfony\Component\HttpFoundation\File\File')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->sessionGet([
+            'api_token' => $this->trackerToken,
+            'transmission_session_id' => $transmissionSessionId
+        ]);
+
+        $this->sessionHas([
+            'api_token' => $isAuthenticated,
+            'transmission_session_id' => true
+        ]);
+
+        $this->checkTrackerAuthentication($userId, $trackerUsername, $trackerPassword, $isAuthenticated);
+
+        $this
+            ->client
+            ->expects($this->once())
+            ->method('download')
+            ->with($this->equalTo($this->trackerToken), $this->equalTo($torrentId))
+            ->willReturn($torrent);
+
+        $torrentClientResult = $withErrors ?
+            $this->throwException(new TorrentClientException()) :
+            $this->returnValue(null);
+
+        $this
+            ->torrentClient
+            ->expects($this->once())
+            ->method('addToQueue')
+            ->with($this->equalTo($transmissionSessionId), $this->equalTo($torrent))
+            ->will($torrentClientResult);
+
+        $response = $this->controller->download($torrentId);
+
+        if ($withErrors) {
+            $this->assertSame(500, $response->getStatusCode());
+        } else {
+            $this->assertSame(200, $response->getStatusCode());
+        }
+    }
+
     protected function checkTrackerAuthentication($userId, $trackerUsername, $trackerPassword, $isAuthenticated = false)
     {
-        $this->sessionHas(['api_token' => $isAuthenticated]);
-
         if (!$isAuthenticated) {
             $this
                 ->userService
