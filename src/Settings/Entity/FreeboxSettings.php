@@ -61,6 +61,24 @@ class FreeboxSettings
     private $deviceName;
 
     /**
+     * @var string
+     * @Column(type="string", length=255, name="app_token")
+     */
+    private $appToken;
+
+    /**
+     * @var int
+     * @Column(type="smallint", name="track_id")
+     */
+    private $trackId;
+
+    /**
+     * @var string
+     * @Column(type="string", length=255)
+     */
+    private $challenge;
+
+    /**
      * @var int
      * @Column(type="integer")
      */
@@ -192,6 +210,63 @@ class FreeboxSettings
     public function setDeviceName($deviceName)
     {
         $this->deviceName = $deviceName;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAppToken()
+    {
+        return $this->appToken;
+    }
+
+    /**
+     * @param string $appToken
+     * @return self
+     */
+    public function setAppToken($appToken)
+    {
+        $this->appToken = $appToken;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTrackId()
+    {
+        return $this->trackId;
+    }
+
+    /**
+     * @param int $trackId
+     * @return self
+     */
+    public function setTrackId($trackId)
+    {
+        $this->trackId = $trackId;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getChallenge()
+    {
+        return $this->challenge;
+    }
+
+    /**
+     * @param string $challenge
+     * @return self
+     */
+    public function setChallenge($challenge)
+    {
+        $this->challenge = $challenge;
 
         return $this;
     }
