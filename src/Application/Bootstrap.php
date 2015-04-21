@@ -83,11 +83,9 @@ class Bootstrap
     {
         $app = $this->app;
 
-        foreach ($controllers as $serviceKey => $definition) {
-            $app[$serviceKey] = $app->share(function() use ($app, $definition) {
-                $dependencies = isset($definition['dependencies']) ? $definition['dependencies'] : [];
-
-                return $this->getControllerInstance($definition['class'], $dependencies);
+        foreach ($controllers as $serviceKey => $parameters) {
+            $app[$serviceKey] = $app->share(function() use ($app, $parameters) {
+                return $this->getControllerInstance($parameters['class'], $parameters);
             });
         }
     }
@@ -112,7 +110,8 @@ class Bootstrap
         $this->app['settings.container']->register('freebox', new FreeboxSettings(
             $this->app['twig'],
             $this->app['form.factory'],
-            $this->app['doctrine.entity_manager']
+            $this->app['doctrine.entity_manager'],
+            $this->app['controllers']
         ));
     }
 
@@ -214,9 +213,7 @@ class Bootstrap
         });
 
         $app['upload.http_client'] = $app->share(function() use ($app, $config) {
-            return new GuzzleClient([
-                'base_url' => $config['upload']['transport']['host'] . ':' . $config['upload']['transport']['port']
-            ]);
+            return new GuzzleClient();
         });
 
         $app['upload.url_resolver'] = $app->share(function() {
@@ -263,20 +260,33 @@ class Bootstrap
      * Returns an instance of a controller class.
      *
      * @param string $controllerClass
-     * @param array $additionalDependencies
+     * @param array $parameters
      * @return AbstractController
      */
-    protected function getControllerInstance($controllerClass, array $additionalDependencies = [])
+    protected function getControllerInstance($controllerClass, array $parameters = [])
     {
         $reflectionClass = new \ReflectionClass($controllerClass);
+        $dependencies = isset($parameters['dependencies']) ? $parameters['dependencies'] : [];
 
-        $defaultDependencies = [
-            $this->app['twig'],
-            $this->app['form.factory'],
-            $this->app['session'],
-            $this->app['url_generator']
-        ];
+        $defaultDependencies = [];
 
-        return $reflectionClass->newInstanceArgs(array_merge($defaultDependencies, $additionalDependencies));
+        if ($reflectionClass->isSubclassOf('\Martial\Warez\Front\Controller\AbstractController')) {
+            $defaultDependencies = [
+                $this->app['twig'],
+                $this->app['form.factory'],
+                $this->app['session'],
+                $this->app['url_generator']
+            ];
+        }
+
+        $controller = $reflectionClass->newInstanceArgs(array_merge($defaultDependencies, $dependencies));
+
+        if (isset($parameters['calls'])) {
+            foreach ($parameters['calls'] as $method => $argument) {
+                call_user_func_array([$controller, $method], [$argument]);
+            }
+        }
+
+        return $controller;
     }
 }
