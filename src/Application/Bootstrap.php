@@ -15,8 +15,6 @@ use Martial\Warez\Security\AuthenticationProvider;
 use Martial\Warez\Security\BlowfishHashPassword;
 use Martial\Warez\Security\Firewall;
 use Martial\Warez\Security\OpenSSLEncoder;
-use Martial\Warez\Settings\FreeboxSettings;
-use Martial\Warez\Settings\SettingsContainer;
 use Martial\Warez\T411\Api\Client;
 use Martial\Warez\T411\Api\Data\DataTransformer;
 use Martial\Warez\T411\Api\Search\QueryFactory;
@@ -106,13 +104,6 @@ class Bootstrap
 
         $this->app['twig']->addExtension(new TransmissionExtension());
         $this->app['twig']->addExtension(new FileExtension());
-
-        $this->app['settings.container']->register('freebox', new FreeboxSettings(
-            $this->app['twig'],
-            $this->app['form.factory'],
-            $this->app['doctrine.entity_manager'],
-            $this->app['controllers']
-        ));
     }
 
     protected function registerServiceProviders()
@@ -249,10 +240,6 @@ class Bootstrap
 
         $app['transmission.manager'] = $app->share(function() use ($app, $config) {
             return new TransmissionManager($app['transmission.http_client'], $config['transmission']);
-        });
-
-        $app['settings.container'] = $app->share(function() {
-            return new SettingsContainer();
         });
     }
 
