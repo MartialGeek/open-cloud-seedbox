@@ -98,12 +98,7 @@ JSON;
             ->expects($this->once())
             ->method('post')
             ->with($this->equalTo('/api/v3/login/authorize'), $this->equalTo([
-                'body' => [
-                    'app_id' => $params['app_id'],
-                    'app_name' => $params['app_name'],
-                    'app_version' => $params['app_version'],
-                    'device_name' => $params['device_name'],
-                ]
+                'body' => json_encode($params, JSON_FORCE_OBJECT)
             ]))
             ->willReturn($this->response);
 
@@ -202,14 +197,14 @@ JSON;
             ->expects($this->once())
             ->method('post')
             ->with($this->equalTo('/api/v3/login/session'), $this->equalTo([
-                    'body' => [
+                    'body' => json_encode([
                         'app_id' => $params['app_id'],
                         'password' => hash_hmac(
                             'sha1',
                             $params['app_token'],
                             $params['challenge']
                         )
-                    ]
+                    ], JSON_FORCE_OBJECT)
             ]))
             ->willReturn($this->response);
 

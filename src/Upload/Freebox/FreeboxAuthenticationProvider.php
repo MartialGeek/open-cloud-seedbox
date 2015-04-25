@@ -49,12 +49,7 @@ class FreeboxAuthenticationProvider implements FreeboxAuthenticationProviderInte
         $response = $this
             ->httpClient
             ->post('/api/v3/login/authorize', [
-                'body' => [
-                    'app_id' => $params['app_id'],
-                    'app_name' => $params['app_name'],
-                    'app_version' => $params['app_version'],
-                    'device_name' => $params['device_name'],
-                ]
+                'body' => json_encode($params, JSON_FORCE_OBJECT)
             ])
             ->json();
 
@@ -149,17 +144,19 @@ class FreeboxAuthenticationProvider implements FreeboxAuthenticationProviderInte
      */
     public function openSession(array $params)
     {
+        $body = json_encode([
+            'app_id' => $params['app_id'],
+            'password' => hash_hmac(
+                'sha1',
+                $params['app_token'],
+                $params['challenge']
+            )
+        ]);
+
         $response = $this
             ->httpClient
             ->post('/api/v3/login/session', [
-                'body' => [
-                    'app_id' => $params['app_id'],
-                    'password' => hash_hmac(
-                        'sha1',
-                        $params['app_token'],
-                        $params['challenge']
-                    )
-                ]
+                'body' => $body
             ])
             ->json();
 
