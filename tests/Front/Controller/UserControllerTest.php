@@ -3,7 +3,6 @@
 namespace Martial\Warez\Tests\Front\Controller;
 
 use Martial\Warez\Form\Login;
-use Martial\Warez\Form\Profile;
 use Martial\Warez\Front\Controller\UserController;
 use Martial\Warez\Security\BadCredentialsException;
 use Martial\Warez\User\UserNotFoundException;
@@ -14,7 +13,6 @@ class UserControllerTest extends ControllerTestCase
     const LOGIN_FAILED = 2;
     const LOGIN_FORM_INVALID = 3;
     const EMAIL_NOT_FOUND = 4;
-    const PROFILE_FORM_INVALID = 5;
 
     /**
      * @var UserController
@@ -25,11 +23,6 @@ class UserControllerTest extends ControllerTestCase
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     public $userService;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    public $profileService;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -64,49 +57,6 @@ class UserControllerTest extends ControllerTestCase
         $this->addFlash('notice', 'You are logged out.');
         $this->generateUrl('homepage', '/');
         $this->controller->logout();
-    }
-
-    public function testDisplayProfile()
-    {
-        $profile = $this
-            ->getMockBuilder('\Martial\Warez\User\Entity\Profile')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $userId = 123;
-
-        $this->sessionGet(['user_id' => $userId]);
-
-        $this
-            ->userService
-            ->expects($this->once())
-            ->method('getProfile')
-            ->with($this->equalTo($userId))
-            ->will($this->returnValue($profile));
-
-        $profile
-            ->expects($this->once())
-            ->method('setTrackerPassword')
-            ->with($this->equalTo(null))
-            ->will($this->returnValue($this->user));
-
-        $this->createForm(new Profile(), $profile);
-        $this->createFormView();
-        $this->render('@user/profile.html.twig', [
-            'formProfile' => $this->formView
-        ]);
-
-        $this->controller->profile();
-    }
-
-    public function testUpdateProfile()
-    {
-        $this->updateProfile();
-    }
-
-    public function testUpdateInvalidProfile()
-    {
-        $this->updateProfile([self::PROFILE_FORM_INVALID]);
     }
 
     /**
@@ -184,56 +134,6 @@ class UserControllerTest extends ControllerTestCase
         $this->controller->login($this->request);
     }
 
-    protected function updateProfile(array $options = [])
-    {
-        $this->createForm(new Profile());
-        $this->handleRequest($this->request);
-
-        if (in_array(self::PROFILE_FORM_INVALID, $options)) {
-            $this->formIsNotValid();
-            $this->createFormView();
-            $this->render('@user/profile.html.twig', [
-                'formProfile' => $this->formView
-            ]);
-        } else {
-            $this->formIsValid();
-            $userId = 123;
-            $this->sessionGet(['user_id' => $userId]);
-            $this->sessionRemove(['api_token']);
-
-            $profile = $this
-                ->getMockBuilder('\Martial\Warez\User\Entity\Profile')
-                ->disableOriginalConstructor()
-                ->getMock();
-
-            $this
-                ->form
-                ->expects($this->once())
-                ->method('getData')
-                ->will($this->returnValue($profile));
-
-            $this
-                ->userService
-                ->expects($this->once())
-                ->method('updateProfile')
-                ->with($this->equalTo($userId), $this->equalTo($profile));
-
-            $this->addFlash('success', 'Profile successfully updated.');
-            $this->generateUrl('user_profile', '/user/profile');
-        }
-
-        $this->controller->profileUpdate($this->request);
-    }
-
-    protected function defineDependencies()
-    {
-        $dependencies = parent::defineDependencies();
-        $dependencies[] = $this->userService;
-        $dependencies[] = $this->profileService;
-
-        return $dependencies;
-    }
-
     protected function authenticateByEmail(array $loginParameters, \PHPUnit_Framework_MockObject_Stub $returnValue)
     {
         $this->getRequestParameter('login', $loginParameters);
@@ -245,10 +145,17 @@ class UserControllerTest extends ControllerTestCase
             ->will($returnValue);
     }
 
+    protected function defineDependencies()
+    {
+        $dependencies = parent::defineDependencies();
+        $dependencies[] = $this->userService;
+
+        return $dependencies;
+    }
+
     protected function setUp()
     {
         $this->userService = $this->getMock('\Martial\Warez\User\UserServiceInterface');
-        $this->profileService = $this->getMock('\Martial\Warez\User\ProfileServiceInterface');
 
         $this->user = $this
             ->getMockBuilder('\Martial\Warez\User\Entity\User')

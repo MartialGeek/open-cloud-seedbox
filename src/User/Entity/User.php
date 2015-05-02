@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\PrePersist;
 use Doctrine\ORM\Mapping\PreUpdate;
 use Doctrine\ORM\Mapping\Table;
+use Martial\Warez\Settings\Entity\TrackerSettingsEntity;
 
 /**
  * Class User
@@ -48,10 +49,10 @@ class User
     protected $password;
 
     /**
-     * @var Profile
-     * @OneToOne(targetEntity="Profile", mappedBy="user")
+     * @var TrackerSettingsEntity
+     * @OneToOne(targetEntity="Martial\Warez\Settings\Entity\TrackerSettingsEntity", mappedBy="user")
      */
-    protected $profile;
+    protected $trackerSettings;
 
     /**
      * @var \DateTime
@@ -142,22 +143,19 @@ class User
     }
 
     /**
-     * @return Profile
+     * @return TrackerSettingsEntity
      */
-    public function getProfile()
+    public function getTrackerSettings()
     {
-        return $this->profile;
+        return $this->trackerSettings;
     }
 
     /**
-     * @param Profile $profile
-     * @return User
+     * @param TrackerSettingsEntity $trackerSettings
      */
-    public function setProfile(Profile $profile)
+    public function setTrackerSettings(TrackerSettingsEntity $trackerSettings)
     {
-        $this->profile = $profile;
-
-        return $this;
+        $this->trackerSettings = $trackerSettings;
     }
 
     /**

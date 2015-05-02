@@ -15,13 +15,13 @@ use Martial\Warez\Security\AuthenticationProvider;
 use Martial\Warez\Security\BlowfishHashPassword;
 use Martial\Warez\Security\Firewall;
 use Martial\Warez\Security\OpenSSLEncoder;
+use Martial\Warez\Settings\TrackerSettings;
 use Martial\Warez\T411\Api\Client;
 use Martial\Warez\T411\Api\Data\DataTransformer;
 use Martial\Warez\T411\Api\Search\QueryFactory;
 use Martial\Warez\Upload\Freebox\FreeboxAuthenticationProvider;
 use Martial\Warez\Upload\UploadAdapterFactory;
 use Martial\Warez\Upload\UploadUrlResolver;
-use Martial\Warez\User\ProfileService;
 use Martial\Warez\User\UserService;
 use Silex\Application;
 use Silex\Provider\DoctrineServiceProvider;
@@ -191,12 +191,12 @@ class Bootstrap
                 $app['doctrine.entity_manager'],
                 $app['security.authentication_provider'],
                 $app['security.password_hash'],
-                $app['profile.service']
+                $app['settings.tracker']
             );
         });
 
-        $app['profile.service'] = $app->share(function() use ($app) {
-            return new ProfileService($app['security.encoder']);
+        $app['settings.tracker'] = $app->share(function() use ($app) {
+            return new TrackerSettings($app['security.encoder']);
         });
 
         $app['security.firewall'] = $app->share(function() use ($app) {

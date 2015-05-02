@@ -26,7 +26,7 @@ class TrackerControllerTest extends ControllerTestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    public $profileService;
+    public $settings;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -36,7 +36,7 @@ class TrackerControllerTest extends ControllerTestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    public $profile;
+    public $entity;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -228,25 +228,25 @@ class TrackerControllerTest extends ControllerTestCase
             $this
                 ->user
                 ->expects($this->once())
-                ->method('getProfile')
-                ->will($this->returnValue($this->profile));
+                ->method('getTrackerSettings')
+                ->will($this->returnValue($this->entity));
 
             $this
-                ->profileService
+                ->settings
                 ->expects($this->once())
                 ->method('decodeTrackerPassword')
-                ->with($this->equalTo($this->profile));
+                ->with($this->equalTo($this->entity));
 
             $this
-                ->profile
+                ->entity
                 ->expects($this->once())
-                ->method('getTrackerUsername')
+                ->method('getUsername')
                 ->will($this->returnValue($trackerUsername));
 
             $this
-                ->profile
+                ->entity
                 ->expects($this->once())
-                ->method('getTrackerPassword')
+                ->method('getPassword')
                 ->will($this->returnValue($trackerPassword));
 
             $this
@@ -264,13 +264,13 @@ class TrackerControllerTest extends ControllerTestCase
     {
         $this->client = $this->getMock('\Martial\Warez\T411\Api\ClientInterface');
         $this->userService = $this->getMock('\Martial\Warez\User\UserServiceInterface');
-        $this->profileService = $this->getMock('\Martial\Warez\User\ProfileServiceInterface');
+        $this->settings = $this->getMock('\Martial\Warez\Settings\TrackerSettingsInterface');
         $this->torrentClient = $this->getMock('\Martial\Warez\Download\TorrentClientInterface');
 
         $dependencies = parent::defineDependencies();
         $dependencies[] = $this->client;
         $dependencies[] = $this->userService;
-        $dependencies[] = $this->profileService;
+        $dependencies[] = $this->settings;
         $dependencies[] = $this->torrentClient;
 
         return $dependencies;
@@ -295,8 +295,8 @@ class TrackerControllerTest extends ControllerTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->profile = $this
-            ->getMockBuilder('\Martial\Warez\User\Entity\Profile')
+        $this->entity = $this
+            ->getMockBuilder('\Martial\Warez\Settings\Entity\TrackerSettingsEntity')
             ->disableOriginalConstructor()
             ->getMock();
 

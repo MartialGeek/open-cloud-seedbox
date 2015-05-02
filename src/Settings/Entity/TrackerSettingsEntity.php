@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\User\Entity;
+namespace Martial\Warez\Settings\Entity;
 
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -12,15 +12,16 @@ use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\PrePersist;
 use Doctrine\ORM\Mapping\PreUpdate;
 use Doctrine\ORM\Mapping\Table;
+use Martial\Warez\User\Entity\User;
 
 /**
  * Class Profile
- * @package Martial\Warez\User\Entity
+ * @package Martial\Warez\Settings\Entity
  * @Entity
- * @Table(name="profile")
+ * @Table(name="settings_tracker")
  * @HasLifecycleCallbacks
  */
-class Profile
+class TrackerSettingsEntity
 {
     /**
      * @var int
@@ -34,17 +35,17 @@ class Profile
      * @var string
      * @Column(type="string", name="tracker_password", length=255)
      */
-    protected $trackerPassword;
+    protected $password;
 
     /**
      * @var string
      * @Column(type="string", name="tracker_username", length=255)
      */
-    protected $trackerUsername;
+    protected $username;
 
     /**
      * @var User
-     * @OneToOne(targetEntity="User", inversedBy="profile")
+     * @OneToOne(targetEntity="Martial\Warez\User\Entity\User", inversedBy="trackerSettings")
      * @JoinColumn(name="user_id", referencedColumnName="id")
      */
     protected $user;
@@ -71,7 +72,7 @@ class Profile
 
     /**
      * @param int $id
-     * @return Profile
+     * @return self
      */
     public function setId($id)
     {
@@ -83,18 +84,18 @@ class Profile
     /**
      * @return string
      */
-    public function getTrackerPassword()
+    public function getPassword()
     {
-        return $this->trackerPassword;
+        return $this->password;
     }
 
     /**
-     * @param string $trackerPassword
-     * @return Profile
+     * @param string $password
+     * @return self
      */
-    public function setTrackerPassword($trackerPassword)
+    public function setPassword($password)
     {
-        $this->trackerPassword = $trackerPassword;
+        $this->password = $password;
 
         return $this;
     }
@@ -102,18 +103,18 @@ class Profile
     /**
      * @return string
      */
-    public function getTrackerUsername()
+    public function getUsername()
     {
-        return $this->trackerUsername;
+        return $this->username;
     }
 
     /**
-     * @param string $trackerUsername
-     * @return Profile
+     * @param string $username
+     * @return self
      */
-    public function setTrackerUsername($trackerUsername)
+    public function setUsername($username)
     {
-        $this->trackerUsername = $trackerUsername;
+        $this->username = $username;
 
         return $this;
     }
@@ -128,7 +129,7 @@ class Profile
 
     /**
      * @param User $user
-     * @return Profile
+     * @return self
      */
     public function setUser($user)
     {
@@ -147,7 +148,7 @@ class Profile
 
     /**
      * @param \DateTime $createdAt
-     * @return Profile
+     * @return self
      */
     public function setCreatedAt(\DateTime $createdAt)
     {
@@ -166,7 +167,7 @@ class Profile
 
     /**
      * @param \DateTime $updatedAt
-     * @return Profile
+     * @return self
      */
     public function setUpdatedAt(\DateTime $updatedAt)
     {

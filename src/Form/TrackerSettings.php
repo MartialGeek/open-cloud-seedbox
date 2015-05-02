@@ -6,7 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class Profile extends AbstractType
+class TrackerSettings extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
@@ -15,8 +15,8 @@ class Profile extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('trackerUsername')
-            ->add('trackerPassword', 'password', [
+            ->add('username')
+            ->add('password', 'password', [
                 'required' => false
             ]);
     }
@@ -27,7 +27,7 @@ class Profile extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => '\Martial\Warez\User\Entity\Profile'
+            'data_class' => '\Martial\Warez\Settings\Entity\TrackerSettingsEntity'
         ]);
     }
 
@@ -38,6 +38,6 @@ class Profile extends AbstractType
      */
     public function getName()
     {
-        return 'profile';
+        return 'tracker_settings';
     }
 }

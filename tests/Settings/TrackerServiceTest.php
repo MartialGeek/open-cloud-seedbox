@@ -2,19 +2,19 @@
 
 namespace Martial\Warez\Tests\User;
 
-use Martial\Warez\User\ProfileService;
+use Martial\Warez\Settings\TrackerSettings;
 
-class ProfileServiceTest extends \PHPUnit_Framework_TestCase
+class TrackerServiceTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ProfileService
+     * @var TrackerSettings
      */
-    public $service;
+    public $settings;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    public $profile;
+    public $entity;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -34,17 +34,17 @@ class ProfileServiceTest extends \PHPUnit_Framework_TestCase
     public function testTrackerPasswordEncoding()
     {
         $this
-            ->profile
+            ->entity
             ->expects($this->once())
-            ->method('getTrackerPassword')
+            ->method('getPassword')
             ->will($this->returnValue($this->trackerPassword));
 
         $this
-            ->profile
+            ->entity
             ->expects($this->once())
-            ->method('setTrackerPassword')
+            ->method('setPassword')
             ->with($this->equalTo($this->encodedTrackerPassword))
-            ->will($this->returnValue($this->profile));
+            ->will($this->returnValue($this->entity));
 
         $this
             ->encoder
@@ -53,23 +53,23 @@ class ProfileServiceTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo($this->trackerPassword))
             ->will($this->returnValue($this->encodedTrackerPassword));
 
-        $this->service->encodeTrackerPassword($this->profile);
+        $this->settings->encodeTrackerPassword($this->entity);
     }
 
     public function testTrackerPasswordDecoding()
     {
         $this
-            ->profile
+            ->entity
             ->expects($this->once())
-            ->method('getTrackerPassword')
+            ->method('getPassword')
             ->will($this->returnValue($this->encodedTrackerPassword));
 
         $this
-            ->profile
+            ->entity
             ->expects($this->once())
-            ->method('setTrackerPassword')
+            ->method('setPassword')
             ->with($this->equalTo($this->trackerPassword))
-            ->will($this->returnValue($this->profile));
+            ->will($this->returnValue($this->entity));
 
         $this
             ->encoder
@@ -78,18 +78,18 @@ class ProfileServiceTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo($this->encodedTrackerPassword))
             ->will($this->returnValue($this->trackerPassword));
 
-        $this->service->decodeTrackerPassword($this->profile);
+        $this->settings->decodeTrackerPassword($this->entity);
     }
 
     protected function setUp()
     {
-        $this->profile = $this
-            ->getMockBuilder('\Martial\Warez\User\Entity\Profile')
+        $this->entity = $this
+            ->getMockBuilder('\Martial\Warez\Settings\Entity\TrackerSettingsEntity')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->encoder = $this->getMock('\Martial\Warez\Security\EncoderInterface');
-        $this->service = new ProfileService($this->encoder);
+        $this->settings = new TrackerSettings($this->encoder);
         $this->trackerPassword = sha1(uniqid());
         $this->encodedTrackerPassword = md5($this->trackerPassword);
     }

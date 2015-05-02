@@ -7,7 +7,6 @@ use Doctrine\ORM\NoResultException;
 use Martial\Warez\Security\AuthenticationProviderInterface;
 use Martial\Warez\Security\BadCredentialsException;
 use Martial\Warez\Security\PasswordHashInterface;
-use Martial\Warez\User\Entity\Profile;
 use Martial\Warez\User\Entity\User;
 use Martial\Warez\User\Repository\UserRepositoryInterface;
 
@@ -29,26 +28,18 @@ class UserService implements UserServiceInterface
     private $passwordHash;
 
     /**
-     * @var ProfileServiceInterface
-     */
-    private $profileService;
-
-    /**
      * @param EntityManager $em
      * @param AuthenticationProviderInterface $authentication
      * @param PasswordHashInterface $passwordHash
-     * @param ProfileServiceInterface $profileService
      */
     public function __construct(
         EntityManager $em,
         AuthenticationProviderInterface $authentication,
-        PasswordHashInterface $passwordHash,
-        ProfileServiceInterface $profileService
+        PasswordHashInterface $passwordHash
     ) {
         $this->em = $em;
         $this->authentication = $authentication;
         $this->passwordHash = $passwordHash;
-        $this->profileService = $profileService;
     }
 
     /**
@@ -140,53 +131,6 @@ class UserService implements UserServiceInterface
         }
 
         return $user;
-    }
-
-    /**
-     * Updates the profile of a user.
-     *
-     * @param int $userId
-     * @param Profile $profile
-     * @return Profile
-     */
-    public function updateProfile($userId, Profile $profile)
-    {
-        $user = $this->find($userId);
-        $currentProfile = is_null($user->getProfile()) ? new Profile() : $user->getProfile();
-        $currentTrackerPassword = $currentProfile->getTrackerPassword();
-        $newTrackerPassword = $profile->getTrackerPassword();
-
-        if ($currentTrackerPassword != $newTrackerPassword && !is_null($newTrackerPassword)) {
-            $currentProfile->setTrackerPassword($newTrackerPassword);
-            $this->profileService->encodeTrackerPassword($currentProfile);
-        }
-
-        $currentProfile->setTrackerUsername($profile->getTrackerUsername());
-        $currentProfile->setUser($user);
-
-        $this->em->persist($currentProfile);
-        $this->em->flush();
-
-        return $profile;
-    }
-
-    /**
-     * Retrieves the profile of a user.
-     *
-     * @param int $userId
-     * @return Profile
-     */
-    public function getProfile($userId)
-    {
-        $user = $this->find($userId);
-        $profile = $user->getProfile();
-
-        if (is_null($profile)) {
-            $profile = new Profile();
-            $profile->setUser($user);
-        }
-
-        return $profile;
     }
 
     /**

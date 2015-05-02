@@ -138,21 +138,6 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
         $this->find([self::USER_NOT_FOUND]);
     }
 
-    public function testUpdateProfile()
-    {
-        $this->updateProfile();
-    }
-
-    public function testUpdateProfileWithSameTrackerPassword()
-    {
-        $this->updateProfile([self::UPDATE_PROFILE_SAME_TRACKER_PASSWORD]);
-    }
-
-    public function testGetProfile()
-    {
-        $this->getProfile();
-    }
-
     protected function register(array $options = [])
     {
         $this->getRepository($this->any());
@@ -240,84 +225,6 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
         if (!in_array(self::USER_NOT_FOUND, $options)) {
             $this->assertSame($this->userEntity, $user);
         }
-    }
-
-    protected function updateProfile(array $options = [])
-    {
-        $currentTrackerPassword = 'trackerP@ssw0rd';
-        $updatedTrackerPassword = in_array(self::UPDATE_PROFILE_SAME_TRACKER_PASSWORD, $options) ?
-            $currentTrackerPassword :
-            'newTr@ckerP@ssw0rd';
-
-        $trackerUserName = 'Toto';
-
-        $profile = $this
-            ->getMockBuilder('\Martial\Warez\User\Entity\Profile')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $currentProfile = $this
-            ->getMockBuilder('\Martial\Warez\User\Entity\Profile')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->userEntity->setId(123);
-        $this->userEntity->setProfile($currentProfile);
-
-        $this->getRepository($this->once());
-        $this
-            ->repo
-            ->expects($this->once())
-            ->method('find')
-            ->with($this->equalTo($this->userEntity->getId()))
-            ->will($this->returnValue($this->userEntity));
-
-        $profile
-            ->expects($this->once())
-            ->method('getTrackerPassword')
-            ->will($this->returnValue($updatedTrackerPassword));
-
-        $currentProfile
-            ->expects($this->once())
-            ->method('getTrackerPassword')
-            ->will($this->returnValue($currentTrackerPassword));
-
-        if (!in_array(self::UPDATE_PROFILE_SAME_TRACKER_PASSWORD, $options)) {
-            $currentProfile
-                ->expects($this->once())
-                ->method('setTrackerPassword')
-                ->with($this->equalTo($updatedTrackerPassword))
-                ->will($this->returnValue($currentProfile));
-
-            $this
-                ->profileService
-                ->expects($this->once())
-                ->method('encodeTrackerPassword')
-                ->with($this->equalTo($currentProfile));
-        }
-
-        $profile
-            ->expects($this->once())
-            ->method('getTrackerUsername')
-            ->will($this->returnValue($trackerUserName));
-
-        $currentProfile
-            ->expects($this->once())
-            ->method('setTrackerUsername')
-            ->with($this->equalTo($trackerUserName))
-            ->will($this->returnValue($currentProfile));
-
-        $this->persist($currentProfile);
-        $this->flush();
-
-        $this->userService->updateProfile($this->userEntity->getId(), $profile);
-    }
-
-    protected function getProfile()
-    {
-        $this->findUserFromRepo($this->userEntity);
-        $profile = $this->userService->getProfile($this->userEntity->getId());
-        $this->assertInstanceOf('\Martial\Warez\User\Entity\Profile', $profile);
     }
 
     protected function getRepository(\PHPUnit_Framework_MockObject_Matcher_Invocation $numberOfCalls)
