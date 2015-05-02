@@ -197,7 +197,7 @@ class Bootstrap
         });
 
         $app['settings.tracker'] = $app->share(function() use ($app) {
-            return new TrackerSettings($app['security.encoder']);
+            return new TrackerSettings($app['security.encoder'], $app['doctrine.entity_manager']);
         });
 
         $app['settings.freebox'] = $app->share(function() use ($app) {

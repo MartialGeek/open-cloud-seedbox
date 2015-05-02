@@ -1,0 +1,16 @@
+{% extends "@home/layout.html.twig" %}
+
+{% block content %}
+    <div class="row">
+        <div class="small-3 columns">
+            <ul class="side-nav">
+                <li><a href="{{ path('settings_freebox') }}">Freebox</a></li>
+                <li><a href="{{ path('settings_tracker') }}">Tracker</a></li>
+            </ul>
+        </div>
+
+        <div class="small-9 columns">
+            {% block settings %}{% endblock %}
+        </div>
+    </div>
+{% endblock %}

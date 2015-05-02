@@ -6,7 +6,7 @@ use Martial\Warez\Download\TorrentClientException;
 use Martial\Warez\Download\TorrentClientInterface;
 use Martial\Warez\Download\TransmissionSessionTrait;
 use Martial\Warez\Form\TrackerSearch;
-use Martial\Warez\Settings\TrackerSettingsInterface;
+use Martial\Warez\Settings\TrackerSettings;
 use Martial\Warez\T411\Api\ClientInterface;
 use Martial\Warez\User\UserServiceInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -30,9 +30,9 @@ class TrackerController extends AbstractController
     private $userService;
 
     /**
-     * @var TrackerSettingsInterface
+     * @var TrackerSettings
      */
-    private $settings;
+    private $settingsManager;
 
     /**
      * @var TorrentClientInterface
@@ -46,7 +46,7 @@ class TrackerController extends AbstractController
      * @param UrlGeneratorInterface $urlGenerator
      * @param ClientInterface $client
      * @param UserServiceInterface $userService
-     * @param TrackerSettingsInterface $profileService
+     * @param TrackerSettings $settingsManager
      * @param TorrentClientInterface $torrentClient
      */
     public function __construct(
@@ -56,12 +56,12 @@ class TrackerController extends AbstractController
         UrlGeneratorInterface $urlGenerator,
         ClientInterface $client,
         UserServiceInterface $userService,
-        TrackerSettingsInterface $profileService,
+        TrackerSettings $settingsManager,
         TorrentClientInterface $torrentClient
     ) {
         $this->client = $client;
         $this->userService = $userService;
-        $this->settings = $profileService;
+        $this->settingsManager = $settingsManager;
         $this->torrentClient = $torrentClient;
         parent::__construct($twig, $formFactory, $session, $urlGenerator);
     }
@@ -106,8 +106,8 @@ class TrackerController extends AbstractController
     private function checkTrackerAuthentication()
     {
         if (!$this->session->has('api_token')) {
-            $settings = $this->userService->find($this->session->get('user_id'))->getTrackerSettings();
-            $this->settings->decodeTrackerPassword($settings);
+            $user = $this->userService->find($this->session->get('user_id'));
+            $settings = $this->settingsManager->getSettings($user);
 
             $this->session->set('api_token', $this->client->authenticate(
                 $settings->getUsername(),

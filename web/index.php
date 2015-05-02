@@ -41,7 +41,8 @@ $bootstrap->registerControllers([
         'class' => '\Martial\Warez\Front\Controller\SettingsController',
         'dependencies' => [
             $app['user.service'],
-            $app['settings.freebox']
+            $app['settings.freebox'],
+            $app['settings.tracker']
         ]
     ]
 ]);
@@ -73,6 +74,14 @@ $app
 $app
     ->post('/settings/freebox', 'settings.controller:updateFreeboxSettings')
     ->bind('settings_freebox_update');
+
+$app
+    ->get('/settings/tracker', 'settings.controller:displayTrackerSettings')
+    ->bind('settings_tracker');
+
+$app
+    ->post('/settings/tracker', 'settings.controller:updateTrackerSettings')
+    ->bind('settings_tracker_update');
 
 $app
     ->get('/tracker/search', 'tracker.controller:search')

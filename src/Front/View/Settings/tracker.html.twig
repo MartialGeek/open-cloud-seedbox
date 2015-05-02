@@ -3,11 +3,11 @@
 {% form_theme form "@form/settings.html.twig" %}
 
 {% block settings %}
-    <h2>Freebox settings</h2>
+    <h2>Tracker settings</h2>
 
-    <form action="{{ path('settings_freebox_update') }}" method="post">
+    <form action="{{ path('settings_tracker_update') }}" method="post">
         {{ form_widget(form) }}
 
-        <input type="submit" class="button right" value="Save" />
+        <input class="button right" type="submit" value="Save" />
     </form>
 {% endblock %}

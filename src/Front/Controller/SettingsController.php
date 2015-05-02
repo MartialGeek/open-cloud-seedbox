@@ -3,8 +3,11 @@
 namespace Martial\Warez\Front\Controller;
 
 use Martial\Warez\Form\FreeboxSettings as FreeboxSettingsType;
+use Martial\Warez\Form\TrackerSettings as TrackerSettingsType;
 use Martial\Warez\Settings\Entity\FreeboxSettingsEntity;
+use Martial\Warez\Settings\Entity\TrackerSettingsEntity;
 use Martial\Warez\Settings\FreeboxSettings;
+use Martial\Warez\Settings\TrackerSettings;
 use Martial\Warez\User\Entity\User;
 use Martial\Warez\User\UserServiceInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -25,6 +28,11 @@ class SettingsController extends AbstractController
     private $freeboxSettings;
 
     /**
+     * @var TrackerSettings
+     */
+    private $trackerSettings;
+
+    /**
      * @var User
      */
     private $currentUser;
@@ -36,6 +44,7 @@ class SettingsController extends AbstractController
      * @param UrlGeneratorInterface $urlGenerator
      * @param UserServiceInterface $userService
      * @param FreeboxSettings $freeboxSettings
+     * @param TrackerSettings $trackerSettings
      */
     public function __construct(
         \Twig_Environment $twig,
@@ -43,11 +52,13 @@ class SettingsController extends AbstractController
         Session $session,
         UrlGeneratorInterface $urlGenerator,
         UserServiceInterface $userService,
-        FreeboxSettings $freeboxSettings
+        FreeboxSettings $freeboxSettings,
+        TrackerSettings $trackerSettings
     ) {
         parent::__construct($twig, $formFactory, $session, $urlGenerator);
         $this->userService = $userService;
         $this->freeboxSettings = $freeboxSettings;
+        $this->trackerSettings = $trackerSettings;
     }
 
     public function index()
@@ -57,8 +68,7 @@ class SettingsController extends AbstractController
 
     public function displayFreeboxSettings()
     {
-        $settings = $this->getFreeboxSettings();
-        $form = $this->getFreeboxForm($settings);
+        $form = $this->getFreeboxForm($this->getFreeboxSettings());
 
         return $this->twig->render('@settings/freebox.html.twig', [
             'form' => $form->createView()
@@ -83,13 +93,40 @@ class SettingsController extends AbstractController
         ]);
     }
 
+    public function displayTrackerSettings()
+    {
+        $form = $this->getTrackerForm($this->getTrackerSettings());
+
+        return $this->twig->render('@settings/tracker.html.twig', [
+            'form' => $form->createView()
+        ]);
+    }
+
+    public function updateTrackerSettings(Request $request)
+    {
+        $settings = $this->getTrackerSettings();
+        $form = $this->getTrackerForm($settings);
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+            $this->trackerSettings->updateSettings($settings, $this->getUser());
+            $this->session->getFlashBag()->add('success', 'Your tracker settings was successfully updated.');
+        }
+
+        $this->session->getFlashBag()->add('error', 'An error occurred during the tracker settings update.');
+
+        return $this->twig->render('@settings/tracker.html.twig', [
+            'form' => $form->createView()
+        ]);
+    }
+
     /**
      * @param FreeboxSettingsEntity $settings
      * @return \Symfony\Component\Form\Form|\Symfony\Component\Form\FormInterface
      */
     private function getFreeboxForm(FreeboxSettingsEntity $settings)
     {
-        return $form = $this->formFactory->create(new FreeboxSettingsType(), $settings);
+        return $this->formFactory->create(new FreeboxSettingsType(), $settings);
     }
 
     /**
@@ -98,6 +135,23 @@ class SettingsController extends AbstractController
     private function getFreeboxSettings()
     {
         return $this->freeboxSettings->getSettings($this->getUser());
+    }
+
+    /**
+     * @param TrackerSettingsEntity $settings
+     * @return \Symfony\Component\Form\Form|\Symfony\Component\Form\FormInterface
+     */
+    private function getTrackerForm(TrackerSettingsEntity $settings)
+    {
+        return $this->formFactory->create(new TrackerSettingsType(), $settings);
+    }
+
+    /**
+     * @return TrackerSettingsEntity
+     */
+    private function getTrackerSettings()
+    {
+        return $this->trackerSettings->getSettings($this->getUser());
     }
 
     /**
