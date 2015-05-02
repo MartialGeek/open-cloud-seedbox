@@ -36,7 +36,7 @@ class FreeboxSettingsTest extends FormTestCase
             ->resolver
             ->expects($this->once())
             ->method('setDefaults')
-            ->with($this->equalTo(['data_class' => '\Martial\Warez\Settings\Entity\FreeboxSettings']))
+            ->with($this->equalTo(['data_class' => '\Martial\Warez\Settings\Entity\FreeboxSettingsEntity']))
             ->will($this->returnValue($this->resolver));
 
         $this->getForm()->setDefaultOptions($this->resolver);
