@@ -23,7 +23,7 @@ class FreeboxSettings extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => '\Martial\Warez\Settings\Entity\FreeboxSettings'
+            'data_class' => '\Martial\Warez\Settings\Entity\FreeboxSettingsEntity'
         ]);
     }
 

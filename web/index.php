@@ -27,7 +27,7 @@ $bootstrap->registerControllers([
         'dependencies' => [
             $app['t411.api.client'],
             $app['user.service'],
-            $app['profile.service'],
+            $app['settings.tracker'],
             $app['transmission.manager']
         ]
     ],
@@ -36,20 +36,19 @@ $bootstrap->registerControllers([
         'dependencies' => [
             $app['transmission.manager']
         ]
+    ],
+    'settings.controller' => [
+        'class' => '\Martial\Warez\Front\Controller\SettingsController',
+        'dependencies' => [
+            $app['user.service'],
+            $app['settings.freebox']
+        ]
     ]
 ]);
 
 $app
     ->get('/', 'home.controller:index')
     ->bind('homepage');
-
-$app
-    ->get('/user/profile', 'user.controller:profile')
-    ->bind('user_profile');
-
-$app
-    ->post('/user/profile/update', 'user.controller:profileUpdate')
-    ->bind('user_profile_update');
 
 $app
     ->post('/login', 'user.controller:login')
@@ -62,6 +61,18 @@ $app
 $app
     ->get('/logout', 'user.controller:logout')
     ->bind('logout');
+
+$app
+    ->get('/settings', 'settings.controller:index')
+    ->bind('settings');
+
+$app
+    ->get('/settings/freebox', 'settings.controller:displayFreeboxSettings')
+    ->bind('settings_freebox');
+
+$app
+    ->post('/settings/freebox', 'settings.controller:updateFreeboxSettings')
+    ->bind('settings_freebox_update');
 
 $app
     ->get('/tracker/search', 'tracker.controller:search')

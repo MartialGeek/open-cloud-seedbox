@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\PrePersist;
 use Doctrine\ORM\Mapping\PreUpdate;
 use Doctrine\ORM\Mapping\Table;
+use Martial\Warez\Settings\Entity\FreeboxSettingsEntity;
 use Martial\Warez\Settings\Entity\TrackerSettingsEntity;
 
 /**
@@ -53,6 +54,12 @@ class User
      * @OneToOne(targetEntity="Martial\Warez\Settings\Entity\TrackerSettingsEntity", mappedBy="user")
      */
     protected $trackerSettings;
+
+    /**
+     * @var FreeboxSettingsEntity
+     * @OneToOne(targetEntity="Martial\Warez\Settings\Entity\FreeboxSettingsEntity", mappedBy="user")
+     */
+    protected $freeboxSettings;
 
     /**
      * @var \DateTime
@@ -152,10 +159,32 @@ class User
 
     /**
      * @param TrackerSettingsEntity $trackerSettings
+     * @return self
      */
     public function setTrackerSettings(TrackerSettingsEntity $trackerSettings)
     {
         $this->trackerSettings = $trackerSettings;
+
+        return $this;
+    }
+
+    /**
+     * @return FreeboxSettingsEntity
+     */
+    public function getFreeboxSettings()
+    {
+        return $this->freeboxSettings;
+    }
+
+    /**
+     * @param FreeboxSettingsEntity $freeboxSettings
+     * @return self
+     */
+    public function setFreeboxSettings($freeboxSettings)
+    {
+        $this->freeboxSettings = $freeboxSettings;
+
+        return $this;
     }
 
     /**

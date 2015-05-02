@@ -6,15 +6,18 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\Table;
+use Martial\Warez\User\Entity\User;
 
 /**
- * Class FreeboxSettings
+ * Class FreeboxSettingsEntity
  * @package Martial\Warez\Settings\Entity
  * @Entity
  * @Table(name="settings_freebox")
  */
-class FreeboxSettings
+class FreeboxSettingsEntity
 {
     /**
      * @var int
@@ -62,27 +65,28 @@ class FreeboxSettings
 
     /**
      * @var string
-     * @Column(type="string", length=255, name="app_token")
+     * @Column(type="string", length=255, name="app_token", nullable=true)
      */
     private $appToken;
 
     /**
      * @var int
-     * @Column(type="smallint", name="track_id")
+     * @Column(type="smallint", name="track_id", nullable=true)
      */
     private $trackId;
 
     /**
      * @var string
-     * @Column(type="string", length=255)
+     * @Column(type="string", length=255, nullable=true)
      */
     private $challenge;
 
     /**
-     * @var int
-     * @Column(type="integer")
+     * @var User
+     * @OneToOne(targetEntity="Martial\Warez\User\Entity\User", inversedBy="freeboxSettings")
+     * @JoinColumn(name="user_id", referencedColumnName="id")
      */
-    private $userId;
+    protected $user;
 
     /**
      * @return int
@@ -272,20 +276,20 @@ class FreeboxSettings
     }
 
     /**
-     * @return int
+     * @return User
      */
-    public function getUserId()
+    public function getUser()
     {
-        return $this->userId;
+        return $this->user;
     }
 
     /**
-     * @param int $userId
+     * @param User $user
      * @return self
      */
-    public function setUserId($userId)
+    public function setUser(User $user)
     {
-        $this->userId = $userId;
+        $this->user = $user;
 
         return $this;
     }

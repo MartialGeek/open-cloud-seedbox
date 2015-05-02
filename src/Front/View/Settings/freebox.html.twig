@@ -1,9 +1,14 @@
-{% block settingsSection %}
+{% extends "@home/layout.html.twig" %}
+
+{% block content %}
     <h2>Freebox settings</h2>
 
-    <form action="{{ path('settings_update', {'key': 'freebox'}) }}" method="post">
+    <form action="{{ path('settings_freebox_update') }}" method="post">
         {{ form_widget(form) }}
 
         <input type="submit" class="button" value="Update" />
     </form>
+
+    <button id="freebox-get-app-token" class="button">Get application token</button>
+    <button id="freebox-check-auth-status" class="button">Check authorization status</button>
 {% endblock %}

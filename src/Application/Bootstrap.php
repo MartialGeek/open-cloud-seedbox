@@ -15,6 +15,7 @@ use Martial\Warez\Security\AuthenticationProvider;
 use Martial\Warez\Security\BlowfishHashPassword;
 use Martial\Warez\Security\Firewall;
 use Martial\Warez\Security\OpenSSLEncoder;
+use Martial\Warez\Settings\FreeboxSettings;
 use Martial\Warez\Settings\TrackerSettings;
 use Martial\Warez\T411\Api\Client;
 use Martial\Warez\T411\Api\Data\DataTransformer;
@@ -197,6 +198,10 @@ class Bootstrap
 
         $app['settings.tracker'] = $app->share(function() use ($app) {
             return new TrackerSettings($app['security.encoder']);
+        });
+
+        $app['settings.freebox'] = $app->share(function() use ($app) {
+            return new FreeboxSettings($app['doctrine.entity_manager']);
         });
 
         $app['security.firewall'] = $app->share(function() use ($app) {
