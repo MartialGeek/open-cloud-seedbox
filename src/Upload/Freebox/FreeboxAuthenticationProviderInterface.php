@@ -44,6 +44,20 @@ interface FreeboxAuthenticationProviderInterface
     const AUTHORIZATION_STATUS_DENIED  = 'denied';
 
     /**
+     * Registers the host of the Freebox.
+     *
+     * @param string $host
+     */
+    public function setHost($host);
+
+    /**
+     * Registers the port of the Freebox.
+     *
+     * @param int $port
+     */
+    public function setPort($port);
+
+    /**
      * Generates an application token with the given parameters.
      * The parameters must provide these keys:
      * <ul>

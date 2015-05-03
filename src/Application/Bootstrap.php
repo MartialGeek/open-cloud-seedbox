@@ -21,6 +21,7 @@ use Martial\Warez\T411\Api\Client;
 use Martial\Warez\T411\Api\Data\DataTransformer;
 use Martial\Warez\T411\Api\Search\QueryFactory;
 use Martial\Warez\Upload\Freebox\FreeboxAuthenticationProvider;
+use Martial\Warez\Upload\Freebox\FreeboxManager;
 use Martial\Warez\Upload\UploadAdapterFactory;
 use Martial\Warez\Upload\UploadUrlResolver;
 use Martial\Warez\User\UserService;
@@ -208,7 +209,7 @@ class Bootstrap
             return new Firewall($app['session']);
         });
 
-        $app['upload.http_client'] = $app->share(function() use ($app, $config) {
+        $app['upload.http_client'] = $app->share(function() use ($app) {
             return new GuzzleClient();
         });
 
@@ -222,13 +223,20 @@ class Bootstrap
 
         $app['upload.freebox_adapter'] = $app->share(function() use ($app, $config) {
             return $app['upload.adapter_factory']->get(
-                $config['upload']['adapter'],
-                $config['upload']['adapter_config']
+                $config['upload']['adapter']
             );
         });
 
         $app['upload.freebox_authentication_provider'] = $app->share(function() use ($app) {
             return new FreeboxAuthenticationProvider($app['upload.http_client']);
+        });
+
+        $app['upload.freebox.manager'] = $app->share(function() use ($app) {
+            return new FreeboxManager(
+                $app['upload.freebox_adapter'],
+                $app['upload.freebox_authentication_provider'],
+                $app['settings.freebox']
+            );
         });
 
         $app['transmission.http_client'] = $app->share(function() use ($config) {
@@ -267,7 +275,8 @@ class Bootstrap
                 $this->app['twig'],
                 $this->app['form.factory'],
                 $this->app['session'],
-                $this->app['url_generator']
+                $this->app['url_generator'],
+                $this->app['user.service']
             ];
         }
 

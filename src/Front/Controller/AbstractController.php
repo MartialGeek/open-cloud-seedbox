@@ -2,6 +2,8 @@
 
 namespace Martial\Warez\Front\Controller;
 
+use Martial\Warez\User\Entity\User;
+use Martial\Warez\User\UserServiceInterface;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -31,20 +33,45 @@ abstract class AbstractController
     protected $urlGenerator;
 
     /**
+     * @var UserServiceInterface
+     */
+    protected $userService;
+
+    /**
+     * @var User
+     */
+    private $currentUser;
+
+    /**
      * @param \Twig_Environment $twig
      * @param FormFactoryInterface $formFactory
      * @param Session $session
      * @param UrlGeneratorInterface $urlGenerator
+     * @param UserServiceInterface $userService
      */
     public function __construct(
         \Twig_Environment $twig,
         FormFactoryInterface $formFactory,
         Session $session,
-        UrlGeneratorInterface $urlGenerator
+        UrlGeneratorInterface $urlGenerator,
+        UserServiceInterface $userService
     ) {
         $this->twig = $twig;
         $this->formFactory = $formFactory;
         $this->session = $session;
         $this->urlGenerator = $urlGenerator;
+        $this->userService = $userService;
+    }
+
+    /**
+     * @return User
+     */
+    protected function getUser()
+    {
+        if (is_null($this->currentUser)) {
+            $this->currentUser = $this->userService->find($this->session->get('user_id'));
+        }
+
+        return $this->currentUser;
     }
 }

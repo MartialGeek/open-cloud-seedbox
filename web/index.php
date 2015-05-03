@@ -14,10 +14,7 @@ $bootstrap->registerControllers([
         'class' => '\Martial\Warez\Front\Controller\HomeController'
     ],
     'user.controller' => [
-        'class' => '\Martial\Warez\Front\Controller\UserController',
-        'dependencies' => [
-            $app['user.service']
-        ]
+        'class' => '\Martial\Warez\Front\Controller\UserController'
     ],
     'security.controller' => [
         'class' => '\Martial\Warez\Front\Controller\SecurityController'
@@ -26,7 +23,6 @@ $bootstrap->registerControllers([
         'class' => '\Martial\Warez\Front\Controller\TrackerController',
         'dependencies' => [
             $app['t411.api.client'],
-            $app['user.service'],
             $app['settings.tracker'],
             $app['transmission.manager']
         ]
@@ -40,9 +36,14 @@ $bootstrap->registerControllers([
     'settings.controller' => [
         'class' => '\Martial\Warez\Front\Controller\SettingsController',
         'dependencies' => [
-            $app['user.service'],
             $app['settings.freebox'],
             $app['settings.tracker']
+        ]
+    ],
+    'freebox.controller' => [
+        'class' => '\Martial\Warez\Front\Controller\FreeboxController',
+        'dependencies' => [
+            $app['upload.freebox.manager']
         ]
     ]
 ]);
@@ -98,5 +99,17 @@ $app
 $app
     ->get('/transmission/torrent/{torrentId}', 'transmission.controller:torrentData')
     ->bind('transmission_torrent_data');
+
+$app
+    ->post('/freebox/ask-permission', 'freebox.controller:askUserPermission')
+    ->bind('freebox_ask_permission');
+
+$app
+    ->get('/freebox/authorization-status/{trackId}', 'freebox.controller:getAuthorizationStatus')
+    ->bind('freebox_authorization_status');
+
+$app
+    ->post('/freebox/open-session', 'freebox.controller:openSession')
+    ->bind('freebox_open_session');
 
 $app->run();

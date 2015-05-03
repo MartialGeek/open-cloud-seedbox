@@ -65,21 +65,9 @@ class FreeboxSettingsEntity
 
     /**
      * @var string
-     * @Column(type="string", length=255, name="app_token", nullable=true)
+     * @Column(type="string", length=255, name="session_token", nullable=true)
      */
-    private $appToken;
-
-    /**
-     * @var int
-     * @Column(type="smallint", name="track_id", nullable=true)
-     */
-    private $trackId;
-
-    /**
-     * @var string
-     * @Column(type="string", length=255, nullable=true)
-     */
-    private $challenge;
+    private $sessionToken;
 
     /**
      * @var User
@@ -221,56 +209,18 @@ class FreeboxSettingsEntity
     /**
      * @return string
      */
-    public function getAppToken()
+    public function getSessionToken()
     {
-        return $this->appToken;
+        return $this->sessionToken;
     }
 
     /**
-     * @param string $appToken
+     * @param string $sessionToken
      * @return self
      */
-    public function setAppToken($appToken)
+    public function setSessionToken($sessionToken)
     {
-        $this->appToken = $appToken;
-
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getTrackId()
-    {
-        return $this->trackId;
-    }
-
-    /**
-     * @param int $trackId
-     * @return self
-     */
-    public function setTrackId($trackId)
-    {
-        $this->trackId = $trackId;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getChallenge()
-    {
-        return $this->challenge;
-    }
-
-    /**
-     * @param string $challenge
-     * @return self
-     */
-    public function setChallenge($challenge)
-    {
-        $this->challenge = $challenge;
+        $this->sessionToken = $sessionToken;
 
         return $this;
     }

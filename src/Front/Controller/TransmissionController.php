@@ -4,6 +4,7 @@ namespace Martial\Warez\Front\Controller;
 
 use Martial\Warez\Download\TorrentClientInterface;
 use Martial\Warez\Download\TransmissionSessionTrait;
+use Martial\Warez\User\UserServiceInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -28,6 +29,7 @@ class TransmissionController extends AbstractController
      * @param FormFactoryInterface $formFactory
      * @param Session $session
      * @param UrlGeneratorInterface $urlGenerator
+     * @param UserServiceInterface $userService
      * @param TorrentClientInterface $torrentClient
      */
     public function __construct(
@@ -35,9 +37,10 @@ class TransmissionController extends AbstractController
         FormFactoryInterface $formFactory,
         Session $session,
         UrlGeneratorInterface $urlGenerator,
+        UserServiceInterface $userService,
         TorrentClientInterface $torrentClient
     ) {
-        parent::__construct($twig, $formFactory, $session, $urlGenerator);
+        parent::__construct($twig, $formFactory, $session, $urlGenerator, $userService);
         $this->torrentClient = $torrentClient;
         $this->transmissionSessionId = $this->getSessionId($this->session, $this->torrentClient);
     }

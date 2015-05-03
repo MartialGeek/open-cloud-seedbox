@@ -42,8 +42,17 @@ class FreeboxSettings
 
     public function updateSettings(FreeboxSettingsEntity $settings, User $user)
     {
-        $settings->setUser($user);
-        $this->em->persist($settings);
+        $currentSettings = $this->getSettings($user);
+
+        $currentSettings
+            ->setSessionToken($settings->getSessionToken())
+            ->setAppId($settings->getAppId())
+            ->setAppName($settings->getAppName())
+            ->setAppVersion($settings->getAppVersion())
+            ->setDeviceName($settings->getDeviceName())
+            ->setTransportHost($settings->getTransportHost())
+            ->setTransportPort($settings->getTransportPort());
+
         $this->em->flush();
     }
 }

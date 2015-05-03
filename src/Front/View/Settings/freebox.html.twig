@@ -5,9 +5,14 @@
 {% block settings %}
     <h2>Freebox settings</h2>
 
-    <form action="{{ path('settings_freebox_update') }}" method="post">
+    <form id="form-freebox-settings" action="{{ path('settings_freebox_update') }}" method="post">
         {{ form_widget(form) }}
 
-        <input type="submit" class="button right" value="Save" />
+        <input id="save-freebox-settings" type="submit" class="button right" value="Save" />
     </form>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="application/javascript" src="/js/settings/freebox.js"></script>
 {% endblock %}

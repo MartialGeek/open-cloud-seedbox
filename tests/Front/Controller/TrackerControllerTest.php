@@ -264,7 +264,10 @@ class TrackerControllerTest extends ControllerTestCase
     {
         $this->client = $this->getMock('\Martial\Warez\T411\Api\ClientInterface');
         $this->userService = $this->getMock('\Martial\Warez\User\UserServiceInterface');
-        $this->settings = $this->getMock('\Martial\Warez\Settings\TrackerSettingsInterface');
+        $this->settings = $this
+            ->getMockBuilder('\Martial\Warez\Settings\TrackerSettings')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->torrentClient = $this->getMock('\Martial\Warez\Download\TorrentClientInterface');
 
         $dependencies = parent::defineDependencies();

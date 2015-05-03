@@ -16,11 +16,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class UserController extends AbstractController
 {
     /**
-     * @var UserServiceInterface
-     */
-    private $userService;
-
-    /**
      * @param \Twig_Environment $twig
      * @param FormFactoryInterface $formFactory
      * @param Session $session
@@ -34,8 +29,7 @@ class UserController extends AbstractController
         UrlGeneratorInterface $urlGenerator,
         UserServiceInterface $userService
     ) {
-        $this->userService = $userService;
-        parent::__construct($twig, $formFactory, $session, $urlGenerator);
+        parent::__construct($twig, $formFactory, $session, $urlGenerator, $userService);
     }
 
     public function login(Request $request)

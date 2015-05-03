@@ -25,11 +25,6 @@ class TrackerController extends AbstractController
     private $client;
 
     /**
-     * @var UserServiceInterface
-     */
-    private $userService;
-
-    /**
      * @var TrackerSettings
      */
     private $settingsManager;
@@ -44,8 +39,8 @@ class TrackerController extends AbstractController
      * @param FormFactoryInterface $formFactory
      * @param Session $session
      * @param UrlGeneratorInterface $urlGenerator
-     * @param ClientInterface $client
      * @param UserServiceInterface $userService
+     * @param ClientInterface $client
      * @param TrackerSettings $settingsManager
      * @param TorrentClientInterface $torrentClient
      */
@@ -54,16 +49,15 @@ class TrackerController extends AbstractController
         FormFactoryInterface $formFactory,
         Session $session,
         UrlGeneratorInterface $urlGenerator,
-        ClientInterface $client,
         UserServiceInterface $userService,
+        ClientInterface $client,
         TrackerSettings $settingsManager,
         TorrentClientInterface $torrentClient
     ) {
         $this->client = $client;
-        $this->userService = $userService;
         $this->settingsManager = $settingsManager;
         $this->torrentClient = $torrentClient;
-        parent::__construct($twig, $formFactory, $session, $urlGenerator);
+        parent::__construct($twig, $formFactory, $session, $urlGenerator, $userService);
     }
 
     public function search(Request $request)
@@ -106,8 +100,7 @@ class TrackerController extends AbstractController
     private function checkTrackerAuthentication()
     {
         if (!$this->session->has('api_token')) {
-            $user = $this->userService->find($this->session->get('user_id'));
-            $settings = $this->settingsManager->getSettings($user);
+            $settings = $this->settingsManager->getSettings($this->getUser());
 
             $this->session->set('api_token', $this->client->authenticate(
                 $settings->getUsername(),

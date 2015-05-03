@@ -19,11 +19,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class SettingsController extends AbstractController
 {
     /**
-     * @var UserServiceInterface
-     */
-    private $userService;
-
-    /**
      * @var FreeboxSettings
      */
     private $freeboxSettings;
@@ -32,11 +27,6 @@ class SettingsController extends AbstractController
      * @var TrackerSettings
      */
     private $trackerSettings;
-
-    /**
-     * @var User
-     */
-    private $currentUser;
 
     /**
      * @param \Twig_Environment $twig
@@ -56,8 +46,7 @@ class SettingsController extends AbstractController
         FreeboxSettings $freeboxSettings,
         TrackerSettings $trackerSettings
     ) {
-        parent::__construct($twig, $formFactory, $session, $urlGenerator);
-        $this->userService = $userService;
+        parent::__construct($twig, $formFactory, $session, $urlGenerator, $userService);
         $this->freeboxSettings = $freeboxSettings;
         $this->trackerSettings = $trackerSettings;
     }
@@ -157,17 +146,5 @@ class SettingsController extends AbstractController
     private function getTrackerSettings()
     {
         return $this->trackerSettings->getSettings($this->getUser());
-    }
-
-    /**
-     * @return User
-     */
-    private function getUser()
-    {
-        if (is_null($this->currentUser)) {
-            $this->currentUser = $this->userService->find($this->session->get('user_id'));
-        }
-
-        return $this->currentUser;
     }
 }

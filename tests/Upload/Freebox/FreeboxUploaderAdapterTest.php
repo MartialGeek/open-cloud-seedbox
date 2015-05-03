@@ -31,47 +31,9 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
     {
         $uploadedFile = new File('/tmp/file', false);
         $uploadUrl = 'http://www.warez.io/files/download/your-file.avi';
+        $sessionToken = uniqid();
 
-        $authorizeResponse = $this->createResponse();
-        $authorizeTrackIdResponse = $this->createResponse();
-        $challengeResponse = $this->createResponse();
-        $sessionResponse = $this->createResponse();
         $addDownloadResponse = $this->createResponse();
-
-        $authorizeResponseData = [
-            'success' => true,
-            'result' => [
-                'app_token' => uniqid(),
-                'track_id' => 42
-            ]
-        ];
-
-        $authorizeTrackIdResponseData = [
-            'success' => true,
-            'result' => [
-                'status' => 'granted',
-                'challenge' => uniqid()
-            ]
-        ];
-
-        $challengeResponseData = [
-            'success' => true,
-            'result' => [
-                'logged_in' => false,
-                'challenge' => uniqid()
-            ]
-        ];
-
-        $sessionResponseData = [
-            'success' => true,
-            'result' => [
-                'session_token' => uniqid(),
-                'challenge' => uniqid(),
-                'permissions' => [
-                    'downloaded' => true
-                ]
-            ]
-        ];
 
         $addDownloadResponseData = [
             'success' => true,
@@ -79,29 +41,6 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
                 'id' => 42
             ]
         ];
-
-        $this
-            ->httpClient
-            ->expects($this->exactly(2))
-            ->method('get')
-            ->withConsecutive(
-                [$this->equalTo('/api/v3/login/authorize/' . $authorizeResponseData['result']['track_id'])],
-                [$this->equalTo('/api/v3/login')]
-            )
-            ->willReturnOnConsecutiveCalls(
-                $authorizeTrackIdResponse,
-                $challengeResponse
-            );
-
-        $authorizeTrackIdResponse
-            ->expects($this->once())
-            ->method('json')
-            ->willReturn($authorizeTrackIdResponseData);
-
-        $challengeResponse
-            ->expects($this->once())
-            ->method('json')
-            ->willReturn($challengeResponseData);
 
         $this
             ->urlResolver
@@ -112,67 +51,27 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
 
         $this
             ->httpClient
-            ->expects($this->exactly(3))
+            ->expects($this->once())
             ->method('post')
-            ->withConsecutive(
-                [
-                    $this->equalTo('/api/v3/login/authorize'),
-                    $this->equalTo([
-                        'body' => [
-                            'app_id' => $this->config['app_id'],
-                            'app_name' => $this->config['app_name'],
-                            'app_version' => $this->config['app_version'],
-                            'device_name' => $this->config['device_name'],
-                        ]
-                    ])
-                ],
-                [
-                    $this->equalTo('/api/v3/login/session'),
-                    $this->equalTo([
-                        'body' => [
-                            'app_id' => $this->config['app_id'],
-                            'password' => hash_hmac(
-                                'sha1',
-                                $authorizeResponseData['result']['app_token'],
-                                $challengeResponseData['result']['challenge']
-                            )
-                        ]
-                    ])
-                ],
-                [
-                    $this->equalTo('/api/v3/downloads/add'),
-                    $this->equalTo([
-                        'body' => [
-                            'download_url' => $uploadUrl
-                        ],
-                        'headers' => [
-                            'X-Fbx-App-Auth' => $sessionResponseData['result']['session_token']
-                        ]
-                    ])
-                ]
+            ->with(
+                $this->equalTo('/api/v3/downloads/add'),
+                $this->equalTo([
+                    'body' => [
+                        'download_url' => $uploadUrl
+                    ],
+                    'headers' => [
+                        'X-Fbx-App-Auth' => $sessionToken
+                    ]
+                ])
             )
-            ->willReturnOnConsecutiveCalls(
-                $authorizeResponse,
-                $sessionResponse,
-                $addDownloadResponse
-            );
-
-        $authorizeResponse
-            ->expects($this->once())
-            ->method('json')
-            ->willReturn($authorizeResponseData);
-
-        $sessionResponse
-            ->expects($this->once())
-            ->method('json')
-            ->willReturn($sessionResponseData);
+            ->willReturn($addDownloadResponse);
 
         $addDownloadResponse
             ->expects($this->once())
             ->method('json')
             ->willReturn($addDownloadResponseData);
 
-        $this->freeboxAdapter->upload($uploadedFile);
+        $this->freeboxAdapter->upload($uploadedFile, [$sessionToken]);
     }
 
     protected function setUp()
@@ -186,7 +85,7 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
             'device_name' => 'seedbox'
         ];
 
-        $this->freeboxAdapter = new FreeboxUploaderAdapter($this->httpClient, $this->urlResolver, $this->config);
+        $this->freeboxAdapter = new FreeboxUploaderAdapter($this->httpClient, $this->urlResolver);
     }
 
     /**

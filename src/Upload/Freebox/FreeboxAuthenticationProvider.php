@@ -12,11 +12,41 @@ class FreeboxAuthenticationProvider implements FreeboxAuthenticationProviderInte
     private $httpClient;
 
     /**
+     * @var string
+     */
+    private $host;
+
+    /**
+     * @var int
+     */
+    private $port;
+
+    /**
      * @param ClientInterface $httpClient
      */
     public function __construct(ClientInterface $httpClient)
     {
         $this->httpClient = $httpClient;
+    }
+
+    /**
+     * Registers the host of the Freebox.
+     *
+     * @param string $host
+     */
+    public function setHost($host)
+    {
+        $this->host = $host;
+    }
+
+    /**
+     * Registers the port of the Freebox.
+     *
+     * @param int $port
+     */
+    public function setPort($port)
+    {
+        $this->port = $port;
     }
 
     /**
@@ -48,7 +78,7 @@ class FreeboxAuthenticationProvider implements FreeboxAuthenticationProviderInte
     {
         $response = $this
             ->httpClient
-            ->post('/api/v3/login/authorize', [
+            ->post($this->buildUrl('/api/v3/login/authorize'), [
                 'body' => json_encode($params, JSON_FORCE_OBJECT)
             ])
             ->json();
@@ -79,7 +109,7 @@ class FreeboxAuthenticationProvider implements FreeboxAuthenticationProviderInte
     {
         $response = $this
             ->httpClient
-            ->get('/api/v3/login/authorize/' . $trackId)
+            ->get($this->buildUrl('/api/v3/login/authorize/' . $trackId))
             ->json();
 
         $this->checkResponseStatus($response, 'An error occurred on retrieving the authorization status.');
@@ -107,7 +137,7 @@ class FreeboxAuthenticationProvider implements FreeboxAuthenticationProviderInte
     {
         $response = $this
             ->httpClient
-            ->get('/api/v3/login')
+            ->get($this->buildUrl('/api/v3/login'))
             ->json();
 
         $this->checkResponseStatus($response, 'An error occurred on retrieving the challenge value.');
@@ -148,14 +178,14 @@ class FreeboxAuthenticationProvider implements FreeboxAuthenticationProviderInte
             'app_id' => $params['app_id'],
             'password' => hash_hmac(
                 'sha1',
-                $params['app_token'],
-                $params['challenge']
+                $params['challenge'],
+                $params['app_token']
             )
         ]);
 
         $response = $this
             ->httpClient
-            ->post('/api/v3/login/session', [
+            ->post($this->buildUrl('/api/v3/login/session'), [
                 'body' => $body
             ])
             ->json();
@@ -177,5 +207,16 @@ class FreeboxAuthenticationProvider implements FreeboxAuthenticationProviderInte
         if (!$response['success']) {
             throw new FreeboxAuthenticationException($errorMessage);
         }
+    }
+
+    /**
+     * Returns the full URL of the resource.
+     *
+     * @param string $uri
+     * @return string
+     */
+    private function buildUrl($uri)
+    {
+        return sprintf('http://%s:%d%s', $this->host, $this->port, $uri);
     }
 }
