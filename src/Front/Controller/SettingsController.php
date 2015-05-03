@@ -11,6 +11,7 @@ use Martial\Warez\Settings\TrackerSettings;
 use Martial\Warez\User\Entity\User;
 use Martial\Warez\User\UserServiceInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -77,13 +78,15 @@ class SettingsController extends AbstractController
 
     public function updateFreeboxSettings(Request $request)
     {
-        $settings = $this->getFreeboxSettings();
+        $settings = new FreeboxSettingsEntity();
         $form = $this->getFreeboxForm($settings);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
             $this->freeboxSettings->updateSettings($settings, $this->getUser());
             $this->session->getFlashBag()->add('success', 'Your Freebox settings was successfully updated.');
+
+            return new RedirectResponse($this->urlGenerator->generate('settings_freebox'));
         }
 
         $this->session->getFlashBag()->add('error', 'An error occurred during the Freebox settings update.');
@@ -104,13 +107,15 @@ class SettingsController extends AbstractController
 
     public function updateTrackerSettings(Request $request)
     {
-        $settings = $this->getTrackerSettings();
+        $settings = new TrackerSettingsEntity();
         $form = $this->getTrackerForm($settings);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
             $this->trackerSettings->updateSettings($settings, $this->getUser());
             $this->session->getFlashBag()->add('success', 'Your tracker settings was successfully updated.');
+
+            return new RedirectResponse($this->urlGenerator->generate('settings_tracker'));
         }
 
         $this->session->getFlashBag()->add('error', 'An error occurred during the tracker settings update.');
