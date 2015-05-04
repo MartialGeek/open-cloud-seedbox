@@ -28,7 +28,13 @@ class Firewall implements FirewallInterface
     {
         $requestUri = $event->getRequest()->getRequestUri();
 
-        if ('/' != $requestUri && '/login' != $requestUri && 'logout' != $requestUri && '/form-login' != $requestUri) {
+        if (
+            '/' != $requestUri &&
+            '/login' != $requestUri &&
+            'logout' != $requestUri &&
+            '/form-login' != $requestUri &&
+            !preg_match('#^/upload#', $requestUri)
+        ) {
             if (!$this->session->get('connected', false)) {
                 $event->setResponse(new Response('Authentication required.', 401));
             }

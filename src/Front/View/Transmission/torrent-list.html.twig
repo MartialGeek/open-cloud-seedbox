@@ -26,7 +26,11 @@
                 <td data-torrent-field="total-size">{{ convertToHumanReadable(torrent.totalSize) }}</td>
                 <td data-torrent-field="status">{{ torrentStatusLabel(torrent.status) }}</td>
                 <td data-torrent-field="added-date">{{ torrent.addedDate|date('Y-m-d') }}</td>
-                <td>{% if torrent.percentDone == 1 %}<a href="" class="action-upload-torrent">Upload to local storage</a>{% endif %}</td>
+                <td>
+                    {% if torrent.percentDone == 1 %}
+                        <a href="{{ path('freebox_upload_file', {'filename': torrent.name}) }}" class="action-upload-torrent">Upload</a>
+                    {% endif %}
+                </td>
             </tr>
         {% else %}
             <tr>

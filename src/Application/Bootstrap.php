@@ -213,8 +213,8 @@ class Bootstrap
             return new GuzzleClient();
         });
 
-        $app['upload.url_resolver'] = $app->share(function() {
-            return new UploadUrlResolver();
+        $app['upload.url_resolver'] = $app->share(function() use ($app) {
+            return new UploadUrlResolver($app['url_generator']);
         });
 
         $app['upload.adapter_factory'] = $app->share(function() use ($app, $config) {

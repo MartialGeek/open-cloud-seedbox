@@ -34,16 +34,17 @@ class FreeboxUploaderAdapter implements UploadInterface
      * Uploads the given file on the target.
      *
      * @param File $file
+     * @param string $targetUrl
      * @param array $config
      * @throws UploadException
      */
-    public function upload(File $file, array $config = array())
+    public function upload(File $file, $targetUrl, array $config = array())
     {
         $downloadUrl = $this->urlResolver->resolve($file);
 
         $addDownloadData = $this
             ->httpClient
-            ->post('/api/v3/downloads/add', [
+            ->post($targetUrl . '/api/v3/downloads/add', [
                 'body' => [
                     'download_url' => $downloadUrl
                 ],

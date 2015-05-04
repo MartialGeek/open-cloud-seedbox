@@ -3,9 +3,23 @@
 namespace Martial\Warez\Upload;
 
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class UploadUrlResolver implements UploadUrlResolverInterface
 {
+    /**
+     * @var UrlGeneratorInterface
+     */
+    private $urlGenerator;
+
+    /**
+     * @param UrlGeneratorInterface $urlGenerator
+     */
+    public function __construct(UrlGeneratorInterface $urlGenerator)
+    {
+        $this->urlGenerator = $urlGenerator;
+    }
+
     /**
      * Returns the public URL which exposes the given file.
      *
@@ -14,6 +28,8 @@ class UploadUrlResolver implements UploadUrlResolverInterface
      */
     public function resolve(File $file)
     {
-        // TODO: Implement resolve() method.
+        return $this->urlGenerator->generate(
+            'upload_file', ['filename' => $file->getFilename()], UrlGeneratorInterface::ABSOLUTE_URL
+        );
     }
 }

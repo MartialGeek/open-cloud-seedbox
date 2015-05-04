@@ -20,6 +20,14 @@ $(function() {
     $('.action-upload-torrent').each(function() {
         $(this).on('click', function(event) {
             event.preventDefault();
+
+            $
+                .post($(this).attr('href'), function(data) {
+                    console.log('Download successfully added.');
+                })
+                .fail(function(error) {
+                    console.log(error.responseText);
+                });
         })
     });
 

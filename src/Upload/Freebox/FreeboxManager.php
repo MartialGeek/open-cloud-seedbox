@@ -131,13 +131,15 @@ class FreeboxManager
      */
     public function uploadFile(File $file, User $user)
     {
-        $token = $this->settingsManager->getSettings($user)->getSessionToken();
+        $settings = $this->settingsManager->getSettings($user);
+        $token = $settings->getSessionToken();
+        $freeboxUrl = sprintf('http://%s:%d', $settings->getTransportHost(), $settings->getTransportPort());
 
         if (is_null($token)) {
             throw new FreeboxSessionException();
         }
 
-        $this->upload->upload($file, ['session_token' => $token]);
+        $this->upload->upload($file, $freeboxUrl, ['session_token' => $token]);
     }
 
     private function configureAuthenticationProvider(FreeboxSettingsEntity $settings)

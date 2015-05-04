@@ -122,11 +122,15 @@ class FreeboxController extends AbstractController
         }
     }
 
-    public function uploadFile(Request $request)
+    public function uploadFile($filename)
     {
-        $file = new File($this->downloadDir . '/' . $request->query->get('filename'));
-        $this->freeboxManager->uploadFile($file, $this->getUser());
+        $file = new File($this->downloadDir . '/' . $filename);
 
-        return new Response('', 204);
+        try {
+            $this->freeboxManager->uploadFile($file, $this->getUser());
+            return new Response('', 204);
+        } catch (FreeboxSessionException $e) {
+            return new JsonResponse(['message' => 'You need to open a Freebox session before uploading files.'], 400);
+        }
     }
 }

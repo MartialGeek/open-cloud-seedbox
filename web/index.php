@@ -44,7 +44,12 @@ $bootstrap->registerControllers([
         'class' => '\Martial\Warez\Front\Controller\FreeboxController',
         'dependencies' => [
             $app['upload.freebox.manager']
-        ]
+        ],
+        'calls' => ['setDownloadDir' => $config['download_dir']]
+    ],
+    'upload.controller' => [
+        'class' => '\Martial\Warez\Front\Controller\UploadController',
+        'calls' => ['setDownloadDir' => $config['download_dir']]
     ]
 ]);
 
@@ -111,5 +116,13 @@ $app
 $app
     ->post('/freebox/open-session', 'freebox.controller:openSession')
     ->bind('freebox_open_session');
+
+$app
+    ->post('/freebox/upload/{filename}', 'freebox.controller:uploadFile')
+    ->bind('freebox_upload_file');
+
+$app
+    ->get('/upload/{filename}', 'upload.controller:upload')
+    ->bind('upload_file');
 
 $app->run();

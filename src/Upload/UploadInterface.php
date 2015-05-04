@@ -10,8 +10,9 @@ interface UploadInterface
      * Uploads the given file on the target.
      *
      * @param File $file
+     * @param string $targetUrl
      * @param array $config
-     * @throws UploadException
+     * @return
      */
-    public function upload(File $file, array $config = array());
+    public function upload(File $file, $targetUrl, array $config = array());
 }

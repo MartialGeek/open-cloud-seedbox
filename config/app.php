@@ -87,5 +87,6 @@ return [
         'host' => $parameters['transmission_host'],
         'port' => $parameters['transmission_port'],
         'rpc_uri' => $parameters['transmission_rpc_uri'],
-    ]
+    ],
+    'download_dir' => $parameters['download_dir'],
 ];
