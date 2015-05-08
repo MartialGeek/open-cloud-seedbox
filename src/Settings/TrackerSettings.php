@@ -65,7 +65,11 @@ class TrackerSettings
         }
 
         $currentSettings->setUsername($settings->getUsername());
-        $this->em->persist($currentSettings);
+
+        if (is_null($currentSettings->getId())) {
+            $this->em->persist($currentSettings);
+        }
+
         $this->em->flush();
     }
 

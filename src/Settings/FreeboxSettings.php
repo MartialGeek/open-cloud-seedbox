@@ -53,6 +53,10 @@ class FreeboxSettings
             ->setTransportHost($settings->getTransportHost())
             ->setTransportPort($settings->getTransportPort());
 
+        if (is_null($currentSettings->getId())) {
+            $this->em->persist($currentSettings);
+        }
+
         $this->em->flush();
     }
 }
