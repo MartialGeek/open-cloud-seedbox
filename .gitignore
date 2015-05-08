@@ -8,10 +8,10 @@ bin/phing
 web/css
 web/js
 web/img
-/web/bower_components
+web/bower_components
 node_modules
-/config/parameters.php
 behat.yml
-.vagrant/
-/config/deploy.rb
-/config/deploy/*.rb
+:.vagrant/
+config/parameters.php
+config/deploy.rb
+config/deploy/*.rb
