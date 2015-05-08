@@ -83,7 +83,7 @@ class FreeboxAuthenticationProvider implements FreeboxAuthenticationProviderInte
             ])
             ->json();
 
-        $this->checkResponseStatus($response, 'An error occurred on retrieving the Freebox token.');
+        $this->checkResponseStatus($response);
 
         return $response;
     }
@@ -112,7 +112,7 @@ class FreeboxAuthenticationProvider implements FreeboxAuthenticationProviderInte
             ->get($this->buildUrl('/api/v3/login/authorize/' . $trackId))
             ->json();
 
-        $this->checkResponseStatus($response, 'An error occurred on retrieving the authorization status.');
+        $this->checkResponseStatus($response);
 
         return $response;
     }
@@ -140,7 +140,7 @@ class FreeboxAuthenticationProvider implements FreeboxAuthenticationProviderInte
             ->get($this->buildUrl('/api/v3/login'))
             ->json();
 
-        $this->checkResponseStatus($response, 'An error occurred on retrieving the challenge value.');
+        $this->checkResponseStatus($response);
 
         return $response;
     }
@@ -190,7 +190,7 @@ class FreeboxAuthenticationProvider implements FreeboxAuthenticationProviderInte
             ])
             ->json();
 
-        $this->checkResponseStatus($response, 'An error occurred on session opening.');
+        $this->checkResponseStatus($response);
 
         return $response;
     }
@@ -199,13 +199,12 @@ class FreeboxAuthenticationProvider implements FreeboxAuthenticationProviderInte
      * Throws an exception on error.
      *
      * @param array $response
-     * @param string $errorMessage
      * @throws FreeboxAuthenticationException
      */
-    private function checkResponseStatus(array $response, $errorMessage)
+    private function checkResponseStatus(array $response)
     {
         if (!$response['success']) {
-            throw new FreeboxAuthenticationException($errorMessage);
+            throw new FreeboxAuthenticationException($response['msg']);
         }
     }
 
