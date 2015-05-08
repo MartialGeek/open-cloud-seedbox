@@ -12,7 +12,7 @@ interface UploadInterface
      * @param File $file
      * @param string $targetUrl
      * @param array $config
-     * @return
+     * @throws UploadException
      */
     public function upload(File $file, $targetUrl, array $config = array());
 }

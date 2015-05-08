@@ -56,10 +56,6 @@ class FreeboxManager
             'device_name' => $settings->getDeviceName()
         ]);
 
-        if (!$appToken['success']) {
-            throw new FreeboxAuthenticationException();
-        }
-
         return $appToken;
     }
 
@@ -108,14 +104,14 @@ class FreeboxManager
         $settings = $this->settingsManager->getSettings($user);
         $this->configureAuthenticationProvider($settings);
 
-        $session = $this->authentication->openSession([
-            'app_id' => $settings->getAppId(),
-            'app_token' => $appToken,
-            'challenge' => $challenge
-        ]);
-
-        if (false === $session['success']) {
-            throw new FreeboxSessionException($session['msg']);
+        try {
+            $session = $this->authentication->openSession([
+                'app_id' => $settings->getAppId(),
+                'app_token' => $appToken,
+                'challenge' => $challenge
+            ]);
+        } catch (FreeboxAuthenticationException $e) {
+            throw new FreeboxSessionException($e->getMessage());
         }
 
         $settings->setSessionToken($session['result']['session_token']);

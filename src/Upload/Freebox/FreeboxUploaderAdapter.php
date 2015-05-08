@@ -42,7 +42,7 @@ class FreeboxUploaderAdapter implements UploadInterface
     {
         $downloadUrl = $this->urlResolver->resolve($file);
 
-        $addDownloadData = $this
+        $response = $this
             ->httpClient
             ->post($targetUrl . '/api/v3/downloads/add', [
                 'body' => [
@@ -54,8 +54,8 @@ class FreeboxUploaderAdapter implements UploadInterface
             ])
             ->json();
 
-        if (!$addDownloadData['success']) {
-            throw new UploadException();
+        if (!$response['success']) {
+            throw new UploadException($response['msg']);
         }
     }
 }
