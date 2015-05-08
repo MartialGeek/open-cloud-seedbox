@@ -11,7 +11,7 @@ web/img
 web/bower_components
 node_modules
 behat.yml
-:.vagrant/
+.vagrant/
 config/parameters.php
 config/deploy.rb
 config/deploy/*.rb
