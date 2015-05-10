@@ -21,6 +21,16 @@ class FreeboxAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
      */
     public $provider;
 
+    /**
+     * @var string
+     */
+    public $host;
+
+    /**
+     * @var int
+     */
+    public $port;
+
     public function testGetApplicationToken()
     {
         $this->getApplicationToken();
@@ -82,22 +92,25 @@ class FreeboxAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
             'device_name' => 'Seedbox'
         ];
 
-        $status = $success ? 'true' : 'false';
-        $jsonResponse = <<<JSON
+        if ($success) {
+            $jsonResponse = <<<JSON
 {
-   "success": $status,
+   "success": true,
    "result": {
       "app_token": "dyNYgfK0Ya6FWGqq83sBHa7TwzWo+pg4fDFUJHShcjVYzTfaRrZzm93p7OTAfH/0",
       "track_id": 42
    }
 }
 JSON;
+        } else {
+            $jsonResponse = $this->getJsonResponseError();
+        }
 
         $this
             ->httpClient
             ->expects($this->once())
             ->method('post')
-            ->with($this->equalTo('/api/v3/login/authorize'), $this->equalTo([
+            ->with($this->equalTo($this->buildUrl('/api/v3/login/authorize')), $this->equalTo([
                 'body' => json_encode($params, JSON_FORCE_OBJECT)
             ]))
             ->willReturn($this->response);
@@ -114,22 +127,26 @@ JSON;
     protected function getAuthorizationStatus($success = true)
     {
         $trackId = 42;
-        $status = $success ? 'true' : 'false';
-        $jsonResponse = <<<JSON
+
+        if ($success) {
+            $jsonResponse = <<<JSON
 {
-    "success": $status,
+    "success": true,
     "result": {
         "status": "granted",
         "challenge": "Bj6xMqoe+DCHD44KqBljJ579seOXNWr2"
     }
 }
 JSON;
+        } else {
+            $jsonResponse = $this->getJsonResponseError();
+        }
 
         $this
             ->httpClient
             ->expects($this->once())
             ->method('get')
-            ->with($this->equalTo('/api/v3/login/authorize/' . $trackId))
+            ->with($this->equalTo($this->buildUrl('/api/v3/login/authorize/' . $trackId)))
             ->willReturn($this->response);
 
         $this->getJsonDecodedResponse($jsonResponse);
@@ -142,23 +159,27 @@ JSON;
 
     protected function getChallengeValue($success = true)
     {
-        $status = $success ? 'true' : 'false';
         $challenge = 'VzhbtpR4r8CLaJle2QgJBEkyd8JPb0zL';
-        $jsonResponse = <<<JSON
+
+        if ($success) {
+            $jsonResponse = <<<JSON
 {
-    "success": $status,
+    "success": true,
     "result": {
         "logged_in": false,
         "challenge": "$challenge"
     }
 }
 JSON;
+        } else {
+            $jsonResponse = $this->getJsonResponseError();
+        }
 
         $this
             ->httpClient
             ->expects($this->once())
             ->method('get')
-            ->with($this->equalTo('/api/v3/login'))
+            ->with($this->equalTo($this->buildUrl('/api/v3/login')))
             ->willReturn($this->response);
 
         $this->getJsonDecodedResponse($jsonResponse);
@@ -177,11 +198,12 @@ JSON;
             'challenge' => uniqid()
         ];
 
-        $status = $success ? 'true' : 'false';
         $sessionToken = '35JYdQSvkcBYK84IFMU7H86clfhS75OzwlQrKlQN1gBch\/Dd62RGzDpgC7YB9jB2';
-        $jsonResponse = <<<JSON
+
+        if ($success) {
+            $jsonResponse = <<<JSON
 {
-   "success": $status,
+   "success": true,
    "result" : {
          "session_token" : "{$sessionToken}",
          "challenge": "jdGL6CtuJ3Dm7p9nkcIQ8pjB+eLwr4Ya",
@@ -191,18 +213,21 @@ JSON;
     }
 }
 JSON;
+        } else {
+            $jsonResponse = $this->getJsonResponseError();
+        }
 
         $this
             ->httpClient
             ->expects($this->once())
             ->method('post')
-            ->with($this->equalTo('/api/v3/login/session'), $this->equalTo([
+            ->with($this->equalTo($this->buildUrl('/api/v3/login/session')), $this->equalTo([
                     'body' => json_encode([
                         'app_id' => $params['app_id'],
                         'password' => hash_hmac(
                             'sha1',
-                            $params['app_token'],
-                            $params['challenge']
+                            $params['challenge'],
+                            $params['app_token']
                         )
                     ], JSON_FORCE_OBJECT)
             ]))
@@ -220,9 +245,16 @@ JSON;
     {
         $this->httpClient = $this->getMock('\GuzzleHttp\ClientInterface');
         $this->response = $this->getMock('\GuzzleHttp\Message\ResponseInterface');
+        $this->host = '66.66.66.66';
+        $this->port = 8888;
         $this->provider = new FreeboxAuthenticationProvider($this->httpClient);
+        $this->provider->setHost($this->host);
+        $this->provider->setPort($this->port);
     }
 
+    /**
+     * @param string $json
+     */
     private function getJsonDecodedResponse($json)
     {
         $json = str_replace('\\', '\\\\', $json);
@@ -232,5 +264,27 @@ JSON;
             ->expects($this->once())
             ->method('json')
             ->willReturn(json_decode($json, true));
+    }
+
+    /**
+     * @param string $uri
+     * @return string
+     */
+    private function buildUrl($uri)
+    {
+        return sprintf('http://%s:%d%s', $this->host, $this->port, $uri);
+    }
+
+    /**
+     * @return string
+     */
+    private function getJsonResponseError()
+    {
+        return <<<JSON
+{
+    "success": false,
+    "msg": "Oops!"
+}
+JSON;
     }
 }
