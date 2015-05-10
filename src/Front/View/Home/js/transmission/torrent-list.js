@@ -22,7 +22,7 @@ $(function() {
             event.preventDefault();
 
             $
-                .post($(this).attr('href'), function(data) {
+                .post($(this).attr('href'), function() {
                     console.log('Download successfully added.');
                 })
                 .fail(function(error) {

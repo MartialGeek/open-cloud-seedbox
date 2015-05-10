@@ -3,6 +3,7 @@
 namespace Martial\Warez\Upload\Freebox;
 
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\ClientException;
 use Martial\Warez\Settings\Entity\FreeboxSettingsEntity;
 use Martial\Warez\Settings\FreeboxSettings;
 use Martial\Warez\Settings\FreeboxSettingsDataTransformer;
@@ -161,10 +162,12 @@ class FreeboxManager
     {
         $settings = $this->settingsManager->getSettings($user);
 
-        if (!$settings->getChallenge() || !$settings->getAppToken()) {
-            throw new FreeboxSessionException('You need a challenge and an application token before opening a session');
+        if (!$settings->getAppToken()) {
+            throw new FreeboxSessionException('You need and an application token before opening a session');
         }
 
+        // Renew the challenge value.
+        $this->isLoggedIn($user);
         $this->configureAuthenticationProvider($settings);
 
         try {
@@ -195,10 +198,22 @@ class FreeboxManager
         $freeboxUrl = sprintf('http://%s:%d', $settings->getTransportHost(), $settings->getTransportPort());
 
         if (is_null($token)) {
-            throw new FreeboxSessionException();
+            $this->openSession($user);
         }
 
-        $this->upload->upload($file, $freeboxUrl, ['session_token' => $token]);
+        try {
+            $this->upload->upload($file, $freeboxUrl, ['session_token' => $token]);
+        } catch (ClientException $e) {
+            if ($e->getCode() == 403) {
+                $this->openSession($user);
+            } else {
+                throw new FreeboxSessionException(
+                    'An error prevents to add the element to the downloads queue',
+                    0,
+                    $e
+                );
+            }
+        }
     }
 
     /**
