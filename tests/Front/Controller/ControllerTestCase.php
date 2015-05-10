@@ -335,6 +335,22 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Simulates a call to the method find of the user service.
+     *
+     * @param int $userId
+     * @param mixed $returnedValue
+     */
+    protected function getUser($userId, $returnedValue)
+    {
+        $this
+            ->userService
+            ->expects($this->once())
+            ->method('find')
+            ->with($this->equalTo($userId))
+            ->willReturn($returnedValue);
+    }
+
+    /**
      * Sets the status of the form.
      *
      * @param bool $valid

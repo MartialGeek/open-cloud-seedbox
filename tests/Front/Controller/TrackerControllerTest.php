@@ -218,43 +218,33 @@ class TrackerControllerTest extends ControllerTestCase
     protected function checkTrackerAuthentication($userId, $trackerUsername, $trackerPassword, $isAuthenticated = false)
     {
         if (!$isAuthenticated) {
-            $this
-                ->userService
-                ->expects($this->once())
-                ->method('find')
-                ->with($this->equalTo($userId))
-                ->will($this->returnValue($this->user));
-
-            $this
-                ->user
-                ->expects($this->once())
-                ->method('getTrackerSettings')
-                ->will($this->returnValue($this->entity));
+            $this->getUser($userId, $this->user);
 
             $this
                 ->settings
                 ->expects($this->once())
-                ->method('decodeTrackerPassword')
-                ->with($this->equalTo($this->entity));
+                ->method('getSettings')
+                ->with($this->user)
+                ->willReturn($this->entity);
 
             $this
                 ->entity
                 ->expects($this->once())
                 ->method('getUsername')
-                ->will($this->returnValue($trackerUsername));
+                ->willReturn($trackerUsername);
 
             $this
                 ->entity
                 ->expects($this->once())
                 ->method('getPassword')
-                ->will($this->returnValue($trackerPassword));
+                ->willReturn($trackerPassword);
 
             $this
                 ->client
                 ->expects($this->once())
                 ->method('authenticate')
                 ->with($this->equalTo($trackerUsername), $this->equalTo($trackerPassword))
-                ->will($this->returnValue($this->trackerToken));
+                ->willReturn($this->trackerToken);
 
             $this->sessionSet(['api_token' => $this->trackerToken]);
         }
@@ -272,7 +262,6 @@ class TrackerControllerTest extends ControllerTestCase
 
         $dependencies = parent::defineDependencies();
         $dependencies[] = $this->client;
-        $dependencies[] = $this->userService;
         $dependencies[] = $this->settings;
         $dependencies[] = $this->torrentClient;
 
