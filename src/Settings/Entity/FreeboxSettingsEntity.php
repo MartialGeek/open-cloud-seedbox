@@ -70,6 +70,18 @@ class FreeboxSettingsEntity
     private $sessionToken;
 
     /**
+     * @var string
+     * @Column(type="string", length=255, name="app_token", nullable=true)
+     */
+    private $appToken;
+
+    /**
+     * @var string
+     * @Column(type="string", length=255, name="challenge", nullable=true)
+     */
+    private $challenge;
+
+    /**
      * @var User
      * @OneToOne(targetEntity="Martial\Warez\User\Entity\User", inversedBy="freeboxSettings")
      * @JoinColumn(name="user_id", referencedColumnName="id")
@@ -221,6 +233,44 @@ class FreeboxSettingsEntity
     public function setSessionToken($sessionToken)
     {
         $this->sessionToken = $sessionToken;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAppToken()
+    {
+        return $this->appToken;
+    }
+
+    /**
+     * @param string $appToken
+     * @return self
+     */
+    public function setAppToken($appToken)
+    {
+        $this->appToken = $appToken;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getChallenge()
+    {
+        return $this->challenge;
+    }
+
+    /**
+     * @param string $challenge
+     * @return self
+     */
+    public function setChallenge($challenge)
+    {
+        $this->challenge = $challenge;
 
         return $this;
     }

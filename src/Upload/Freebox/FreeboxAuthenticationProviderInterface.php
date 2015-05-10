@@ -104,7 +104,7 @@ interface FreeboxAuthenticationProviderInterface
     public function getAuthorizationStatus($trackId);
 
     /**
-     * Returns a new challenge value.
+     * Checks if the application is logged in. Useful for regenerating a new challenge.
      * Here is an example of result:
      * <code>
      * [
@@ -117,9 +117,10 @@ interface FreeboxAuthenticationProviderInterface
      * </code>
      *
      * @return array
+     * @param string $sessionToken
      * @throws FreeboxAuthenticationException
      */
-    public function getChallengeValue();
+    public function getConnectionStatus($sessionToken = '');
 
     /**
      * Open a new session with the given parameters.

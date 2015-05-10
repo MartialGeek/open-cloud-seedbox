@@ -162,7 +162,7 @@ JSON;
             ->willReturn($this->response);
 
         $this->getJsonDecodedResponse($jsonResponse);
-        $result = $this->provider->getChallengeValue();
+        $result = $this->provider->getConnectionStatus();
 
         if ($success) {
             $this->assertSame($challenge, $result['result']['challenge']);

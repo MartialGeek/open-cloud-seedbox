@@ -118,7 +118,7 @@ class FreeboxAuthenticationProvider implements FreeboxAuthenticationProviderInte
     }
 
     /**
-     * Returns a new challenge value.
+     * Checks if the application is logged in. Useful for regenerating a new challenge.
      * Here is an example of result:
      * <code>
      * [
@@ -130,14 +130,21 @@ class FreeboxAuthenticationProvider implements FreeboxAuthenticationProviderInte
      * ]
      * </code>
      *
+     * @param string $sessionToken
      * @return array
      * @throws FreeboxAuthenticationException
      */
-    public function getChallengeValue()
+    public function getConnectionStatus($sessionToken = '')
     {
+        $headers = !empty($sessionToken) ? [
+            'headers' => [
+                'X-Fbx-App-Auth' => $sessionToken
+            ]
+        ] : [];
+
         $response = $this
             ->httpClient
-            ->get($this->buildUrl('/api/v3/login'))
+            ->get($this->buildUrl('/api/v3/login'), $headers)
             ->json();
 
         $this->checkResponseStatus($response);

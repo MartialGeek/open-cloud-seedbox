@@ -1,58 +1,38 @@
 $(function() {
 
-    var trackId, appToken, challenge = null;
-
-    function openSession() {
-        $
-            .post('/freebox/open-session', {
-                'app_token': appToken,
-                'challenge': challenge
-            },function() {
-                alert('Session successfully opened.')
-            })
-            .fail(function(error) {
-                console.log(error.responseText);
-            });
-    }
-
-    function getAuthorizationStatus() {
+    /**
+     * Checks the status of the authorization.
+     * @param {integer} trackId
+     */
+    function getAuthorizationStatus(trackId) {
         $
             .get('/freebox/authorization-status/' + trackId, function(data) {
                 if (data.status == 'success') {
-                    challenge = data.challenge
-
-                    openSession();
+                    alert('The application was successfully authorized.');
                 } else if (data.status == 'pending') {
                     console.log('Authorization is pending, retry in 2 seconds...');
-                    setTimeout(getAuthorizationStatus(), 2000);
+                    setTimeout(getAuthorizationStatus(trackId), 2000);
                 }
             }, 'json')
             .fail(function(error) {
-                console.log(error.responseText);
+                alert(error.responseText);
             });
     }
 
+    /**
+     * Sends a permission request to the Freebox.
+     */
     function askPermission() {
         $
             .post('/freebox/ask-permission', function(data) {
-                trackId = data.result.track_id;
-                appToken = data.result.app_token;
-
-                getAuthorizationStatus();
+                getAuthorizationStatus(data.result.track_id);
             }, 'json')
             .fail(function(error) {
-                console.log(error.responseText)
+                alert(error.responseText);
             });
     }
 
-    $('#save-freebox-settings').on('click', function(event) {
-        var form = $('#form-freebox-settings');
-        event.preventDefault();
-
-        if (confirm('Do you want to open a session?')) {
-            askPermission();
-        } else {
-            form.submit();
-        }
+    $('#send-authorization-request').on('click', function() {
+        askPermission();
     });
 });

@@ -41,6 +41,8 @@ class FreeboxManager
     }
 
     /**
+     * Sends a permission request to the Freebox. The user must allow the application on the front panel of the box.
+     *
      * @param User $user
      * @return array
      * @throws FreeboxAuthenticationException
@@ -55,6 +57,9 @@ class FreeboxManager
             'app_version' => $settings->getAppVersion(),
             'device_name' => $settings->getDeviceName()
         ]);
+
+        $settings->setAppToken($appToken['result']['app_token']);
+        $this->settingsManager->updateSettings($settings, $user);
 
         return $appToken;
     }
@@ -76,6 +81,8 @@ class FreeboxManager
 
         switch ($authStatus['result']['status']) {
             case FreeboxAuthenticationProviderInterface::AUTHORIZATION_STATUS_GRANTED:
+                $settings->setChallenge($authStatus['result']['challenge']);
+                $this->settingsManager->updateSettings($settings, $user);
                 break;
             case FreeboxAuthenticationProviderInterface::AUTHORIZATION_STATUS_DENIED:
                 throw new FreeboxAuthorizationDeniedException();
@@ -92,23 +99,49 @@ class FreeboxManager
     }
 
     /**
+     * Return true if the application is already logged in.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function isLoggedIn(User $user)
+    {
+        $settings = $this->settingsManager->getSettings($user);
+        $this->configureAuthenticationProvider($settings);
+        $sessionToken = $settings->getSessionToken();
+
+        if (is_null($sessionToken)) {
+            $sessionToken = '';
+        }
+
+        $status = $this->authentication->getConnectionStatus($sessionToken);
+        $settings->setChallenge($status['result']['challenge']);
+        $this->settingsManager->updateSettings($settings, $user);
+
+        return $status['result']['logged_in'];
+    }
+
+    /**
      * Opens a Freebox session and returns a session token.
      *
      * @param User $user
-     * @param string $appToken
-     * @param string $challenge
      * @throws FreeboxSessionException
      */
-    public function openSession(User $user, $appToken, $challenge)
+    public function openSession(User $user)
     {
         $settings = $this->settingsManager->getSettings($user);
+
+        if (!$settings->getChallenge() || !$settings->getAppToken()) {
+            throw new FreeboxSessionException('You need a challenge and an application token before opening a session');
+        }
+
         $this->configureAuthenticationProvider($settings);
 
         try {
             $session = $this->authentication->openSession([
                 'app_id' => $settings->getAppId(),
-                'app_token' => $appToken,
-                'challenge' => $challenge
+                'app_token' => $settings->getAppToken(),
+                'challenge' => $settings->getChallenge()
             ]);
         } catch (FreeboxAuthenticationException $e) {
             throw new FreeboxSessionException($e->getMessage());
