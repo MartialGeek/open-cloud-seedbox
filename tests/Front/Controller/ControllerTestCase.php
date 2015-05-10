@@ -58,6 +58,11 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
     public $flashBag;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    public $userService;
+
+    /**
      * @var AbstractController
      */
     public $controller;
@@ -91,6 +96,7 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
         $this->request->request = $this->requestParameterBag;
         $this->request->query = $this->queryParameterBag;
         $this->flashBag = $this->getMock('\Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface');
+        $this->userService = $this->getMock('\Martial\Warez\User\UserServiceInterface');
         $this->createController();
     }
 
@@ -100,7 +106,8 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
             $this->twig,
             $this->formFactory,
             $this->session,
-            $this->urlGenerator
+            $this->urlGenerator,
+            $this->userService
         ];
     }
 
