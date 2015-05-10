@@ -29,6 +29,7 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
 
     public function testUploadFile()
     {
+        $freeboxUrl = 'http://66.66.66.66:8888';
         $uploadedFile = new File('/tmp/file', false);
         $uploadUrl = 'http://www.warez.io/files/download/your-file.avi';
         $sessionToken = uniqid();
@@ -54,7 +55,7 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('post')
             ->with(
-                $this->equalTo('/api/v3/downloads/add'),
+                $this->equalTo($freeboxUrl . '/api/v3/downloads/add'),
                 $this->equalTo([
                     'body' => [
                         'download_url' => $uploadUrl
@@ -71,7 +72,9 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
             ->method('json')
             ->willReturn($addDownloadResponseData);
 
-        $this->freeboxAdapter->upload($uploadedFile, [$sessionToken]);
+        $this->freeboxAdapter->upload($uploadedFile, $freeboxUrl, [
+            'session_token' => $sessionToken
+        ]);
     }
 
     protected function setUp()
