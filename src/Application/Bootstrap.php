@@ -16,6 +16,7 @@ use Martial\Warez\Security\BlowfishHashPassword;
 use Martial\Warez\Security\Firewall;
 use Martial\Warez\Security\OpenSSLEncoder;
 use Martial\Warez\Settings\FreeboxSettings;
+use Martial\Warez\Settings\FreeboxSettingsDataTransformer;
 use Martial\Warez\Settings\TrackerSettings;
 use Martial\Warez\T411\Api\Client;
 use Martial\Warez\T411\Api\Data\DataTransformer;
@@ -205,6 +206,10 @@ class Bootstrap
             return new FreeboxSettings($app['doctrine.entity_manager']);
         });
 
+        $app['settings.freebox.data_transformer'] = $app->share(function() {
+            return new FreeboxSettingsDataTransformer();
+        });
+
         $app['security.firewall'] = $app->share(function() use ($app) {
             return new Firewall($app['session']);
         });
@@ -235,7 +240,10 @@ class Bootstrap
             return new FreeboxManager(
                 $app['upload.freebox_adapter'],
                 $app['upload.freebox_authentication_provider'],
-                $app['settings.freebox']
+                $app['settings.freebox'],
+                $app['settings.freebox.data_transformer'],
+                new GuzzleClient(),
+                $app['url_generator']
             );
         });
 

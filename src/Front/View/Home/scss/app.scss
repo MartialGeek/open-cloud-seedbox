@@ -52,3 +52,10 @@ img {
   border: none;
   width: 100%;
 }
+
+.loader {
+  background-image: url("/img/loader.gif");
+  min-width: 32px;
+  min-height: 32px;
+  display: none;
+}

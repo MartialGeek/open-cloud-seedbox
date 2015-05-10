@@ -2,14 +2,20 @@
 
 namespace Martial\Warez\Upload\Freebox;
 
+use GuzzleHttp\ClientInterface;
 use Martial\Warez\Settings\Entity\FreeboxSettingsEntity;
 use Martial\Warez\Settings\FreeboxSettings;
+use Martial\Warez\Settings\FreeboxSettingsDataTransformer;
 use Martial\Warez\Upload\UploadInterface;
 use Martial\Warez\User\Entity\User;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class FreeboxManager
 {
+    const HTTP_HEADER_USER_EMAIL = 'X-App-User-Email';
+    const HTTP_HEADER_USER_PASSWORD = 'X-App-User-Password';
+
     /**
      * @var UploadInterface
      */
@@ -26,18 +32,42 @@ class FreeboxManager
     private $settingsManager;
 
     /**
+     * @var FreeboxSettingsDataTransformer
+     */
+    private $dataTransformer;
+
+    /**
+     * @var ClientInterface
+     */
+    private $httpClient;
+
+    /**
+     * @var UrlGeneratorInterface
+     */
+    private $urlGenerator;
+
+    /**
      * @param UploadInterface $upload
      * @param FreeboxAuthenticationProviderInterface $authenticationProvider
      * @param FreeboxSettings $settings
+     * @param FreeboxSettingsDataTransformer $dataTransformer
+     * @param ClientInterface $httpClient
+     * @param UrlGeneratorInterface $urlGeneratorInterface
      */
     public function __construct(
         UploadInterface $upload,
         FreeboxAuthenticationProviderInterface $authenticationProvider,
-        FreeboxSettings $settings
+        FreeboxSettings $settings,
+        FreeboxSettingsDataTransformer $dataTransformer,
+        ClientInterface $httpClient,
+        UrlGeneratorInterface $urlGeneratorInterface
     ) {
         $this->upload = $upload;
         $this->authentication = $authenticationProvider;
         $this->settingsManager = $settings;
+        $this->dataTransformer = $dataTransformer;
+        $this->httpClient = $httpClient;
+        $this->urlGenerator = $urlGeneratorInterface;
     }
 
     /**
@@ -169,6 +199,45 @@ class FreeboxManager
         }
 
         $this->upload->upload($file, $freeboxUrl, ['session_token' => $token]);
+    }
+
+    /**
+     * Returns an array of the Freebox settings value for the given user.
+     *
+     * @param User $user
+     * @param string $email
+     * @param string $rawPassword
+     * @param string $baseUrl
+     */
+    public function exportSettings(User $user, $email, $rawPassword, $baseUrl)
+    {
+        $settings = $this->settingsManager->getSettings($user);
+        $toArray = $this->dataTransformer->toArray($settings);
+        $url = $baseUrl . $this->urlGenerator->generate('freebox_import_settings');
+
+        $this
+            ->httpClient
+            ->post($url, [
+                'body' => [
+                    'settings' => $toArray
+                ],
+                'headers' => [
+                    self::HTTP_HEADER_USER_EMAIL => $email,
+                    self::HTTP_HEADER_USER_PASSWORD => $rawPassword
+                ]
+            ]);
+    }
+
+    /**
+     * Imports the settings in the given user profile.
+     *
+     * @param User $user
+     * @param array $arraySettings
+     */
+    public function importSettings(User $user, array $arraySettings)
+    {
+        $settings = $this->dataTransformer->toObject($arraySettings);
+        $this->settingsManager->updateSettings($settings, $user);
     }
 
     private function configureAuthenticationProvider(FreeboxSettingsEntity $settings)

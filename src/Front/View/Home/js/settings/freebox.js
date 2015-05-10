@@ -35,4 +35,21 @@ $(function() {
     $('#send-authorization-request').on('click', function() {
         askPermission();
     });
+
+    $('#exportSettingsData').on('submit', function(event) {
+        event.preventDefault();
+        var form = $(this);
+        var loader = form.find('i.loader');
+
+        loader.css('display', 'inline-block');
+
+        $
+            .post($(form).attr('action'), $(form).serialize())
+            .fail(function(error) {
+                alert('Oops!\n\n' + error.responseText);
+            })
+            .always(function() {
+                loader.css('display', 'none');
+            });
+    });
 });

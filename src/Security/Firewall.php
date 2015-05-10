@@ -33,6 +33,7 @@ class Firewall implements FirewallInterface
             '/login' != $requestUri &&
             'logout' != $requestUri &&
             '/form-login' != $requestUri &&
+            '/freebox/import-settings' != $requestUri &&
             !preg_match('#^/upload#', $requestUri)
         ) {
             if (!$this->session->get('connected', false)) {

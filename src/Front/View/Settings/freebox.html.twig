@@ -8,10 +8,58 @@
     <form id="form-freebox-settings" action="{{ path('settings_freebox_update') }}" method="post">
         {{ form_widget(form) }}
 
-        <input id="save-freebox-settings" type="submit" class="button right" value="Save" />
+        <input id="save-freebox-settings" type="submit" class="button success right" value="Save" />
     </form>
 
-    <button id="send-authorization-request" class="btn">Get authorization</button>
+    <div class="row">
+        <button id="send-authorization-request" class="button">Get authorization</button>
+    </div>
+
+    <div class="row">
+        <button data-reveal-id="exportSettingsModal" class="button">Export settings</button>
+    </div>
+
+    <div id="exportSettingsModal" class="reveal-modal" data-reveal aria-labelledby="exportSettings" aria-hidden="true" role="dialog">
+        <h2 id="exportSettings">Export Freebox settings.</h2>
+        <p class="lead">Fill the following fields to upload your settings on a remote application instance.</p>
+
+        <form id="exportSettingsData" action="{{ path('freebox_export_settings') }}" method="post">
+            <div class="row">
+                <div class="large-12 columns">
+                    <label>
+                        Base URL
+                        <input type="url" name="url" placeholder="http://www.application.com" />
+                    </label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="large-12 columns">
+                    <label>
+                        User email
+                        <input type="email" name="email" placeholder="user@email.com" />
+                    </label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="large-12 columns">
+                    <label>
+                        User password
+                        <input type="password" name="raw-password" placeholder="sup3rP@ssw0rD" />
+                    </label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="large-11 columns">
+                    <input type="submit" class="button" value="Export" />
+                </div>
+                <div class="large-1 columns">
+                    <i class="loader"></i>
+                </div>
+            </div>
+        </form>
+
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
 {% endblock %}
 
 {% block javascripts %}

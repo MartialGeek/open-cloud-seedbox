@@ -40,6 +40,10 @@ class FreeboxSettings
         return $settings;
     }
 
+    /**
+     * @param FreeboxSettingsEntity $settings
+     * @param User $user
+     */
     public function updateSettings(FreeboxSettingsEntity $settings, User $user)
     {
         $currentSettings = $this->getSettings($user);

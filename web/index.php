@@ -122,6 +122,14 @@ $app
     ->bind('freebox_upload_file');
 
 $app
+    ->post('/freebox/export-settings', 'freebox.controller:exportSettings')
+    ->bind('freebox_export_settings');
+
+$app
+    ->post('/freebox/import-settings', 'freebox.controller:importSettings')
+    ->bind('freebox_import_settings');
+
+$app
     ->get('/upload/{filename}', 'upload.controller:upload')
     ->bind('upload_file');
 

@@ -2,6 +2,8 @@
 
 namespace Martial\Warez\Front\Controller;
 
+use GuzzleHttp\Exception\RequestException;
+use Martial\Warez\Security\BadCredentialsException;
 use Martial\Warez\Upload\Freebox\FreeboxAuthorizationDeniedException;
 use Martial\Warez\Upload\Freebox\FreeboxAuthenticationException;
 use Martial\Warez\Upload\Freebox\FreeboxAuthorizationException;
@@ -9,6 +11,7 @@ use Martial\Warez\Upload\Freebox\FreeboxAuthorizationPendingException;
 use Martial\Warez\Upload\Freebox\FreeboxAuthorizationTimeoutException;
 use Martial\Warez\Upload\Freebox\FreeboxManager;
 use Martial\Warez\Upload\Freebox\FreeboxSessionException;
+use Martial\Warez\User\UserNotFoundException;
 use Martial\Warez\User\UserServiceInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\File\File;
@@ -132,5 +135,45 @@ class FreeboxController extends AbstractController
         } catch (FreeboxSessionException $e) {
             return new JsonResponse(['message' => 'You need to open a Freebox session before uploading files.'], 400);
         }
+    }
+
+    public function exportSettings(Request $request)
+    {
+        $response = new Response();
+        $url = $request->request->get('url');
+        $email = $request->request->get('email');
+        $rawPassword = $request->request->get('raw-password');
+
+        try {
+            $this->freeboxManager->exportSettings($this->getUser(), $email, $rawPassword, $url);
+            $response->setStatusCode(204);
+        } catch (RequestException $e) {
+            $response->setStatusCode(500);
+            $response->setContent($e->getMessage());
+        }
+
+        return $response;
+    }
+
+    public function importSettings(Request $request)
+    {
+        $userEmail = $request->headers->get(FreeboxManager::HTTP_HEADER_USER_EMAIL);
+        $userPassword = $request->headers->get(FreeboxManager::HTTP_HEADER_USER_PASSWORD);
+        $settings = $request->request->get('settings');
+        $response = new Response();
+
+        try {
+            $user = $this->userService->authenticateByEmail($userEmail, $userPassword);
+            $this->freeboxManager->importSettings($user, $settings);
+            $response->setStatusCode(204);
+        } catch (UserNotFoundException $e) {
+            $response->setStatusCode(401);
+            $response->setContent('User not found.');
+        } catch (BadCredentialsException $e) {
+            $response->setStatusCode(401);
+            $response->setContent('Bad credentials.');
+        }
+
+        return $response;
     }
 }
