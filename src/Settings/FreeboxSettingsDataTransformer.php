@@ -33,7 +33,7 @@ class FreeboxSettingsDataTransformer
     {
         $settings = new FreeboxSettingsEntity();
 
-        $settings->setTransportPort($array['transportHost']);
+        $settings->setTransportHost($array['transportHost']);
         $settings->setTransportPort($array['transportPort']);
         $settings->setAppId($array['appId']);
         $settings->setAppName($array['appName']);
