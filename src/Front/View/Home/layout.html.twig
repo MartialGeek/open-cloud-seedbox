@@ -50,7 +50,7 @@
         {% for flashMessage in app.session.flashbag.get('notice') %}
             <div class="row">
                 <div class="small-12 columns">
-                    <div data-alert class="alert-notice">
+                    <div data-alert class="alert-box notice radius">
                         {{ flashMessage }}
                         <a href="#" class="close">&times;</a>
                     </div>
@@ -61,7 +61,7 @@
         {% for flashMessage in app.session.flashbag.get('success') %}
             <div class="row">
                 <div class="small-12 columns">
-                    <div data-alert class="alert-success">
+                    <div data-alert class="alert-box success radius">
                         {{ flashMessage }}
                         <a href="#" class="close">&times;</a>
                     </div>
@@ -72,7 +72,7 @@
         {% for flashMessage in app.session.flashbag.get('error') %}
             <div class="row">
                 <div class="small-12 columns">
-                    <div data-alert class="alert-error">
+                    <div data-alert class="alert-box error radius">
                         {{ flashMessage }}
                         <a href="#" class="close">&times;</a>
                     </div>

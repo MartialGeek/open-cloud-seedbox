@@ -20,13 +20,14 @@ $(function() {
     $('.action-upload-torrent').each(function() {
         $(this).on('click', function(event) {
             event.preventDefault();
+            var container = $('.main-content').first();
 
             $
                 .post($(this).attr('href'), function() {
-                    console.log('Download successfully added.');
+                    container.addFlash('success', 'Element successfully added to the downloads queue.');
                 })
                 .fail(function(error) {
-                    console.log(error.responseText);
+                    container.addFlash('error', 'Oops!\n' + error.responseText);
                 });
         })
     });
