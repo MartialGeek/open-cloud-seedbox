@@ -173,7 +173,7 @@ class TrackerControllerTest extends ControllerTestCase
 
         $torrent = $this
             ->getMockBuilder('\Symfony\Component\HttpFoundation\File\File')
-            ->disableOriginalConstructor()
+            ->setConstructorArgs(['/path/to/file', false])
             ->getMock();
 
         $this->sessionGet([
