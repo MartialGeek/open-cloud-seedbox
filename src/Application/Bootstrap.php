@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
 use GuzzleHttp\Client as GuzzleClient;
 use Martial\Warez\Download\TransmissionManager;
+use Martial\Warez\Filesystem\ZipArchiver;
 use Martial\Warez\Front\Controller\AbstractController;
 use Martial\Warez\Front\Twig\FileExtension;
 use Martial\Warez\Front\Twig\TransmissionExtension;
@@ -261,6 +262,10 @@ class Bootstrap
 
         $app['transmission.manager'] = $app->share(function() use ($app, $config) {
             return new TransmissionManager($app['transmission.http_client'], $config['transmission']);
+        });
+
+        $app['filesystem.archiver.zip'] = $app->share(function() {
+            return new ZipArchiver();
         });
     }
 

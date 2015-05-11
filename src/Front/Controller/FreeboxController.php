@@ -3,6 +3,7 @@
 namespace Martial\Warez\Front\Controller;
 
 use GuzzleHttp\Exception\RequestException;
+use Martial\Warez\Filesystem\ZipArchiver;
 use Martial\Warez\Security\BadCredentialsException;
 use Martial\Warez\Upload\Freebox\FreeboxAuthorizationDeniedException;
 use Martial\Warez\Upload\Freebox\FreeboxAuthenticationException;
@@ -29,6 +30,11 @@ class FreeboxController extends AbstractController
     private $freeboxManager;
 
     /**
+     * @var ZipArchiver
+     */
+    private $archiver;
+
+    /**
      * @var string
      */
     private $downloadDir;
@@ -47,10 +53,12 @@ class FreeboxController extends AbstractController
         Session $session,
         UrlGeneratorInterface $urlGenerator,
         UserServiceInterface $userService,
-        FreeboxManager $freeboxManager
+        FreeboxManager $freeboxManager,
+        ZipArchiver $archiver
     ) {
         parent::__construct($twig, $formFactory, $session, $urlGenerator, $userService);
         $this->freeboxManager = $freeboxManager;
+        $this->archiver = $archiver;
     }
 
     /**
@@ -127,7 +135,20 @@ class FreeboxController extends AbstractController
 
     public function uploadFile($filename)
     {
-        $file = new File($this->downloadDir . '/' . $filename);
+        if (is_dir($filename)) {
+            $fileInfo = new \SplFileInfo($filename);
+            $filePath = '/tmp/warez/' . $fileInfo->getBasename('.' . $fileInfo->getExtension()) . '.zip';
+
+            try {
+                $this->archiver->createArchive($fileInfo, $filePath);
+            } catch (\RuntimeException $e) {
+                return new JsonResponse(['message', $e->getMessage()], 500);
+            }
+        } else {
+            $filePath = $this->downloadDir . '/' . $filename;
+        }
+
+        $file = new File($filePath);
 
         try {
             $this->freeboxManager->uploadFile($file, $this->getUser());
