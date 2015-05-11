@@ -25,7 +25,7 @@ class UploadController
     {
         $file = new File($this->downloadDir . '/' . $filename);
         $response = new BinaryFileResponse($file);
-        $response->headers->set('Content-Type', $file->getMimeType());
+        $response->headers->set('Content-Type', $file->getMimeType() . '; charset=UTF-8');
 
         $response->setContentDisposition(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
