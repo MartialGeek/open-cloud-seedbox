@@ -6,6 +6,15 @@
 
 <project name="Warez build file" basedir="." default="build">
     <property name="binDir" value="${project.basedir}/bin" />
+    <property name="buildDir" value="${project.basedir}/build" />
+
+    <target name="clean">
+        <delete dir="${buildDir}" />
+    </target>
+
+    <target name="prepare">
+        <mkdir dir="${buildDir}" />
+    </target>
 
     <target name="composer_install">
         <exec command="composer install" checkreturn="true" passthru="true" />
@@ -22,7 +31,8 @@
         <exec executable="${binDir}/behat" checkreturn="true" passthru="true" />
     </target>
 
-    <target name="build" depends="composer_install">
+    <target name="build" depends="clean,prepare,composer_install">
         <phingcall target="technical_tests" />
     </target>
 </project>
+
