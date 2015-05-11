@@ -24,6 +24,5 @@
 
     <target name="build" depends="composer_install">
         <phingcall target="technical_tests" />
-        <phingcall target="functional_tests" />
     </target>
 </project>
