@@ -2,6 +2,7 @@
 
 namespace Martial\Warez\Application;
 
+use Alchemy\Zippy\Zippy;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\FilesystemCache;
 use Doctrine\ORM\EntityManager;
@@ -264,9 +265,13 @@ class Bootstrap
             return new TransmissionManager($app['transmission.http_client'], $config['transmission']);
         });
 
-        $app['filesystem.archiver.zip'] = $app->share(function() {
-            return new ZipArchiver();
+        $app['filesystem.archiver.zip'] = $app->share(function() use ($app) {
+            return new ZipArchiver($app['zippy']);
         });
+
+        $app['zippy'] = function() {
+            return Zippy::load();
+        };
     }
 
     /**

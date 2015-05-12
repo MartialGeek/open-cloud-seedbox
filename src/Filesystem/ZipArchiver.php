@@ -2,8 +2,23 @@
 
 namespace Martial\Warez\Filesystem;
 
+use Alchemy\Zippy\Zippy;
+
 class ZipArchiver
 {
+    /**
+     * @var Zippy
+     */
+    private $zippy;
+
+    /**
+     * @param Zippy $zippy
+     */
+    public function __construct(Zippy $zippy)
+    {
+        $this->zippy = $zippy;
+    }
+
     /**
      * @param \SplFileInfo $file
      * @param $archivePath
@@ -11,13 +26,14 @@ class ZipArchiver
      */
     public function createArchive(\SplFileInfo $file, $archivePath)
     {
-        $archive = new \ZipArchive();
+        $structure = [];
 
-        if ($archive->open($archivePath, \ZipArchive::CREATE) !== true) {
-            throw new \RuntimeException('Unable to create the archive ' . $archivePath);
+        if ($file->isDir()) {
+            $structure[$file->getFilename()] = $file->getRealPath();
+        } else {
+            $structure[] = $file->getRealPath();
         }
 
-        $archive->addFile($file->getPathname());
-        $archive->close();
+        $this->zippy->create($archivePath, $structure);
     }
 }
