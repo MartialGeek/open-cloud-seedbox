@@ -44,7 +44,8 @@ $bootstrap->registerControllers([
         'class' => '\Martial\Warez\Front\Controller\FreeboxController',
         'dependencies' => [
             $app['upload.freebox.manager'],
-            $app['filesystem.archiver.zip']
+            $app['filesystem.archiver.zip'],
+            $app['filesystem']
         ],
         'calls' => ['setDownloadDir' => $config['download_dir']]
     ],
