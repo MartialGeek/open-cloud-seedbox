@@ -46,6 +46,7 @@ class FreeboxController extends AbstractController
      * @param UrlGeneratorInterface $urlGenerator
      * @param UserServiceInterface $userService
      * @param FreeboxManager $freeboxManager
+     * @param ZipArchiver $archiver
      */
     public function __construct(
         \Twig_Environment $twig,
@@ -135,8 +136,10 @@ class FreeboxController extends AbstractController
 
     public function uploadFile($filename)
     {
-        if (is_dir($filename)) {
-            $fileInfo = new \SplFileInfo($filename);
+        $fullPath = $this->downloadDir . '/' . $filename;
+
+        if (is_dir($fullPath)) {
+            $fileInfo = new \SplFileInfo($fullPath);
             $filePath = '/tmp/warez/' . $fileInfo->getBasename('.' . $fileInfo->getExtension()) . '.zip';
 
             try {
@@ -145,7 +148,7 @@ class FreeboxController extends AbstractController
                 return new JsonResponse(['message', $e->getMessage()], 500);
             }
         } else {
-            $filePath = $this->downloadDir . '/' . $filename;
+            $filePath = $fullPath;
         }
 
         $file = new File($filePath);
