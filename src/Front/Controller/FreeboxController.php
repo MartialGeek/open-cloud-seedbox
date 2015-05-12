@@ -14,6 +14,7 @@ use Martial\Warez\Upload\Freebox\FreeboxManager;
 use Martial\Warez\Upload\Freebox\FreeboxSessionException;
 use Martial\Warez\User\UserNotFoundException;
 use Martial\Warez\User\UserServiceInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -35,6 +36,11 @@ class FreeboxController extends AbstractController
     private $archiver;
 
     /**
+     * @var Filesystem
+     */
+    private $fs;
+
+    /**
      * @var string
      */
     private $downloadDir;
@@ -47,6 +53,7 @@ class FreeboxController extends AbstractController
      * @param UserServiceInterface $userService
      * @param FreeboxManager $freeboxManager
      * @param ZipArchiver $archiver
+     * @param Filesystem $fs
      */
     public function __construct(
         \Twig_Environment $twig,
@@ -55,11 +62,13 @@ class FreeboxController extends AbstractController
         UrlGeneratorInterface $urlGenerator,
         UserServiceInterface $userService,
         FreeboxManager $freeboxManager,
-        ZipArchiver $archiver
+        ZipArchiver $archiver,
+        Filesystem $fs
     ) {
         parent::__construct($twig, $formFactory, $session, $urlGenerator, $userService);
         $this->freeboxManager = $freeboxManager;
         $this->archiver = $archiver;
+        $this->fs = $fs;
     }
 
     /**
@@ -140,10 +149,12 @@ class FreeboxController extends AbstractController
 
         if (is_dir($fullPath)) {
             $fileInfo = new \SplFileInfo($fullPath);
-            $filePath = '/tmp/warez/' . $fileInfo->getBasename('.' . $fileInfo->getExtension()) . '.zip';
+            $archivePath = '/tmp/warez/' . $fileInfo->getBasename('.' . $fileInfo->getExtension()) . '.zip';
 
             try {
-                $this->archiver->createArchive($fileInfo, $filePath);
+                $this->archiver->createArchive($fileInfo, $archivePath);
+                $filePath = $this->downloadDir . '/' . basename($archivePath);
+                $this->fs->rename($archivePath, $filePath);
             } catch (\RuntimeException $e) {
                 return new JsonResponse(['message', $e->getMessage()], 500);
             }
