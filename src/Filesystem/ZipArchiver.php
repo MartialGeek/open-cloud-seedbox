@@ -26,6 +26,10 @@ class ZipArchiver
      */
     public function createArchive(\SplFileInfo $file, $archivePath)
     {
+        /**
+         * @todo Very bad! Consider to create a worker to handle the archive creation.
+         */
+        ini_set('max_execution_time', 0);
         $structure = [];
 
         if ($file->isDir()) {
