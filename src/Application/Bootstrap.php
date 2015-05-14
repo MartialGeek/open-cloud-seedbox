@@ -238,15 +238,22 @@ class Bootstrap
             return new FreeboxAuthenticationProvider($app['upload.http_client']);
         });
 
-        $app['upload.freebox.manager'] = $app->share(function() use ($app) {
-            return new FreeboxManager(
+        $app['upload.freebox.manager'] = $app->share(function() use ($app, $config) {
+            $manager = new FreeboxManager(
                 $app['upload.freebox_adapter'],
                 $app['upload.freebox_authentication_provider'],
                 $app['settings.freebox'],
                 $app['settings.freebox.data_transformer'],
                 new GuzzleClient(),
-                $app['url_generator']
+                $app['url_generator'],
+                $app['filesystem.archiver.zip'],
+                $app['filesystem']
             );
+
+            $manager->setArchivePath($config['upload_archive_path']);
+            $manager->setDownloadDir($config['download_dir']);
+
+            return $manager;
         });
 
         $app['transmission.http_client'] = $app->share(function() use ($config) {

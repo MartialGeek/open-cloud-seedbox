@@ -10,6 +10,7 @@ return [
     'security_encoder_password' => '',
     'security_encoder_salt' => '',
     'upload_adapter' => '',
+    'upload_archive_path' => '',
     'torrent_files_path' => '',
     'transmission_login' => '',
     'transmission_password' => '',

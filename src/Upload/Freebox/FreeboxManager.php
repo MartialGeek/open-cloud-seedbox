@@ -4,11 +4,13 @@ namespace Martial\Warez\Upload\Freebox;
 
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
+use Martial\Warez\Filesystem\ZipArchiver;
 use Martial\Warez\Settings\Entity\FreeboxSettingsEntity;
 use Martial\Warez\Settings\FreeboxSettings;
 use Martial\Warez\Settings\FreeboxSettingsDataTransformer;
 use Martial\Warez\Upload\UploadInterface;
 use Martial\Warez\User\Entity\User;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -48,12 +50,34 @@ class FreeboxManager
     private $urlGenerator;
 
     /**
+     * @var ZipArchiver
+     */
+    private $archiver;
+
+    /**
+     * @var Filesystem
+     */
+    private $fs;
+
+    /**
+     * @var string
+     */
+    private $downloadDir;
+
+    /**
+     * @var string
+     */
+    private $archivePath;
+
+    /**
      * @param UploadInterface $upload
      * @param FreeboxAuthenticationProviderInterface $authenticationProvider
      * @param FreeboxSettings $settings
      * @param FreeboxSettingsDataTransformer $dataTransformer
      * @param ClientInterface $httpClient
      * @param UrlGeneratorInterface $urlGeneratorInterface
+     * @param ZipArchiver $archiver
+     * @param Filesystem $fs
      */
     public function __construct(
         UploadInterface $upload,
@@ -61,7 +85,9 @@ class FreeboxManager
         FreeboxSettings $settings,
         FreeboxSettingsDataTransformer $dataTransformer,
         ClientInterface $httpClient,
-        UrlGeneratorInterface $urlGeneratorInterface
+        UrlGeneratorInterface $urlGeneratorInterface,
+        ZipArchiver $archiver,
+        Filesystem $fs
     ) {
         $this->upload = $upload;
         $this->authentication = $authenticationProvider;
@@ -69,6 +95,26 @@ class FreeboxManager
         $this->dataTransformer = $dataTransformer;
         $this->httpClient = $httpClient;
         $this->urlGenerator = $urlGeneratorInterface;
+        $this->archiver = $archiver;
+        $this->fs = $fs;
+    }
+
+    /**
+     * @param string $downloadDir
+     */
+    public function setDownloadDir($downloadDir)
+    {
+        $this->downloadDir = $downloadDir;
+    }
+
+    /**
+     * Sets the path where the archive are generated.
+     *
+     * @param string $archivePath
+     */
+    public function setArchivePath($archivePath)
+    {
+        $this->archivePath = $archivePath;
     }
 
     /**
@@ -187,25 +233,37 @@ class FreeboxManager
     /**
      * Uploads the given file.
      *
-     * @param File $file
+     * @param string $fileName
      * @param User $user
      * @throws FreeboxSessionException
      */
-    public function uploadFile(File $file, User $user)
+    public function uploadFile($fileName, User $user)
     {
+        $filePath = $this->downloadDir . '/' . $fileName;
+
+        if (is_dir($filePath)) {
+            $fileInfo = new \SplFileInfo($filePath);
+            $archivePath = $this->archivePath . '/' . $fileInfo->getBasename('.' . $fileInfo->getExtension()) . '.zip';
+            $this->archiver->createArchive($fileInfo, $archivePath);
+            $filePath = $archivePath;
+        }
+
+        $file = new File($filePath);
         $settings = $this->settingsManager->getSettings($user);
-        $token = $settings->getSessionToken();
         $freeboxUrl = sprintf('http://%s:%d', $settings->getTransportHost(), $settings->getTransportPort());
 
-        if (is_null($token)) {
+        if (is_null($settings->getSessionToken())) {
             $this->openSession($user);
+            $settings = $this->settingsManager->getSettings($user);
         }
 
         try {
-            $this->upload->upload($file, $freeboxUrl, ['session_token' => $token]);
+            $this->upload->upload($file, $freeboxUrl, ['session_token' => $settings->getSessionToken()]);
         } catch (ClientException $e) {
-            if ($e->getCode() == 403) {
+            if ($e->getCode() == 403 || $e->getCode() == 401) {
                 $this->openSession($user);
+                $settings = $this->settingsManager->getSettings($user);
+                $this->upload->upload($file, $freeboxUrl, ['session_token' => $settings->getSessionToken()]);
             } else {
                 throw new FreeboxSessionException(
                     'An error prevents to add the element to the downloads queue',

@@ -79,7 +79,8 @@ return [
         ]
     ],
     'upload' => [
-        'adapter' => $parameters['upload_adapter']
+        'adapter' => $parameters['upload_adapter'],
+        'archive_path' => $parameters['upload_archive_path']
     ],
     'transmission' => [
         'login' => $parameters['transmission_login'],

@@ -3,7 +3,6 @@
 namespace Martial\Warez\Front\Controller;
 
 use GuzzleHttp\Exception\RequestException;
-use Martial\Warez\Filesystem\ZipArchiver;
 use Martial\Warez\Security\BadCredentialsException;
 use Martial\Warez\Upload\Freebox\FreeboxAuthorizationDeniedException;
 use Martial\Warez\Upload\Freebox\FreeboxAuthenticationException;
@@ -14,9 +13,7 @@ use Martial\Warez\Upload\Freebox\FreeboxManager;
 use Martial\Warez\Upload\Freebox\FreeboxSessionException;
 use Martial\Warez\User\UserNotFoundException;
 use Martial\Warez\User\UserServiceInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,29 +28,12 @@ class FreeboxController extends AbstractController
     private $freeboxManager;
 
     /**
-     * @var ZipArchiver
-     */
-    private $archiver;
-
-    /**
-     * @var Filesystem
-     */
-    private $fs;
-
-    /**
-     * @var string
-     */
-    private $downloadDir;
-
-    /**
      * @param \Twig_Environment $twig
      * @param FormFactoryInterface $formFactory
      * @param Session $session
      * @param UrlGeneratorInterface $urlGenerator
      * @param UserServiceInterface $userService
      * @param FreeboxManager $freeboxManager
-     * @param ZipArchiver $archiver
-     * @param Filesystem $fs
      */
     public function __construct(
         \Twig_Environment $twig,
@@ -61,24 +41,10 @@ class FreeboxController extends AbstractController
         Session $session,
         UrlGeneratorInterface $urlGenerator,
         UserServiceInterface $userService,
-        FreeboxManager $freeboxManager,
-        ZipArchiver $archiver,
-        Filesystem $fs
+        FreeboxManager $freeboxManager
     ) {
         parent::__construct($twig, $formFactory, $session, $urlGenerator, $userService);
         $this->freeboxManager = $freeboxManager;
-        $this->archiver = $archiver;
-        $this->fs = $fs;
-    }
-
-    /**
-     * Sets the directory of the downloaded files.
-     *
-     * @param string $downloadDir
-     */
-    public function setDownloadDir($downloadDir)
-    {
-        $this->downloadDir = $downloadDir;
     }
 
     public function askUserPermission()
@@ -145,27 +111,8 @@ class FreeboxController extends AbstractController
 
     public function uploadFile($filename)
     {
-        $fullPath = $this->downloadDir . '/' . $filename;
-
-        if (is_dir($fullPath)) {
-            $fileInfo = new \SplFileInfo($fullPath);
-            $archivePath = '/tmp/warez/' . $fileInfo->getBasename('.' . $fileInfo->getExtension()) . '.zip';
-
-            try {
-                $this->archiver->createArchive($fileInfo, $archivePath);
-                $filePath = $this->downloadDir . '/' . basename($archivePath);
-                $this->fs->rename($archivePath, $filePath);
-            } catch (\RuntimeException $e) {
-                return new JsonResponse(['message', $e->getMessage()], 500);
-            }
-        } else {
-            $filePath = $fullPath;
-        }
-
-        $file = new File($filePath);
-
         try {
-            $this->freeboxManager->uploadFile($file, $this->getUser());
+            $this->freeboxManager->uploadFile($filename, $this->getUser());
             return new Response('', 204);
         } catch (FreeboxSessionException $e) {
             return new JsonResponse(['message' => 'You need to open a Freebox session before uploading files.'], 400);
