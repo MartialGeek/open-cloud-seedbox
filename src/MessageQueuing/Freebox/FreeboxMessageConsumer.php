@@ -54,7 +54,7 @@ class FreeboxMessageConsumer extends AbstractMessageQueuing
                 throw new \InvalidArgumentException('The user with the ID ' . $data['userId'] . ' could not be found.');
             }
 
-            $this->freeboxManager->uploadFile($data['fileName'], $user);
+            $this->freeboxManager->generateArchiveAndUpload($data['fileName'], $user);
         });
     }
 }
