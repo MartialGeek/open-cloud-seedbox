@@ -19,6 +19,8 @@ class FreeboxManager
 {
     const HTTP_HEADER_USER_EMAIL = 'X-App-User-Email';
     const HTTP_HEADER_USER_PASSWORD = 'X-App-User-Password';
+    const DOWNLOAD_TYPE_REGULAR = 'regular';
+    const DOWNLOAD_TYPE_ARCHIVE = 'archive';
 
     /**
      * @var UploadInterface
@@ -267,7 +269,7 @@ class FreeboxManager
         $fileInfo = new \SplFileInfo($filePath);
         $archivePath = $this->archivePath . '/' . $fileInfo->getBasename('.' . $fileInfo->getExtension()) . '.zip';
         $this->archiver->createArchive($fileInfo, $archivePath);
-        $this->upload($archivePath, $user);
+        $this->upload($archivePath, $user, self::DOWNLOAD_TYPE_ARCHIVE);
     }
 
     /**
@@ -321,9 +323,10 @@ class FreeboxManager
     /**
      * @param string $filePath
      * @param User $user
+     * @param string $type
      * @throws FreeboxSessionException
      */
-    private function upload($filePath, User $user)
+    private function upload($filePath, User $user, $type = self::DOWNLOAD_TYPE_REGULAR)
     {
         $file = new File($filePath);
         $settings = $this->settingsManager->getSettings($user);
@@ -338,7 +341,10 @@ class FreeboxManager
         } catch (ClientException $e) {
             if ($e->getCode() == 403 || $e->getCode() == 401) {
                 $settings = $this->openNewSession($user);
-                $this->upload->upload($file, $freeboxUrl, ['session_token' => $settings->getSessionToken()]);
+                $this->upload->upload($file, $freeboxUrl, [
+                    'session_token' => $settings->getSessionToken(),
+                    'type' => $type
+                ]);
             } else {
                 throw new FreeboxSessionException(
                     'An error prevents to add the element to the downloads queue',

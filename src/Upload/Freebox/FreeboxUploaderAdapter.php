@@ -40,7 +40,9 @@ class FreeboxUploaderAdapter implements UploadInterface
      */
     public function upload(File $file, $targetUrl, array $config = array())
     {
-        $downloadUrl = $this->urlResolver->resolve($file);
+        $downloadUrl = $this->urlResolver->resolve($file, [
+            'upload_type' => isset($config['type']) ? $config['type'] : FreeboxManager::DOWNLOAD_TYPE_REGULAR
+        ]);
 
         $response = $this
             ->httpClient

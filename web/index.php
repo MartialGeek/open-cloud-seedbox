@@ -49,7 +49,10 @@ $bootstrap->registerControllers([
     ],
     'upload.controller' => [
         'class' => '\Martial\Warez\Front\Controller\UploadController',
-        'calls' => ['setDownloadDir' => $config['download_dir']]
+        'calls' => [
+            'setDownloadDir' => $config['download_dir'],
+            'setArchiveDir' => $config['upload']['archive_path']
+        ]
     ]
 ]);
 
