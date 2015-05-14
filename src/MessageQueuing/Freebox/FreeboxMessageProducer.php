@@ -14,7 +14,8 @@ class FreeboxMessageProducer extends AbstractMessageQueuing
             'userId' => $userId
         ], JSON_FORCE_OBJECT);
 
-        $this->channel->queue_declare(FreeboxQueues::GENERATE_ARCHIVE_AND_UPLOAD, false, false, false, false);
-        $this->channel->basic_publish(new AMQPMessage($body));
+        $queue = FreeboxQueues::GENERATE_ARCHIVE_AND_UPLOAD;
+        $this->channel->queue_declare($queue, false, false, false, false);
+        $this->channel->basic_publish(new AMQPMessage($body), '', $queue);
     }
 }
