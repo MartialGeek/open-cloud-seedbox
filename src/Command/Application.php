@@ -2,6 +2,7 @@
 
 namespace Martial\Warez\Command;
 
+use Martial\Warez\Command\Message\Listen;
 use Martial\Warez\Command\User\UserCreate;
 use Martial\Warez\Command\Assets\AssetsInstall;
 use Martial\Warez\Command\Server\ServerRun;
@@ -55,5 +56,6 @@ class Application extends BaseApplication
 
         $this->add(new ServerRun(new ProcessBuilder(), $this->config['project_root']));
         $this->add(new UserCreate($this->app['user.service']));
+        $this->add(new Listen($this->app['message_queuing.freebox.consumer']));
     }
 }

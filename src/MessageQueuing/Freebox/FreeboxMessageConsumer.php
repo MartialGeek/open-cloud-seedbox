@@ -6,6 +6,7 @@ use Martial\Warez\MessageQueuing\AbstractMessageQueuing;
 use Martial\Warez\Upload\Freebox\FreeboxManager;
 use Martial\Warez\User\UserService;
 use PhpAmqpLib\Message\AMQPMessage;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class FreeboxMessageConsumer extends AbstractMessageQueuing
 {
@@ -37,16 +38,19 @@ class FreeboxMessageConsumer extends AbstractMessageQueuing
 
     /**
      * Listens the messages that generate the archives and then upload them on the Freebox.
+     *
+     * @param OutputInterface $output
      */
-    public function generateArchiveAndUpload()
+    public function generateArchiveAndUpload(OutputInterface $output)
     {
         $queue = FreeboxQueues::GENERATE_ARCHIVE_AND_UPLOAD;
         $this->channel->queue_declare($queue, false, false, false, false);
-        $this->channel->basic_consume($queue, '', false, true, false, false, function (AMQPMessage $msg) {
+        $this->channel->basic_consume($queue, '', false, true, false, false, function (AMQPMessage $msg) use ($output) {
             if ($this->logger) {
                 $this->logger->info('New message received: ' . $msg->body);
             }
 
+            $output->writeln('New message received: ' . $msg->body);
             $data = json_decode($msg->body);
             $user = $this->userService->find($data['userId']);
 

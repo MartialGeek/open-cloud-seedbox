@@ -32,6 +32,6 @@ class Listen extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->freeboxConsumer->generateArchiveAndUpload();
+        $this->freeboxConsumer->generateArchiveAndUpload($output);
     }
 }
