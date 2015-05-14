@@ -60,5 +60,9 @@ class FreeboxMessageConsumer extends AbstractMessageQueuing
 
             $this->freeboxManager->generateArchiveAndUpload($data['fileName'], $user);
         });
+
+        while (count($this->channel->callbacks)) {
+            $this->channel->wait();
+        }
     }
 }
