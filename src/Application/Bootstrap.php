@@ -224,7 +224,7 @@ class Bootstrap
         });
 
         $app['upload.url_resolver'] = $app->share(function() use ($app) {
-            return new UploadUrlResolver($app['url_generator']);
+            return new UploadUrlResolver($app['request_stack']);
         });
 
         $app['upload.adapter_factory'] = $app->share(function() use ($app, $config) {

@@ -3,21 +3,23 @@
 namespace Martial\Warez\Upload;
 
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class UploadUrlResolver implements UploadUrlResolverInterface
 {
-    /**
-     * @var UrlGeneratorInterface
-     */
-    private $urlGenerator;
+    const UPLOAD_URI = '/upload/{filename}';
 
     /**
-     * @param UrlGeneratorInterface $urlGenerator
+     * @var RequestStack
      */
-    public function __construct(UrlGeneratorInterface $urlGenerator)
+    private $requestStack;
+
+    /**
+     * @param RequestStack $requestStack
+     */
+    function __construct(RequestStack $requestStack)
     {
-        $this->urlGenerator = $urlGenerator;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -28,8 +30,8 @@ class UploadUrlResolver implements UploadUrlResolverInterface
      */
     public function resolve(File $file)
     {
-        return $this->urlGenerator->generate(
-            'upload_file', ['filename' => $file->getFilename()], UrlGeneratorInterface::ABSOLUTE_URL
-        );
+        $uri = str_replace('{filename}', $file->getFilename(), self::UPLOAD_URI);
+
+        return $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost() . $uri;
     }
 }

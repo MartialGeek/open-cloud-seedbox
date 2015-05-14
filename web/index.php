@@ -1,6 +1,7 @@
 <?php
 
 use Martial\Warez\Application\Bootstrap;
+use Martial\Warez\Upload\UploadUrlResolver;
 use Silex\Application;
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -129,7 +130,7 @@ $app
     ->bind('freebox_import_settings');
 
 $app
-    ->get('/upload/{filename}', 'upload.controller:upload')
+    ->get(UploadUrlResolver::UPLOAD_URI, 'upload.controller:upload')
     ->bind('upload_file');
 
 $app->run();
