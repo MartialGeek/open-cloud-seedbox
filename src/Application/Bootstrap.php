@@ -250,7 +250,7 @@ class Bootstrap
                 $app['filesystem']
             );
 
-            $manager->setArchivePath($config['upload_archive_path']);
+            $manager->setArchivePath($config['upload']['archive_path']);
             $manager->setDownloadDir($config['download_dir']);
 
             return $manager;
