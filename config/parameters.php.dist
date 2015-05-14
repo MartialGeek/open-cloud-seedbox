@@ -2,6 +2,7 @@
 
 return [
     'app_env' => 'prod',
+    'app_host' => '',
     'doctrine_driver' => '',
     'doctrine_dbname' => '',
     'doctrine_host' => '',

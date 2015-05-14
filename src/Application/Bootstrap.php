@@ -223,8 +223,11 @@ class Bootstrap
             return new GuzzleClient();
         });
 
-        $app['upload.url_resolver'] = $app->share(function() use ($app) {
-            return new UploadUrlResolver($app['request_stack']);
+        $app['upload.url_resolver'] = $app->share(function() use ($config) {
+            $revolver = new UploadUrlResolver();
+            $revolver->setHost($config['application']['host']);
+
+            return $revolver;
         });
 
         $app['upload.adapter_factory'] = $app->share(function() use ($app, $config) {

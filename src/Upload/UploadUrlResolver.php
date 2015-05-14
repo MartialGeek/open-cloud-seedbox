@@ -3,23 +3,22 @@
 namespace Martial\Warez\Upload;
 
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 class UploadUrlResolver implements UploadUrlResolverInterface
 {
     const UPLOAD_URI = '/upload/{filename}';
 
     /**
-     * @var RequestStack
+     * @var string
      */
-    private $requestStack;
+    private $host;
 
     /**
-     * @param RequestStack $requestStack
+     * @param string $host
      */
-    function __construct(RequestStack $requestStack)
+    public function setHost($host)
     {
-        $this->requestStack = $requestStack;
+        $this->host = $host;
     }
 
     /**
@@ -32,6 +31,6 @@ class UploadUrlResolver implements UploadUrlResolverInterface
     {
         $uri = str_replace('{filename}', $file->getFilename(), self::UPLOAD_URI);
 
-        return $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost() . $uri;
+        return $this->host . $uri;
     }
 }

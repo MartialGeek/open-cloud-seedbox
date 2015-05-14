@@ -6,7 +6,8 @@ $parameters = require __DIR__ . '/parameters.php';
 
 return [
     'application' => [
-        'env' => $parameters['app_env']
+        'env' => $parameters['app_env'],
+        'host' => $parameters['app_host']
     ],
     'project_root' => CONFIG_PROJECT_ROOT,
     'assets' => [
