@@ -51,7 +51,7 @@ class FreeboxMessageConsumer extends AbstractMessageQueuing
             }
 
             $output->writeln('New message received: ' . $msg->body);
-            $data = json_decode($msg->body);
+            $data = json_decode($msg->body, true);
             $user = $this->userService->find($data['userId']);
 
             if (!$user) {
