@@ -18,4 +18,9 @@ return [
     'transmission_port' => '',
     'transmission_rpc_uri' => '',
     'download_dir' => '',
+    'message_queuing_freebox_connection_host' => '',
+    'message_queuing_freebox_connection_port' => '',
+    'message_queuing_freebox_connection_user' => '',
+    'message_queuing_freebox_connection_password' => '',
+    'message_queuing_freebox_connection_vhost' => '',
 ];

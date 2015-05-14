@@ -90,4 +90,15 @@ return [
         'rpc_uri' => $parameters['transmission_rpc_uri'],
     ],
     'download_dir' => $parameters['download_dir'],
+    'message_queuing' => [
+        'freebox' => [
+            'connection' => [
+                'host' => $parameters['message_queuing_freebox_connection_host'],
+                'port' => $parameters['message_queuing_freebox_connection_port'],
+                'user' => $parameters['message_queuing_freebox_connection_user'],
+                'password' => $parameters['message_queuing_freebox_connection_password'],
+                'vhost' => $parameters['message_queuing_freebox_connection_vhost'],
+            ]
+        ]
+    ]
 ];

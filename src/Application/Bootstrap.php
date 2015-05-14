@@ -13,6 +13,8 @@ use Martial\Warez\Filesystem\ZipArchiver;
 use Martial\Warez\Front\Controller\AbstractController;
 use Martial\Warez\Front\Twig\FileExtension;
 use Martial\Warez\Front\Twig\TransmissionExtension;
+use Martial\Warez\MessageQueuing\Freebox\FreeboxMessageConsumer;
+use Martial\Warez\MessageQueuing\Freebox\FreeboxMessageProducer;
 use Martial\Warez\Security\AuthenticationProvider;
 use Martial\Warez\Security\BlowfishHashPassword;
 use Martial\Warez\Security\Firewall;
@@ -28,6 +30,7 @@ use Martial\Warez\Upload\Freebox\FreeboxManager;
 use Martial\Warez\Upload\UploadAdapterFactory;
 use Martial\Warez\Upload\UploadUrlResolver;
 use Martial\Warez\User\UserService;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
 use Silex\Application;
 use Silex\Provider\DoctrineServiceProvider;
 use Silex\Provider\FormServiceProvider;
@@ -247,7 +250,8 @@ class Bootstrap
                 new GuzzleClient(),
                 $app['url_generator'],
                 $app['filesystem.archiver.zip'],
-                $app['filesystem']
+                $app['filesystem'],
+                $app['message_queuing.freebox.producer']
             );
 
             $manager->setArchivePath($config['upload']['archive_path']);
@@ -279,6 +283,34 @@ class Bootstrap
         $app['zippy'] = function() {
             return Zippy::load();
         };
+
+        $app['message_queuing.freebox.connection'] = $app->share(function() use ($app, $config) {
+            $messageConfig = $config['message_queuing']['freebox'];
+
+            return new AMQPStreamConnection(
+                $messageConfig['connection']['host'],
+                $messageConfig['connection']['port'],
+                $messageConfig['connection']['user'],
+                $messageConfig['connection']['password'],
+                $messageConfig['connection']['vhost']
+            );
+        });
+
+        $app['message_queuing.freebox.consumer'] = $app->share(function() use ($app) {
+            $consumer = new FreeboxMessageConsumer($app['message_queuing.freebox.connection']);
+            $consumer->setLogger($app['logger']);
+            $consumer->setFreeboxManager($app['upload.freebox.manager']);
+            $consumer->setUserService($app['user.service']);
+
+            return $consumer;
+        });
+
+        $app['message_queuing.freebox.producer'] = $app->share(function() use ($app) {
+            $consumer = new FreeboxMessageProducer($app['message_queuing.freebox.connection']);
+            $consumer->setLogger($app['logger']);
+
+            return $consumer;
+        });
     }
 
     /**
