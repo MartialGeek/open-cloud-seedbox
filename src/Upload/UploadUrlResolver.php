@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\File\File;
 
 class UploadUrlResolver implements UploadUrlResolverInterface
 {
-    const UPLOAD_URI = '/upload';
+    const UPLOAD_URI = '/upload/';
 
     /**
      * @var string
@@ -31,8 +31,9 @@ class UploadUrlResolver implements UploadUrlResolverInterface
      */
     public function resolve(File $file, array $options = [])
     {
+        $type = isset($options['download_type']) ? $options['download_type'] : FreeboxManager::DOWNLOAD_TYPE_REGULAR;
         $uri  = self::UPLOAD_URI . '?filename=' . urlencode($file->getPathname());
-        $uri .= '&type=' . isset($options['type']) ? $options['type'] : FreeboxManager::DOWNLOAD_TYPE_REGULAR;
+        $uri .= '&type=' . $type;
 
         return $this->host . $uri;
     }
