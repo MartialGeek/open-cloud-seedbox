@@ -41,25 +41,8 @@ class UploadUrlResolverTest extends \PHPUnit_Framework_TestCase
             ->getMock();
     }
 
-    public function testResolveWithoutType()
+    public function testResolve()
     {
-        $this->resolve();
-    }
-
-    public function testResolveWithArchiveType()
-    {
-        $this->resolve('archive');
-    }
-
-    private function resolve($type = null)
-    {
-        $downloadType = is_null($type) ? 'regular' : $type;
-        $options = [];
-
-        if (!is_null($type)) {
-            $options['download_type'] = $type;
-        }
-
         $filePathName = dirname($this->filePath);
 
         $this
@@ -68,8 +51,8 @@ class UploadUrlResolverTest extends \PHPUnit_Framework_TestCase
             ->method('getPathname')
             ->willReturn($filePathName);
 
-        $url = $this->resolver->resolve($this->file, $options);
-        $expectedUrl = $this->host . '/upload/?filename=' . urlencode($filePathName) . '&type=' . $downloadType;
+        $url = $this->resolver->resolve($this->file);
+        $expectedUrl = $this->host . '/upload/?filename=' . urlencode($filePathName);
         $this->assertSame($expectedUrl, $url);
     }
 }

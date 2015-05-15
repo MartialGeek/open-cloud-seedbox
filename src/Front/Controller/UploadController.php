@@ -40,18 +40,7 @@ class UploadController
     public function upload(Request $request)
     {
         $filename = $request->query->get('filename');
-        $type = $request->query->get('type', FreeboxManager::DOWNLOAD_TYPE_REGULAR);
-
-        if ($type == FreeboxManager::DOWNLOAD_TYPE_REGULAR) {
-            $filePath = $this->downloadDir;
-        } elseif ($type == FreeboxManager::DOWNLOAD_TYPE_ARCHIVE) {
-            $filePath = $this->archiveDir;
-        } else {
-            return new Response('Unknown value for the parameter "type"');
-        }
-
-        $filePath .= '/' . $filename;
-        $file = new File($filePath);
+        $file = new File($filename);
         $response = new BinaryFileResponse($file);
         $response->headers->set('Content-Type', $file->getMimeType() . '; charset=UTF-8');
 

@@ -26,15 +26,10 @@ class UploadUrlResolver implements UploadUrlResolverInterface
      * Returns the public URL which exposes the given file.
      *
      * @param File $file
-     * @param array $options
      * @return string
      */
-    public function resolve(File $file, array $options = [])
+    public function resolve(File $file)
     {
-        $type = isset($options['download_type']) ? $options['download_type'] : FreeboxManager::DOWNLOAD_TYPE_REGULAR;
-        $uri  = self::UPLOAD_URI . '?filename=' . urlencode($file->getPathname());
-        $uri .= '&type=' . $type;
-
-        return $this->host . $uri;
+        return $this->host .  self::UPLOAD_URI . '?filename=' . urlencode($file->getPathname());
     }
 }
