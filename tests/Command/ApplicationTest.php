@@ -46,12 +46,19 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp('/assets:install/', $commandTester->getDisplay(), 'Command assets:install was not found.');
         $this->assertRegExp('/server:run/', $commandTester->getDisplay(), 'Command server:run was not found.');
         $this->assertRegExp('/user:create/', $commandTester->getDisplay(), 'Command server:run was not found.');
+        $this->assertRegExp('/message:listen/', $commandTester->getDisplay(), 'Command server:run was not found.');
     }
 
     protected function setUp()
     {
+        $freeboxConsumer = $this
+            ->getMockBuilder('\Martial\Warez\MessageQueuing\Freebox\FreeboxMessageConsumer')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $services = [
-            'user.service' => $this->getMock('\Martial\Warez\User\UserServiceInterface')
+            'user.service' => $this->getMock('\Martial\Warez\User\UserServiceInterface'),
+            'message_queuing.freebox.consumer' => $freeboxConsumer
         ];
 
         $this->services = $services;
