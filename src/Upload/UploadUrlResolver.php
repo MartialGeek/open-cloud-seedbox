@@ -2,7 +2,6 @@
 
 namespace Martial\Warez\Upload;
 
-use Martial\Warez\Upload\Freebox\FreeboxManager;
 use Symfony\Component\HttpFoundation\File\File;
 
 class UploadUrlResolver implements UploadUrlResolverInterface
