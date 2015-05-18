@@ -4,7 +4,6 @@ namespace Martial\Warez\Download;
 
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\RequestException;
-use Symfony\Component\HttpFoundation\File\File;
 
 class TransmissionManager implements TorrentClientInterface
 {
@@ -40,10 +39,10 @@ class TransmissionManager implements TorrentClientInterface
      * Adds a torrent in the download queue.
      *
      * @param string $sessionId
-     * @param File $torrent
+     * @param \SplFileInfo $torrent
      * @throws TorrentClientException
      */
-    public function addToQueue($sessionId, File $torrent)
+    public function addToQueue($sessionId, \SplFileInfo $torrent)
     {
         $body = '{"method": "torrent-add", "arguments": {"filename": "' . $torrent->getPathname() . '"}}';
         $response = $this->sendRequest($sessionId, $body)->json();

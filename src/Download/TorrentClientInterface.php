@@ -2,18 +2,16 @@
 
 namespace Martial\Warez\Download;
 
-use Symfony\Component\HttpFoundation\File\File;
-
 interface TorrentClientInterface
 {
     /**
      * Adds a torrent in the download queue.
      *
      * @param string $sessionId
-     * @param File $torrent
+     * @param \SplFileInfo $torrent
      * @throws TorrentClientException
      */
-    public function addToQueue($sessionId, File $torrent);
+    public function addToQueue($sessionId, \SplFileInfo $torrent);
 
     /**
      * Removes the given torrent ID from the queue.
