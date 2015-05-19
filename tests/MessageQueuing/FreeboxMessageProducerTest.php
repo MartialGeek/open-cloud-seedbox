@@ -43,6 +43,21 @@ class FreeboxMessageProducerTest extends \PHPUnit_Framework_TestCase
         $this->messageProducer = new FreeboxMessageProducer($this->connection);
     }
 
+    protected function tearDown()
+    {
+        $this
+            ->channel
+            ->expects($this->once())
+            ->method('close');
+
+        $this
+            ->connection
+            ->expects($this->once())
+            ->method('close');
+
+        unset($this->messageProducer);
+    }
+
     public function testGenerateArchiveAndUpload()
     {
         $fileName = 'superfilename.txt';
