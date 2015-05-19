@@ -33,7 +33,7 @@ abstract class AbstractMessageQueuing
         $this->channel = $this->connection->channel($channelId);
     }
 
-    function __destruct()
+    public function __destruct()
     {
         $this->channel->close();
         $this->connection->close();
