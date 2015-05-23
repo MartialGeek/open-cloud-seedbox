@@ -2,6 +2,7 @@
 
 namespace Martial\Warez\Command\Message;
 
+use Doctrine\DBAL\Connection;
 use Martial\Warez\MessageQueuing\Freebox\FreeboxMessageConsumer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,11 +16,18 @@ class Listen extends Command
     private $freeboxConsumer;
 
     /**
-     * @param FreeboxMessageConsumer $freeboxConsumer
+     * @var Connection
      */
-    public function __construct(FreeboxMessageConsumer $freeboxConsumer)
+    private $connection;
+
+    /**
+     * @param FreeboxMessageConsumer $freeboxConsumer
+     * @param Connection $connection
+     */
+    public function __construct(FreeboxMessageConsumer $freeboxConsumer, Connection $connection)
     {
         $this->freeboxConsumer = $freeboxConsumer;
+        $this->connection = $connection;
         parent::__construct();
     }
 
@@ -32,6 +40,6 @@ class Listen extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->freeboxConsumer->generateArchiveAndUpload($output);
+        $this->freeboxConsumer->generateArchiveAndUpload($this->connection, $output);
     }
 }

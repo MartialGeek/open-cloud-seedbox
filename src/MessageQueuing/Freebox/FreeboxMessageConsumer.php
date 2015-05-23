@@ -2,6 +2,7 @@
 
 namespace Martial\Warez\MessageQueuing\Freebox;
 
+use Doctrine\DBAL\Connection;
 use Martial\Warez\MessageQueuing\AbstractMessageQueuing;
 use Martial\Warez\Upload\Freebox\FreeboxManager;
 use Martial\Warez\User\UserService;
@@ -39,27 +40,38 @@ class FreeboxMessageConsumer extends AbstractMessageQueuing
     /**
      * Listens the messages that generate the archives and then upload them on the Freebox.
      *
+     * @param Connection $connection
      * @param OutputInterface $output
      */
-    public function generateArchiveAndUpload(OutputInterface $output)
+    public function generateArchiveAndUpload(Connection $connection, OutputInterface $output)
     {
         $queue = FreeboxQueues::GENERATE_ARCHIVE_AND_UPLOAD;
         $this->channel->queue_declare($queue, false, false, false, false);
-        $this->channel->basic_consume($queue, '', false, true, false, false, function (AMQPMessage $msg) use ($output) {
-            if ($this->logger) {
-                $this->logger->info('New message received: ' . $msg->body);
+        $this->channel->basic_consume(
+            $queue,
+            '',
+            false,
+            true,
+            false,
+            false,
+            function (AMQPMessage $msg) use ($connection, $output) {
+                if ($this->logger) {
+                    $this->logger->info('New message received: ' . $msg->body);
+                }
+
+                $output->writeln('New message received: ' . $msg->body);
+                $data = json_decode($msg->body, true);
+                $connection->connect();
+                $user = $this->userService->find($data['userId']);
+
+                if (!$user) {
+                    throw new \InvalidArgumentException('The user with the ID ' . $data['userId'] . ' could not be found.');
+                }
+
+                $this->freeboxManager->generateArchiveAndUpload($data['fileName'], $user);
+                $connection->close();
             }
-
-            $output->writeln('New message received: ' . $msg->body);
-            $data = json_decode($msg->body, true);
-            $user = $this->userService->find($data['userId']);
-
-            if (!$user) {
-                throw new \InvalidArgumentException('The user with the ID ' . $data['userId'] . ' could not be found.');
-            }
-
-            $this->freeboxManager->generateArchiveAndUpload($data['fileName'], $user);
-        });
+        );
 
         while (count($this->channel->callbacks)) {
             $this->channel->wait();

@@ -56,6 +56,9 @@ class Application extends BaseApplication
 
         $this->add(new ServerRun(new ProcessBuilder(), $this->config['project_root']));
         $this->add(new UserCreate($this->app['user.service']));
-        $this->add(new Listen($this->app['message_queuing.freebox.consumer']));
+        $this->add(new Listen(
+            $this->app['message_queuing.freebox.consumer'],
+            $this->app['doctrine.entity_manager']->getConnection()
+        ));
     }
 }
