@@ -2,6 +2,7 @@
 
 namespace Martial\Warez\Upload;
 
+use Martial\Warez\Upload\Freebox\FreeboxManager;
 use Symfony\Component\HttpFoundation\File\File;
 
 class UploadUrlResolver implements UploadUrlResolverInterface
@@ -25,10 +26,21 @@ class UploadUrlResolver implements UploadUrlResolverInterface
      * Returns the public URL which exposes the given file.
      *
      * @param File $file
+     * @param array $options
      * @return string
      */
-    public function resolve(File $file)
+    public function resolve(File $file, array $options = [])
     {
-        return $this->host .  self::UPLOAD_URI . '?filename=' . urlencode($file->getPathname());
+        $uploadType = isset($options['upload_type']) ? $options['upload_type'] : FreeboxManager::UPLOAD_TYPE_REGULAR;
+
+        $url = sprintf(
+            '%s%s?filename=%s&upload-type=%s',
+            $this->host,
+            self::UPLOAD_URI,
+            urlencode($file->getPathname()),
+            $uploadType
+        );
+
+        return $url;
     }
 }

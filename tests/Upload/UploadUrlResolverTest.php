@@ -41,8 +41,31 @@ class UploadUrlResolverTest extends \PHPUnit_Framework_TestCase
             ->getMock();
     }
 
-    public function testResolve()
+    public function testResolveRegular()
     {
+        $this->resolve();
+    }
+
+    public function testResolveArchive()
+    {
+        $this->resolve('archive');
+    }
+
+    public function testResolveUnknownType()
+    {
+        $this->resolve('unknown');
+    }
+
+    private function resolve($type = 'regular')
+    {
+        switch ($type) {
+            case 'archive':
+                $uploadType = $type;
+                break;
+            default:
+                $uploadType = 'regular';
+        }
+
         $filePathName = dirname($this->filePath);
 
         $this
@@ -51,8 +74,8 @@ class UploadUrlResolverTest extends \PHPUnit_Framework_TestCase
             ->method('getPathname')
             ->willReturn($filePathName);
 
-        $url = $this->resolver->resolve($this->file);
-        $expectedUrl = $this->host . '/upload/?filename=' . urlencode($filePathName);
+        $url = $this->resolver->resolve($this->file, ['upload_type' => $uploadType]);
+        $expectedUrl = $this->host . '/upload/?filename=' . urlencode($filePathName) . '&upload-type=' . $uploadType;
         $this->assertSame($expectedUrl, $url);
     }
 }
