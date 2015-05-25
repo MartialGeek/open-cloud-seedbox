@@ -27,11 +27,44 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
      */
     public $freeboxAdapter;
 
-    public function testUploadFile()
+    public function testUploadRegularFile()
+    {
+        $this->upload();
+    }
+
+    public function testUploadArchive()
+    {
+        $this->upload('archive');
+    }
+
+    protected function setUp()
+    {
+        $this->httpClient = $this->getMock('\GuzzleHttp\ClientInterface');
+        $this->urlResolver = $this->getMock('\Martial\Warez\Upload\UploadUrlResolverInterface');
+        $this->config = [
+            'app_id' => 'net.warez-manager',
+            'app_name' => 'Warez Manager',
+            'app_version' => '1.0',
+            'device_name' => 'seedbox'
+        ];
+
+        $this->freeboxAdapter = new FreeboxUploaderAdapter($this->httpClient, $this->urlResolver);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createResponse()
+    {
+        return $this->getMock('\GuzzleHttp\Message\ResponseInterface');
+    }
+
+    private function upload($uploadType = 'regular')
     {
         $freeboxUrl = 'http://66.66.66.66:8888';
         $uploadedFile = new File('/tmp/file', false);
-        $uploadUrl = 'http://www.warez.io/files/download/your-file.avi';
+        $filename = urlencode('/path/to/file.avi');
+        $uploadUrl = 'http://www.warez.io/files/download/?filename=' . $filename . '&upload-type=' . $uploadType;
         $sessionToken = uniqid();
 
         $addDownloadResponse = $this->createResponse();
@@ -47,7 +80,7 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
             ->urlResolver
             ->expects($this->once())
             ->method('resolve')
-            ->with($this->equalTo($uploadedFile))
+            ->with($this->equalTo($uploadedFile), $this->equalTo(['upload_type' => $uploadType]))
             ->willReturn($uploadUrl);
 
         $this
@@ -73,29 +106,8 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
             ->willReturn($addDownloadResponseData);
 
         $this->freeboxAdapter->upload($uploadedFile, $freeboxUrl, [
-            'session_token' => $sessionToken
+            'session_token' => $sessionToken,
+            'upload_type' => $uploadType
         ]);
-    }
-
-    protected function setUp()
-    {
-        $this->httpClient = $this->getMock('\GuzzleHttp\ClientInterface');
-        $this->urlResolver = $this->getMock('\Martial\Warez\Upload\UploadUrlResolverInterface');
-        $this->config = [
-            'app_id' => 'net.warez-manager',
-            'app_name' => 'Warez Manager',
-            'app_version' => '1.0',
-            'device_name' => 'seedbox'
-        ];
-
-        $this->freeboxAdapter = new FreeboxUploaderAdapter($this->httpClient, $this->urlResolver);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    private function createResponse()
-    {
-        return $this->getMock('\GuzzleHttp\Message\ResponseInterface');
     }
 }
