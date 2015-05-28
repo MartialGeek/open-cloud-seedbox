@@ -34,19 +34,12 @@ vagrant up
 
 ### Edit your "hosts" file
 
-Open a SSH connection to the virtual machine and copy the public IP (eth2 adapter).
-
-```sh
-vagrant ssh
-ifconfig
-```
-
-Now edit your "hosts" file (/etc/hosts on Linux or OSX or c:\Windows\System32\drivers\etc\hosts on Windows) and paste
-the IP. The domain name must be "warez.dev".
+Edit your "hosts" file (/etc/hosts on Linux or OSX or c:\Windows\System32\drivers\etc\hosts on Windows) to add the
+warez.dev IP (default to 192.168.0.42):
 
 ```
 127.0.0.1      localhost
-172.xx.xx.xx   warez.dev
+192.168.0.42   warez.dev
 ```
 
 ### Configure your tracker account

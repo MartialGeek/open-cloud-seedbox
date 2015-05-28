@@ -226,7 +226,10 @@ exec { 'build_assets':
 
 exec { 'symlink_assets':
     command => "${project_path}/bin/warez assets:install",
-    require => Exec['build_assets'],
+    require => [
+        Exec['build_assets'],
+        Class['rabbitmq']
+    ],
     cwd     => $project_path,
     user    => 'vagrant'
 }
@@ -254,4 +257,24 @@ exec { 'create_warez_user':
 exec { 'touch /home/vagrant/.warez_user_created':
     user        => 'vagrant',
     refreshonly => true
+}
+
+class { 'rabbitmq':
+    admin_enable => true,
+    delete_guest_user => false,
+    config_variables => { loopback_users => [] }
+}
+
+rabbitmq_user { 'warez':
+    password => 'warez'
+}
+
+rabbitmq_vhost { 'warez':
+    ensure => present
+}
+
+rabbitmq_user_permissions { 'warez@warez':
+    configure_permission => '.*',
+    read_permission      => '.*',
+    write_permission     => '.*'
 }

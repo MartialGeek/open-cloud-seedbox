@@ -2,6 +2,7 @@
 
 return [
     'app_env' => 'dev',
+    'app_host' => 'http://warez.dev',
     'doctrine_driver' => 'pdo_mysql',
     'doctrine_dbname' => 'warez',
     'doctrine_host' => 'localhost',
@@ -9,10 +10,18 @@ return [
     'doctrine_password' => 'warez',
     'security_encoder_password' => 'fjiezoriuhriueghiue',
     'security_encoder_salt' => '',
+    'upload_adapter' => 'freebox',
+    'upload_archive_path' => '/tmp/warez_archives',
     'torrent_files_path' => '/var/lib/warez/torrents',
     'transmission_login' => 'warez',
     'transmission_password' => 'warez',
     'transmission_host' => 'localhost',
     'transmission_port' => 9091,
     'transmission_rpc_uri' => '/transmission/rpc',
+    'download_dir' => '/var/lib/transmission-daemon/downloads',
+    'message_queuing_freebox_connection_host' => '127.0.0.1',
+    'message_queuing_freebox_connection_port' => 5672,
+    'message_queuing_freebox_connection_user' => 'warez',
+    'message_queuing_freebox_connection_password' => 'warez',
+    'message_queuing_freebox_connection_vhost' => 'warez',
 ];
