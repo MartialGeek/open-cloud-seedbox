@@ -28,6 +28,7 @@ use Martial\Warez\T411\Api\Search\QueryFactory;
 use Martial\Warez\Upload\Freebox\FreeboxAuthenticationProvider;
 use Martial\Warez\Upload\Freebox\FreeboxManager;
 use Martial\Warez\Upload\UploadAdapterFactory;
+use Martial\Warez\Upload\UploadListener;
 use Martial\Warez\Upload\UploadUrlResolver;
 use Martial\Warez\User\UserService;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
@@ -112,6 +113,11 @@ class Bootstrap
 
         $this->app['twig']->addExtension(new TransmissionExtension());
         $this->app['twig']->addExtension(new FileExtension());
+
+        $this->app['dispatcher']->addListener('kernel.terminate', [
+            $this->app['upload.listener'],
+            'onKernelTerminate'
+        ]);
     }
 
     protected function registerServiceProviders()
@@ -313,6 +319,10 @@ class Bootstrap
             $consumer->setLogger($app['logger']);
 
             return $consumer;
+        });
+
+        $app['upload.listener'] = $app->share(function() {
+            return new UploadListener();
         });
     }
 

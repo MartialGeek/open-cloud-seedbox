@@ -56,9 +56,23 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $entityManager = $this->getMock('\Doctrine\ORM\EntityManagerInterface');
+
+        $connection = $this
+            ->getMockBuilder('\Doctrine\DBAL\Connection')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $entityManager
+            ->expects($this->once())
+            ->method('getConnection')
+            ->willReturn($connection);
+
+
         $services = [
             'user.service' => $this->getMock('\Martial\Warez\User\UserServiceInterface'),
-            'message_queuing.freebox.consumer' => $freeboxConsumer
+            'message_queuing.freebox.consumer' => $freeboxConsumer,
+            'doctrine.entity_manager' => $entityManager
         ];
 
         $this->services = $services;
@@ -77,6 +91,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
                     return $services[$key];
                 }
             ));
+
         $this->config = include __DIR__ . '/mockConsoleConfig.php';
         $this->console = new Application($this->silexApp, $this->config);
     }
