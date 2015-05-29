@@ -224,7 +224,7 @@ class Bootstrap
         });
 
         $app['security.firewall'] = $app->share(function() use ($app) {
-            return new Firewall($app['session']);
+            return new Firewall($app['session'], $app['url_generator']);
         });
 
         $app['upload.http_client'] = $app->share(function() use ($app) {

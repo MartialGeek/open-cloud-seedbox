@@ -29,7 +29,12 @@ class FirewallTest extends \PHPUnit_Framework_TestCase
      */
     public $request;
 
-    public function testRestrictedAreaShouldReturnA401ResponseWithNonConnectedUser()
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    public $urlGenerator;
+
+    public function testRestrictedAreaRedirectToTheHomepageWithANonConnectedUser()
     {
         $this->onKernelRequest([self::RESTRICTED_AREA, self::NON_CONNECTED_USER]);
     }
@@ -71,11 +76,34 @@ class FirewallTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue($connected));
 
             if (in_array(self::NON_CONNECTED_USER, $options)) {
+                $flashBag = $this->getMock('\Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface');
+
+                $this
+                    ->session
+                    ->expects($this->once())
+                    ->method('getFlashBag')
+                    ->willReturn($flashBag);
+
+                $flashBag
+                    ->expects($this->once())
+                    ->method('add')
+                    ->with(
+                        $this->equalTo('error'),
+                        $this->equalTo('You must open a session.')
+                    );
+
+                $this
+                    ->urlGenerator
+                    ->expects($this->once())
+                    ->method('generate')
+                    ->with($this->equalTo('homepage'))
+                    ->willReturn('/');
+
                 $this
                     ->getResponseEvent
                     ->expects($this->once())
                     ->method('setResponse')
-                    ->with($this->isInstanceOf('\Symfony\Component\HttpFoundation\Response'));
+                    ->with($this->isInstanceOf('\Symfony\Component\HttpFoundation\RedirectResponse'));
             }
         }
 
@@ -99,6 +127,8 @@ class FirewallTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->firewall = new Firewall($this->session);
+        $this->urlGenerator = $this->getMock('\Symfony\Component\Routing\Generator\UrlGeneratorInterface');
+
+        $this->firewall = new Firewall($this->session, $this->urlGenerator);
     }
 }

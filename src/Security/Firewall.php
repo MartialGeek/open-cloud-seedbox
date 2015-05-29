@@ -2,9 +2,10 @@
 
 namespace Martial\Warez\Security;
 
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class Firewall implements FirewallInterface
 {
@@ -14,11 +15,18 @@ class Firewall implements FirewallInterface
     private $session;
 
     /**
-     * @param Session $session
+     * @var UrlGeneratorInterface
      */
-    public function __construct(Session $session)
+    private $urlGenerator;
+
+    /**
+     * @param Session $session
+     * @param UrlGeneratorInterface $urlGenerator
+     */
+    public function __construct(Session $session, UrlGeneratorInterface $urlGenerator)
     {
         $this->session = $session;
+        $this->urlGenerator = $urlGenerator;
     }
 
     /**
@@ -37,7 +45,11 @@ class Firewall implements FirewallInterface
             !preg_match('#^/upload#', $requestUri)
         ) {
             if (!$this->session->get('connected', false)) {
-                $event->setResponse(new Response('Authentication required.', 401));
+                $this->session->getFlashBag()->add('error', 'You must open a session.');
+
+                $event->setResponse(
+                    new RedirectResponse($this->urlGenerator->generate('homepage'))
+                );
             }
         }
     }
