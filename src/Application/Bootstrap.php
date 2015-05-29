@@ -113,11 +113,6 @@ class Bootstrap
 
         $this->app['twig']->addExtension(new TransmissionExtension());
         $this->app['twig']->addExtension(new FileExtension());
-
-        $this->app['dispatcher']->addListener('kernel.terminate', [
-            $this->app['upload.listener'],
-            'onKernelTerminate'
-        ]);
     }
 
     protected function registerServiceProviders()
