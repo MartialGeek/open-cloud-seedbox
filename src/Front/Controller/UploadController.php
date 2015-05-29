@@ -2,11 +2,9 @@
 
 namespace Martial\Warez\Front\Controller;
 
-use Martial\Warez\Upload\Freebox\FreeboxManager;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class UploadController
