@@ -126,7 +126,9 @@ class Bootstrap
             ->register(new ServiceControllerServiceProvider())
             ->register(new TwigServiceProvider(), $this->config['twig'])
             ->register(new MonologServiceProvider(), $this->config['monolog'])
-            ->register(new SessionServiceProvider())
+            ->register(new SessionServiceProvider(), [
+                'session.storage.options' => $this->config['session']
+            ])
             ->register(new FormServiceProvider())
             ->register(new ValidatorServiceProvider())
             ->register(new TranslationServiceProvider(), $this->config['translator'])

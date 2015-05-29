@@ -9,6 +9,9 @@ return [
         'env' => $parameters['app_env'],
         'host' => $parameters['app_host']
     ],
+    'session' => [
+        'cookie_lifetime' => 604800
+    ],
     'project_root' => CONFIG_PROJECT_ROOT,
     'assets' => [
         'source_paths' => [
