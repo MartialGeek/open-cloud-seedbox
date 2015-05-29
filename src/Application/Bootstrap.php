@@ -322,13 +322,6 @@ class Bootstrap
 
             return $consumer;
         });
-
-        $app['upload.listener'] = $app->share(function() use ($app) {
-            $listener = new UploadListener();
-            $listener->setLogger($app['logger']);
-
-            return $listener;
-        });
     }
 
     /**

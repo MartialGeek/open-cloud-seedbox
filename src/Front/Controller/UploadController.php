@@ -44,10 +44,12 @@ class UploadController
         $response = new BinaryFileResponse($file);
         $response->headers->set('Content-Type', $file->getMimeType() . '; charset=UTF-8');
 
-        $response->setContentDisposition(
-            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $file->getFilename()
-        );
+        $response
+            ->setContentDisposition(
+                ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+                $file->getFilename()
+            )
+            ->deleteFileAfterSend(true);
 
         return $response;
     }
