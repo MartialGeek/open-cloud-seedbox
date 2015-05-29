@@ -27,7 +27,7 @@ $(function() {
                     container.addFlash('success', 'Element successfully added to the downloads queue.');
                 })
                 .fail(function(error) {
-                    container.addFlash('error', 'Oops!\n' + error.responseText);
+                    container.addFlash('alert', 'Oops!\n' + error.responseText);
                 });
         })
     });

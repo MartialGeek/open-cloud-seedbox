@@ -17,7 +17,7 @@ $(function() {
                 }
             }, 'json')
             .fail(function(error) {
-                container.addFlash('error', 'Oops!\n' + error.responseText)
+                container.addFlash('alert', 'Oops!\n' + error.responseText)
             });
     }
 
@@ -31,7 +31,7 @@ $(function() {
             }, 'json')
             .fail(function(error) {
                 var container = $('.main-content').first();
-                container.addFlash('error', 'Oops!\n\n' + error.responseText);
+                container.addFlash('alert', 'Oops!\n\n' + error.responseText);
             });
     }
 
@@ -52,7 +52,7 @@ $(function() {
                 container.addFlash('success', 'Your settings have been successfully exported.');
             })
             .fail(function(error) {
-                container.addFlash('error', 'Oops!\n\n' + error.responseText);
+                container.addFlash('alert', 'Oops!\n\n' + error.responseText);
             })
             .always(function() {
                 loader.css('display', 'none');
