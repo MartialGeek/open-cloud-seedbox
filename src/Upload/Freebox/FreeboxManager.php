@@ -225,7 +225,6 @@ class FreeboxManager
 
         // Renew the challenge value.
         $this->isLoggedIn($user);
-        $this->configureAuthenticationProvider($settings);
 
         try {
             $session = $this->authentication->openSession([
