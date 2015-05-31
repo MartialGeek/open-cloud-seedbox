@@ -345,7 +345,8 @@ class FreeboxManager
             $this->upload->upload($file, $freeboxUrl, $uploadOptions);
         } catch (ClientException $e) {
             if ($e->getCode() == 403 || $e->getCode() == 401) {
-                $uploadOptions['session_token'] = $this->openNewSession($user);
+                $settings = $this->openNewSession($user);
+                $uploadOptions['session_token'] = $settings->getSessionToken();
                 $this->upload->upload($file, $freeboxUrl, $uploadOptions);
             } else {
                 throw new FreeboxSessionException(
