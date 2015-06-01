@@ -242,6 +242,11 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
         $this->upload();
     }
 
+    public function testUploadArchive()
+    {
+        $this->upload('archive');
+    }
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
@@ -624,27 +629,44 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
 
     private function upload($uploadType = 'regular')
     {
-        $file = 'ubuntu-14.04-desktop-amd64.iso.torrent';
-        $settings = $this->getSettings($this->once());
-        $transportHost = $this->getTransportHost($settings);
-        $transportPort = $this->getTransportPort($settings);
-        $freeboxUrl = sprintf('http://%s:%d', $transportHost, $transportPort);
-        $sessionToken = $this->getSessionToken($settings, $this->exactly(2));
+        $file = $uploadType == 'regular' ? 'ubuntu-14.04-desktop-amd64.iso.torrent' : 'TestDir';
 
-        $uploadOptions = [
-            'session_token' => $sessionToken,
-            'upload_type' => $uploadType
-        ];
+        if ($uploadType == 'regular') {
+            $settings = $this->getSettings($this->once());
+            $transportHost = $this->getTransportHost($settings);
+            $transportPort = $this->getTransportPort($settings);
+            $freeboxUrl = sprintf('http://%s:%d', $transportHost, $transportPort);
+            $sessionToken = $this->getSessionToken($settings, $this->exactly(2));
 
-        $this
-            ->uploadManager
-            ->expects($this->once())
-            ->method('upload')
-            ->with(
-                $this->isInstanceOf('\Symfony\Component\HttpFoundation\File\File'),
-                $this->equalTo($freeboxUrl),
-                $this->equalTo($uploadOptions)
-            );
+            $uploadOptions = [
+                'session_token' => $sessionToken,
+                'upload_type' => $uploadType
+            ];
+
+            $this
+                ->uploadManager
+                ->expects($this->once())
+                ->method('upload')
+                ->with(
+                    $this->isInstanceOf('\Symfony\Component\HttpFoundation\File\File'),
+                    $this->equalTo($freeboxUrl),
+                    $this->equalTo($uploadOptions)
+                );
+        } elseif ($uploadType == 'archive') {
+            $userId = 42;
+
+            $this
+                ->user
+                ->expects($this->once())
+                ->method('getId')
+                ->willReturn($userId);
+
+            $this
+                ->messageProducer
+                ->expects($this->once())
+                ->method('generateArchiveAndUpload')
+                ->with($this->equalTo($file), $this->equalTo($userId));
+        }
 
         $this->freeboxManager->setDownloadDir(__DIR__ . '/../../Resources/T411');
         $this->freeboxManager->uploadFile($file, $this->user);
