@@ -237,6 +237,16 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
         $this->openSession('auth_error');
     }
 
+    public function testUploadRegularFile()
+    {
+        $this->upload();
+    }
+
+    public function testUploadArchive()
+    {
+        $this->upload('archive');
+    }
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
@@ -271,18 +281,8 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
      */
     private function configureAuthenticationProvider(\PHPUnit_Framework_MockObject_MockObject $settingsEntity)
     {
-        $host = 'http://freebox.mafreebox.fr';
-        $port = 8888;
-
-        $settingsEntity
-            ->expects($this->once())
-            ->method('getTransportHost')
-            ->willReturn($host);
-
-        $settingsEntity
-            ->expects($this->once())
-            ->method('getTransportPort')
-            ->willReturn($port);
+        $host = $this->getTransportHost($settingsEntity);
+        $port = $this->getTransportPort($settingsEntity);
 
         $this
             ->authenticationProvider
@@ -295,6 +295,61 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('setPort')
             ->with($this->equalTo($port));
+    }
+
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $settingsEntity
+     * @param \PHPUnit_Framework_MockObject_Matcher_Invocation $matcher
+     * @return string
+     */
+    private function getSessionToken(
+        \PHPUnit_Framework_MockObject_MockObject $settingsEntity,
+        \PHPUnit_Framework_MockObject_Matcher_Invocation $matcher = null
+    ) {
+        if (is_null($matcher)) {
+            $matcher = $this->once();
+        }
+
+        $sessionToken = uniqid();
+
+        $settingsEntity
+            ->expects($matcher)
+            ->method('getSessionToken')
+            ->willReturn($sessionToken);
+
+        return $sessionToken;
+    }
+
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $settingsEntity
+     * @return string
+     */
+    private function getTransportHost(\PHPUnit_Framework_MockObject_MockObject $settingsEntity)
+    {
+        $transportHost = '42.42.42.42';
+
+        $settingsEntity
+            ->expects($this->once())
+            ->method('getTransportHost')
+            ->willReturn($transportHost);
+
+        return $transportHost;
+    }
+
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $settingsEntity
+     * @return string
+     */
+    private function getTransportPort(\PHPUnit_Framework_MockObject_MockObject $settingsEntity)
+    {
+        $transportPort = 8888;
+
+        $settingsEntity
+            ->expects($this->once())
+            ->method('getTransportPort')
+            ->willReturn($transportPort);
+
+        return $transportPort;
     }
 
     /**
@@ -570,5 +625,50 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->freeboxManager->openSession($this->user);
+    }
+
+    private function upload($uploadType = 'regular')
+    {
+        $file = $uploadType == 'regular' ? 'ubuntu-14.04-desktop-amd64.iso.torrent' : 'TestDir';
+
+        if ($uploadType == 'regular') {
+            $settings = $this->getSettings($this->once());
+            $transportHost = $this->getTransportHost($settings);
+            $transportPort = $this->getTransportPort($settings);
+            $freeboxUrl = sprintf('http://%s:%d', $transportHost, $transportPort);
+            $sessionToken = $this->getSessionToken($settings, $this->exactly(2));
+
+            $uploadOptions = [
+                'session_token' => $sessionToken,
+                'upload_type' => $uploadType
+            ];
+
+            $this
+                ->uploadManager
+                ->expects($this->once())
+                ->method('upload')
+                ->with(
+                    $this->isInstanceOf('\Symfony\Component\HttpFoundation\File\File'),
+                    $this->equalTo($freeboxUrl),
+                    $this->equalTo($uploadOptions)
+                );
+        } elseif ($uploadType == 'archive') {
+            $userId = 42;
+
+            $this
+                ->user
+                ->expects($this->once())
+                ->method('getId')
+                ->willReturn($userId);
+
+            $this
+                ->messageProducer
+                ->expects($this->once())
+                ->method('generateArchiveAndUpload')
+                ->with($this->equalTo($file), $this->equalTo($userId));
+        }
+
+        $this->freeboxManager->setDownloadDir(__DIR__ . '/../../Resources/T411');
+        $this->freeboxManager->uploadFile($file, $this->user);
     }
 }
