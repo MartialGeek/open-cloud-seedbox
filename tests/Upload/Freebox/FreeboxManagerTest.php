@@ -197,7 +197,7 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testTrackAuthorizationStatusUnknownError()
     {
-        $this->trackAuthorizationStatus('timeout');
+        $this->trackAuthorizationStatus('unknown');
     }
 
     public function testIsLoggedIn()
