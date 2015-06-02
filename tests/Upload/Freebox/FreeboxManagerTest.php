@@ -242,6 +242,11 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
         $this->upload();
     }
 
+    public function testUploadRegularFileWithNoSessionToken()
+    {
+        $this->upload('regular', false);
+    }
+
     public function testUploadArchive()
     {
         $this->upload('archive');
@@ -278,11 +283,19 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param \PHPUnit_Framework_MockObject_MockObject $settingsEntity
+     * @param bool $retrieveAuthenticationData
      */
-    private function configureAuthenticationProvider(\PHPUnit_Framework_MockObject_MockObject $settingsEntity)
-    {
-        $host = $this->getTransportHost($settingsEntity);
-        $port = $this->getTransportPort($settingsEntity);
+    private function configureAuthenticationProvider(
+        \PHPUnit_Framework_MockObject_MockObject $settingsEntity,
+        $retrieveAuthenticationData = true
+    ) {
+        if ($retrieveAuthenticationData) {
+            $host = $this->getTransportHost($settingsEntity);
+            $port = $this->getTransportPort($settingsEntity);
+        } else {
+            $host = '42.42.42.42';
+            $port = 8888;
+        }
 
         $this
             ->authenticationProvider
@@ -302,34 +315,15 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
      * @param \PHPUnit_Framework_MockObject_Matcher_Invocation $matcher
      * @return string
      */
-    private function getSessionToken(
+    private function getTransportHost(
         \PHPUnit_Framework_MockObject_MockObject $settingsEntity,
         \PHPUnit_Framework_MockObject_Matcher_Invocation $matcher = null
     ) {
-        if (is_null($matcher)) {
-            $matcher = $this->once();
-        }
-
-        $sessionToken = uniqid();
-
-        $settingsEntity
-            ->expects($matcher)
-            ->method('getSessionToken')
-            ->willReturn($sessionToken);
-
-        return $sessionToken;
-    }
-
-    /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $settingsEntity
-     * @return string
-     */
-    private function getTransportHost(\PHPUnit_Framework_MockObject_MockObject $settingsEntity)
-    {
+        $matcher = is_null($matcher) ? $this->once() : $matcher;
         $transportHost = '42.42.42.42';
 
         $settingsEntity
-            ->expects($this->once())
+            ->expects($matcher)
             ->method('getTransportHost')
             ->willReturn($transportHost);
 
@@ -338,14 +332,18 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param \PHPUnit_Framework_MockObject_MockObject $settingsEntity
+     * @param \PHPUnit_Framework_MockObject_Matcher_Invocation $matcher
      * @return string
      */
-    private function getTransportPort(\PHPUnit_Framework_MockObject_MockObject $settingsEntity)
-    {
+    private function getTransportPort(
+        \PHPUnit_Framework_MockObject_MockObject $settingsEntity,
+        \PHPUnit_Framework_MockObject_Matcher_Invocation $matcher = null
+    ) {
+        $matcher = is_null($matcher) ? $this->once() : $matcher;
         $transportPort = 8888;
 
         $settingsEntity
-            ->expects($this->once())
+            ->expects($matcher)
             ->method('getTransportPort')
             ->willReturn($transportPort);
 
@@ -433,22 +431,6 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $settingsEntity
-     * @return string
-     */
-    private function getAppToken(\PHPUnit_Framework_MockObject_MockObject $settingsEntity)
-    {
-        $appToken = uniqid();
-
-        $settingsEntity
-            ->expects($this->once())
-            ->method('getAppToken')
-            ->willReturn($appToken);
-
-        return $appToken;
-    }
-
-    /**
      * @return array
      */
     private function getAppTokenFromApi()
@@ -517,9 +499,13 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param bool $isLoggedIn
      * @param \PHPUnit_Framework_MockObject_MockObject $settings
+     * @param bool $retrieveAuthenticationData
      */
-    private function isLoggedIn($isLoggedIn, \PHPUnit_Framework_MockObject_MockObject $settings = null)
-    {
+    private function isLoggedIn(
+        $isLoggedIn,
+        \PHPUnit_Framework_MockObject_MockObject $settings = null,
+        $retrieveAuthenticationData = true
+    ) {
         $internalCall = true;
 
         if (is_null($settings)) {
@@ -527,7 +513,7 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
             $settings = $this->getSettings($this->once());
         }
 
-        $this->configureAuthenticationProvider($settings);
+        $this->configureAuthenticationProvider($settings, $retrieveAuthenticationData);
 
         $connectionData = [
             "success" => true,
@@ -537,10 +523,12 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $settings
-            ->expects($this->once())
-            ->method('getSessionToken')
-            ->willReturn(null);
+        if ($retrieveAuthenticationData) {
+            $settings
+                ->expects($this->once())
+                ->method('getSessionToken')
+                ->willReturn(null);
+        }
 
         $this
             ->authenticationProvider
@@ -561,10 +549,19 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    private function openSession($behavior = 'success')
-    {
-        $getSettingsCalls = $behavior == 'missing_app_token' ? $this->once() : $this->exactly(2);
-        $settings = $this->getSettings($getSettingsCalls);
+    private function openSession(
+        $behavior = 'success',
+        \PHPUnit_Framework_MockObject_MockObject $settings = null
+    ) {
+        $internalCall = false;
+
+        if (!is_null($settings)) {
+            $internalCall = true;
+        } else {
+            $getSettingsCalls = $behavior == 'missing_app_token' ? $this->once() : $this->exactly(2);
+            $settings = $this->getSettings($getSettingsCalls);
+        }
+
         $appToken = $behavior == 'missing_app_token' ? null : uniqid();
         $getAppTokenCalls = $behavior == 'missing_app_token' ? $this->once() : $this->exactly(2);
 
@@ -584,7 +581,7 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
             return;
         }
 
-        $this->isLoggedIn(true, $settings);
+        $this->isLoggedIn(true, $settings, !$internalCall);
 
         $openSessionData = [
             'app_id' => $this->getAppId($settings),
@@ -624,22 +621,51 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
                 ->with($this->equalTo($authData['result']['session_token']));
         }
 
-        $this->freeboxManager->openSession($this->user);
+        if (!$internalCall) {
+            $this->freeboxManager->openSession($this->user);
+        }
     }
 
-    private function upload($uploadType = 'regular')
+    private function upload($uploadType = 'regular', $withSessionToken = true)
     {
         $file = $uploadType == 'regular' ? 'ubuntu-14.04-desktop-amd64.iso.torrent' : 'TestDir';
 
         if ($uploadType == 'regular') {
-            $settings = $this->getSettings($this->once());
-            $transportHost = $this->getTransportHost($settings);
-            $transportPort = $this->getTransportPort($settings);
+            $getSettingsCalls = $withSessionToken ? $this->once() : $this->exactly(4);
+            $settings = $this->getSettings($getSettingsCalls);
+
+            $getTransportHostCalls = $withSessionToken ? $this->once() : $this->exactly(2);
+            $getTransportPortCalls = $withSessionToken ? $this->once() : $this->exactly(2);
+            $transportHost = $this->getTransportHost($settings, $getTransportHostCalls);
+            $transportPort = $this->getTransportPort($settings, $getTransportPortCalls);
+
             $freeboxUrl = sprintf('http://%s:%d', $transportHost, $transportPort);
-            $sessionToken = $this->getSessionToken($settings, $this->exactly(2));
+            $firstSessionTokenValue = $withSessionToken ? uniqid() : null;
+            $secondSessionTokenValue = $withSessionToken ? $firstSessionTokenValue : uniqid();
+
+            $getSessionTokenCalls = $withSessionToken ? $this->exactly(2) : $this->exactly(3);
+            $getSessionTokenInvocation = $settings
+                ->expects($getSessionTokenCalls)
+                ->method('getSessionToken');
+
+            if ($withSessionToken) {
+                $getSessionTokenInvocation
+                    ->willReturnOnConsecutiveCalls($firstSessionTokenValue, $secondSessionTokenValue);
+            } else {
+                $getSessionTokenInvocation
+                    ->willReturnOnConsecutiveCalls(
+                        $firstSessionTokenValue,
+                        $firstSessionTokenValue,
+                        $secondSessionTokenValue
+                    );
+            }
+
+            if (!$withSessionToken) {
+                $this->openSession('success', $settings);
+            }
 
             $uploadOptions = [
-                'session_token' => $sessionToken,
+                'session_token' => $secondSessionTokenValue,
                 'upload_type' => $uploadType
             ];
 
