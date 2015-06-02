@@ -272,45 +272,6 @@ class FreeboxManager
     }
 
     /**
-     * Returns an array of the Freebox settings value for the given user.
-     *
-     * @param User $user
-     * @param string $email
-     * @param string $rawPassword
-     * @param string $baseUrl
-     */
-    public function exportSettings(User $user, $email, $rawPassword, $baseUrl)
-    {
-        $settings = $this->settingsManager->getSettings($user);
-        $toArray = $this->dataTransformer->toArray($settings);
-        $url = $baseUrl . $this->urlGenerator->generate('freebox_import_settings');
-
-        $this
-            ->httpClient
-            ->post($url, [
-                'body' => [
-                    'settings' => $toArray
-                ],
-                'headers' => [
-                    self::HTTP_HEADER_USER_EMAIL => $email,
-                    self::HTTP_HEADER_USER_PASSWORD => $rawPassword
-                ]
-            ]);
-    }
-
-    /**
-     * Imports the settings in the given user profile.
-     *
-     * @param User $user
-     * @param array $arraySettings
-     */
-    public function importSettings(User $user, array $arraySettings)
-    {
-        $settings = $this->dataTransformer->toObject($arraySettings);
-        $this->settingsManager->updateSettings($settings, $user);
-    }
-
-    /**
      * @param FreeboxSettingsEntity $settings
      */
     private function configureAuthenticationProvider(FreeboxSettingsEntity $settings)
