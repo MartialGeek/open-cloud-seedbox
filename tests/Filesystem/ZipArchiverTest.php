@@ -39,18 +39,20 @@ class ZipArchiverTest extends \PHPUnit_Framework_TestCase
     private function createArchive($type = 'file')
     {
         $filename = 'file.txt';
-        $path = '/path/to/file.txt';
+        $filePath = '/path/to/file.txt';
         $archivePath = '/path/to/archives';
 
         if ($type == 'file') {
-            $structure = [$path];
+            $structure = [$filePath];
         } else {
-            $structure = [$filename => $path];
+            $structure = [$filename => $filePath];
         }
+
+        $fileConstructorArg = $type == 'file' ? $filePath : $archivePath;
 
         $file = $this
             ->getMockBuilder('\SplFileInfo')
-            ->disableOriginalConstructor()
+            ->setConstructorArgs([$fileConstructorArg])
             ->getMock();
 
         $file
@@ -61,7 +63,7 @@ class ZipArchiverTest extends \PHPUnit_Framework_TestCase
         $file
             ->expects($this->once())
             ->method('getRealPath')
-            ->willReturn($path);
+            ->willReturn($filePath);
 
         if ($type == 'dir') {
             $file
