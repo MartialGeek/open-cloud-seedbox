@@ -237,19 +237,60 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
         $this->openSession('auth_error');
     }
 
-    public function testUploadRegularFile()
+    public function testUploadFile()
     {
-        $this->upload();
+        $file = 'ubuntu-14.04-desktop-amd64.iso.torrent';
+        $this->upload($file);
     }
 
-    public function testUploadRegularFileWithNoSessionToken()
+    public function testUploadFileWithNoSessionToken()
     {
-        $this->upload('regular', false);
+        $file = 'ubuntu-14.04-desktop-amd64.iso.torrent';
+        $this->upload($file, 'file', false);
     }
 
-    public function testUploadArchive()
+    public function testUploadDirectory()
     {
-        $this->upload('archive');
+        $file = 'TestDir';
+        $userId = 42;
+
+        $this
+            ->user
+            ->expects($this->once())
+            ->method('getId')
+            ->willReturn($userId);
+
+        $this
+            ->messageProducer
+            ->expects($this->once())
+            ->method('generateArchiveAndUpload')
+            ->with($this->equalTo($file), $this->equalTo($userId));
+
+        $this->freeboxManager->setDownloadDir(__DIR__ . '/../../Resources/T411');
+        $this->freeboxManager->uploadFile($file, $this->user);
+    }
+
+    public function testGenerateArchiveAndUpload()
+    {
+        $fileName = 'ubuntu-14.04-desktop-amd64.iso.torrent';
+        $baseStubPath = __DIR__ . '/../../Resources/T411';
+        $archiveDir = $baseStubPath . '/TestDir';
+        $archiveFileName = 'ubuntu-14.04-desktop-amd64.iso.zip';
+
+        $this
+            ->archiver
+            ->expects($this->once())
+            ->method('createArchive')
+            ->with(
+                $this->isInstanceOf('\SplFileInfo'),
+                $this->equalTo($archiveDir . '/' . 'ubuntu-14.04-desktop-amd64.iso.zip')
+            );
+
+        $this->upload($archiveFileName, 'archive', true, true);
+
+        $this->freeboxManager->setDownloadDir($baseStubPath);
+        $this->freeboxManager->setArchivePath($archiveDir);
+        $this->freeboxManager->generateArchiveAndUpload($fileName, $this->user);
     }
 
     /**
@@ -626,75 +667,59 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    private function upload($uploadType = 'regular', $withSessionToken = true)
+    private function upload($file, $uploadType = 'file', $withSessionToken = true, $internalCall = false)
     {
-        $file = $uploadType == 'regular' ? 'ubuntu-14.04-desktop-amd64.iso.torrent' : 'TestDir';
+        $getSettingsCalls = $withSessionToken ? $this->once() : $this->exactly(4);
+        $settings = $this->getSettings($getSettingsCalls);
 
-        if ($uploadType == 'regular') {
-            $getSettingsCalls = $withSessionToken ? $this->once() : $this->exactly(4);
-            $settings = $this->getSettings($getSettingsCalls);
+        $getTransportHostCalls = $withSessionToken ? $this->once() : $this->exactly(2);
+        $getTransportPortCalls = $withSessionToken ? $this->once() : $this->exactly(2);
+        $transportHost = $this->getTransportHost($settings, $getTransportHostCalls);
+        $transportPort = $this->getTransportPort($settings, $getTransportPortCalls);
 
-            $getTransportHostCalls = $withSessionToken ? $this->once() : $this->exactly(2);
-            $getTransportPortCalls = $withSessionToken ? $this->once() : $this->exactly(2);
-            $transportHost = $this->getTransportHost($settings, $getTransportHostCalls);
-            $transportPort = $this->getTransportPort($settings, $getTransportPortCalls);
+        $freeboxUrl = sprintf('http://%s:%d', $transportHost, $transportPort);
+        $firstSessionTokenValue = $withSessionToken ? uniqid() : null;
+        $secondSessionTokenValue = $withSessionToken ? $firstSessionTokenValue : uniqid();
 
-            $freeboxUrl = sprintf('http://%s:%d', $transportHost, $transportPort);
-            $firstSessionTokenValue = $withSessionToken ? uniqid() : null;
-            $secondSessionTokenValue = $withSessionToken ? $firstSessionTokenValue : uniqid();
+        $getSessionTokenCalls = $withSessionToken ? $this->exactly(2) : $this->exactly(3);
+        $getSessionTokenInvocation = $settings
+            ->expects($getSessionTokenCalls)
+            ->method('getSessionToken');
 
-            $getSessionTokenCalls = $withSessionToken ? $this->exactly(2) : $this->exactly(3);
-            $getSessionTokenInvocation = $settings
-                ->expects($getSessionTokenCalls)
-                ->method('getSessionToken');
-
-            if ($withSessionToken) {
-                $getSessionTokenInvocation
-                    ->willReturnOnConsecutiveCalls($firstSessionTokenValue, $secondSessionTokenValue);
-            } else {
-                $getSessionTokenInvocation
-                    ->willReturnOnConsecutiveCalls(
-                        $firstSessionTokenValue,
-                        $firstSessionTokenValue,
-                        $secondSessionTokenValue
-                    );
-            }
-
-            if (!$withSessionToken) {
-                $this->openSession('success', $settings);
-            }
-
-            $uploadOptions = [
-                'session_token' => $secondSessionTokenValue,
-                'upload_type' => $uploadType
-            ];
-
-            $this
-                ->uploadManager
-                ->expects($this->once())
-                ->method('upload')
-                ->with(
-                    $this->isInstanceOf('\Symfony\Component\HttpFoundation\File\File'),
-                    $this->equalTo($freeboxUrl),
-                    $this->equalTo($uploadOptions)
+        if ($withSessionToken) {
+            $getSessionTokenInvocation
+                ->willReturnOnConsecutiveCalls($firstSessionTokenValue, $secondSessionTokenValue);
+        } else {
+            $getSessionTokenInvocation
+                ->willReturnOnConsecutiveCalls(
+                    $firstSessionTokenValue,
+                    $firstSessionTokenValue,
+                    $secondSessionTokenValue
                 );
-        } elseif ($uploadType == 'archive') {
-            $userId = 42;
-
-            $this
-                ->user
-                ->expects($this->once())
-                ->method('getId')
-                ->willReturn($userId);
-
-            $this
-                ->messageProducer
-                ->expects($this->once())
-                ->method('generateArchiveAndUpload')
-                ->with($this->equalTo($file), $this->equalTo($userId));
         }
 
-        $this->freeboxManager->setDownloadDir(__DIR__ . '/../../Resources/T411');
-        $this->freeboxManager->uploadFile($file, $this->user);
+        if (!$withSessionToken) {
+            $this->openSession('success', $settings);
+        }
+
+        $uploadOptions = [
+            'session_token' => $secondSessionTokenValue,
+            'upload_type' => $uploadType == 'file' ? 'regular' : 'archive'
+        ];
+
+        $this
+            ->uploadManager
+            ->expects($this->once())
+            ->method('upload')
+            ->with(
+                $this->isInstanceOf('\Symfony\Component\HttpFoundation\File\File'),
+                $this->equalTo($freeboxUrl),
+                $this->equalTo($uploadOptions)
+            );
+
+        if (!$internalCall) {
+            $this->freeboxManager->setDownloadDir(__DIR__ . '/../../Resources/T411');
+            $this->freeboxManager->uploadFile($file, $this->user);
+        }
     }
 }
