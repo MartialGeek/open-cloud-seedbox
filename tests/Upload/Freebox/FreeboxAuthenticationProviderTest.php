@@ -57,17 +57,22 @@ class FreeboxAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $this->getAuthorizationStatus(false);
     }
 
-    public function testGetChallengeValueShouldReturnAString()
+    public function testGetConnectionStatusShouldReturnAString()
     {
-        $this->getChallengeValue();
+        $this->getConnectionStatus();
+    }
+
+    public function testGetConnectionStatusWithExistingSessionToken()
+    {
+        $this->getConnectionStatus(true, true);
     }
 
     /**
      * @expectedException \Martial\Warez\Upload\Freebox\FreeboxAuthenticationException
      */
-    public function testGetChallengeValueShouldTrowAnExceptionOnError()
+    public function testGetConnectionStatusShouldTrowAnExceptionOnError()
     {
-        $this->getChallengeValue(false);
+        $this->getConnectionStatus(false);
     }
 
     public function testOpenSessionShouldReturnASessionTokenOnSuccess()
@@ -157,9 +162,16 @@ JSON;
         }
     }
 
-    protected function getChallengeValue($success = true)
+    protected function getConnectionStatus($success = true, $withSessionToken = false)
     {
         $challenge = 'VzhbtpR4r8CLaJle2QgJBEkyd8JPb0zL';
+        $sessionToken = $withSessionToken ? uniqid() : '';
+
+        $headers = $withSessionToken ? [
+            'headers' => [
+                'X-Fbx-App-Auth' => $sessionToken
+            ]
+        ] : [];
 
         if ($success) {
             $jsonResponse = <<<JSON
@@ -179,11 +191,11 @@ JSON;
             ->httpClient
             ->expects($this->once())
             ->method('get')
-            ->with($this->equalTo($this->buildUrl('/api/v3/login')))
+            ->with($this->equalTo($this->buildUrl('/api/v3/login')), $this->equalTo($headers))
             ->willReturn($this->response);
 
         $this->getJsonDecodedResponse($jsonResponse);
-        $result = $this->provider->getConnectionStatus();
+        $result = $this->provider->getConnectionStatus($sessionToken);
 
         if ($success) {
             $this->assertSame($challenge, $result['result']['challenge']);
