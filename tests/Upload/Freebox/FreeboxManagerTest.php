@@ -2,6 +2,7 @@
 
 namespace Martial\Warez\Tests\Upload\Freebox;
 
+use GuzzleHttp\Exception\ClientException;
 use Martial\Warez\Upload\Freebox\FreeboxAuthenticationException;
 use Martial\Warez\Upload\Freebox\FreeboxManager;
 use Martial\Warez\Upload\Freebox\FreeboxSessionException;
@@ -291,6 +292,15 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
         $this->freeboxManager->setDownloadDir($baseStubPath);
         $this->freeboxManager->setArchivePath($archiveDir);
         $this->freeboxManager->generateArchiveAndUpload($fileName, $this->user);
+    }
+
+    /**
+     * @expectedException \Martial\Warez\Upload\Freebox\FreeboxSessionException
+     */
+    public function testUploadFileReturnsAnUnknownError()
+    {
+        $file = 'ubuntu-14.04-desktop-amd64.iso.torrent';
+        $this->upload($file, 'error');
     }
 
     /**
@@ -704,10 +714,10 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
 
         $uploadOptions = [
             'session_token' => $secondSessionTokenValue,
-            'upload_type' => $uploadType == 'file' ? 'regular' : 'archive'
+            'upload_type' => $uploadType == 'file' || $uploadType == 'error' ? 'regular' : 'archive'
         ];
 
-        $this
+        $uploadInvocation = $this
             ->uploadManager
             ->expects($this->once())
             ->method('upload')
@@ -716,6 +726,13 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
                 $this->equalTo($freeboxUrl),
                 $this->equalTo($uploadOptions)
             );
+
+        if ($uploadType == 'error') {
+            $request = $this->getMock('\GuzzleHttp\Message\RequestInterface');
+            $e = new ClientException('Oops', $request);
+
+            $uploadInvocation->willThrowException($e);
+        }
 
         if (!$internalCall) {
             $this->freeboxManager->setDownloadDir(__DIR__ . '/../../Resources/T411');
