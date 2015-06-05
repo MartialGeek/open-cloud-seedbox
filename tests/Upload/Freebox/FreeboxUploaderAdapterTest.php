@@ -3,6 +3,7 @@
 namespace Martial\Warez\Tests\Upload\Freebox;
 
 use Martial\Warez\Upload\Freebox\FreeboxUploaderAdapter;
+use Martial\Warez\Upload\UploadException;
 use Symfony\Component\HttpFoundation\File\File;
 
 class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
@@ -37,6 +38,22 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
         $this->upload('archive');
     }
 
+    public function testUploadReturnsAnError()
+    {
+        $exceptionThrown = false;
+
+        try {
+            $this->upload('regular', false);
+        } catch (UploadException $e) {
+            $exceptionThrown = true;
+            $this->assertSame('Oops!', $e->getMessage());
+        }
+
+        if (!$exceptionThrown) {
+            $this->fail('The expected exception \Martial\Warez\Upload\UploadException was not thrown.');
+        }
+    }
+
     protected function setUp()
     {
         $this->httpClient = $this->getMock('\GuzzleHttp\ClientInterface');
@@ -59,7 +76,7 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
         return $this->getMock('\GuzzleHttp\Message\ResponseInterface');
     }
 
-    private function upload($uploadType = 'regular')
+    private function upload($uploadType = 'regular', $success = true)
     {
         $freeboxUrl = 'http://66.66.66.66:8888';
         $uploadedFile = new File('/tmp/file', false);
@@ -70,11 +87,13 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
         $addDownloadResponse = $this->createResponse();
 
         $addDownloadResponseData = [
-            'success' => true,
+            'success' => $success,
             'result' => [
                 'id' => 42
             ]
         ];
+
+        $addDownloadResponseData['msg'] = 'Oops!';
 
         $this
             ->urlResolver
