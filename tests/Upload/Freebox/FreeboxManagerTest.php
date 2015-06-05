@@ -3,6 +3,8 @@
 namespace Martial\Warez\Tests\Upload\Freebox;
 
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Message\Request;
+use GuzzleHttp\Message\Response;
 use Martial\Warez\Upload\Freebox\FreeboxAuthenticationException;
 use Martial\Warez\Upload\Freebox\FreeboxManager;
 use Martial\Warez\Upload\Freebox\FreeboxSessionException;
@@ -301,6 +303,12 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
     {
         $file = 'ubuntu-14.04-desktop-amd64.iso.torrent';
         $this->upload($file, 'error');
+    }
+
+    public function testUploadFileReturnsA401Error()
+    {
+        $file = 'ubuntu-14.04-desktop-amd64.iso.torrent';
+        $this->upload($file, 'error401');
     }
 
     /**
@@ -615,20 +623,16 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
 
         $appToken = $behavior == 'missing_app_token' ? null : uniqid();
         $getAppTokenCalls = $behavior == 'missing_app_token' ? $this->once() : $this->exactly(2);
+        $getAppTokenResult = $behavior == 'missing_app_token' ? null : $appToken;
 
-        $getAppTokenInvocation = $settings
+        $settings
             ->expects($getAppTokenCalls)
-            ->method('getAppToken');
-
-        if ($behavior == 'missing_app_token') {
-            $getAppTokenInvocation->willReturn(null);
-        } else {
-            $getAppTokenInvocation
-                ->willReturnOnConsecutiveCalls($appToken, $appToken);
-        }
+            ->method('getAppToken')
+            ->willReturn($getAppTokenResult);
 
         if ($behavior == 'missing_app_token') {
             $this->freeboxManager->openSession($this->user);
+
             return;
         }
 
@@ -680,46 +684,75 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
     private function upload($file, $uploadType = 'file', $withSessionToken = true, $internalCall = false)
     {
         $getSettingsCalls = $withSessionToken ? $this->once() : $this->exactly(4);
+
+        if ($uploadType == 'error401') {
+            $getSettingsCalls = $this->exactly(4);
+        }
+
         $settings = $this->getSettings($getSettingsCalls);
 
         $getTransportHostCalls = $withSessionToken ? $this->once() : $this->exactly(2);
         $getTransportPortCalls = $withSessionToken ? $this->once() : $this->exactly(2);
+
+        if ($uploadType == 'error401') {
+            $getTransportHostCalls = $this->exactly(2);
+            $getTransportPortCalls = $this->exactly(2);
+        }
+
         $transportHost = $this->getTransportHost($settings, $getTransportHostCalls);
         $transportPort = $this->getTransportPort($settings, $getTransportPortCalls);
 
         $freeboxUrl = sprintf('http://%s:%d', $transportHost, $transportPort);
         $firstSessionTokenValue = $withSessionToken ? uniqid() : null;
         $secondSessionTokenValue = $withSessionToken ? $firstSessionTokenValue : uniqid();
+        $getSessionTokenCalls = $this->exactly(2);
 
-        $getSessionTokenCalls = $withSessionToken ? $this->exactly(2) : $this->exactly(3);
+        if (!$withSessionToken) {
+            $getSessionTokenCalls = $this->exactly(3);
+        }
+
+        if ($uploadType == 'error401') {
+            $getSessionTokenCalls = $this->exactly(4);
+        }
+
         $getSessionTokenInvocation = $settings
             ->expects($getSessionTokenCalls)
             ->method('getSessionToken');
 
-        if ($withSessionToken) {
+        if ($withSessionToken && $uploadType != 'error401') {
             $getSessionTokenInvocation
                 ->willReturnOnConsecutiveCalls($firstSessionTokenValue, $secondSessionTokenValue);
-        } else {
+        } elseif (!$withSessionToken) {
             $getSessionTokenInvocation
                 ->willReturnOnConsecutiveCalls(
                     $firstSessionTokenValue,
                     $firstSessionTokenValue,
                     $secondSessionTokenValue
                 );
+        } elseif ($uploadType == 'error401') {
+            $getSessionTokenInvocation
+                ->willReturnOnConsecutiveCalls(
+                    $firstSessionTokenValue,
+                    $firstSessionTokenValue,
+                    null,
+                    $secondSessionTokenValue
+                );
         }
 
-        if (!$withSessionToken) {
+        if (!$withSessionToken || $uploadType == 'error401') {
             $this->openSession('success', $settings);
         }
 
         $uploadOptions = [
             'session_token' => $secondSessionTokenValue,
-            'upload_type' => $uploadType == 'file' || $uploadType == 'error' ? 'regular' : 'archive'
+            'upload_type' => $uploadType == 'archive' ? 'archive' : 'regular'
         ];
+
+        $uploadCalls = $uploadType == 'error401' ? $this->exactly(2) : $this->once();
 
         $uploadInvocation = $this
             ->uploadManager
-            ->expects($this->once())
+            ->expects($uploadCalls)
             ->method('upload')
             ->with(
                 $this->isInstanceOf('\Symfony\Component\HttpFoundation\File\File'),
@@ -727,11 +760,19 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
                 $this->equalTo($uploadOptions)
             );
 
-        if ($uploadType == 'error') {
-            $request = $this->getMock('\GuzzleHttp\Message\RequestInterface');
-            $e = new ClientException('Oops', $request);
+        if ($uploadType == 'error' || $uploadType == 'error401') {
+            $request = new Request('get', '42.42.42.42');
+            $response = $uploadType == 'error401' ? new Response(401) : null;
+            $e = new ClientException('Oops', $request, $response);
 
-            $uploadInvocation->willThrowException($e);
+            if ($uploadType == 'error401') {
+                $uploadInvocation->will($this->onConsecutiveCalls(
+                    $this->throwException($e),
+                    $this->returnValue(null)
+                ));
+            } else {
+                $uploadInvocation->willThrowException($e);
+            }
         }
 
         if (!$internalCall) {
