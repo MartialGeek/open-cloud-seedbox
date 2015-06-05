@@ -2,15 +2,8 @@
 
 namespace Martial\Warez\Tests\MessageQueuing;
 
-use Martial\Warez\MessageQueuing\Freebox\FreeboxMessageProducer;
-
 abstract class AbstractMessageQueuing extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var FreeboxMessageProducer
-     */
-    public $messageProducer;
-
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
@@ -46,8 +39,6 @@ abstract class AbstractMessageQueuing extends \PHPUnit_Framework_TestCase
             ->willReturn($this->channel);
 
         $this->logger = $this->getMock('\Psr\Log\LoggerInterface');
-        $this->messageProducer = new FreeboxMessageProducer($this->connection);
-        $this->messageProducer->setLogger($this->logger);
     }
 
     protected function tearDown()

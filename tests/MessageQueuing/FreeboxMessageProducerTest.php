@@ -2,10 +2,20 @@
 
 namespace Martial\Warez\Tests\MessageQueuing;
 
+use Martial\Warez\MessageQueuing\Freebox\FreeboxMessageProducer;
+
 class FreeboxMessageProducerTest extends AbstractMessageQueuing
 {
+    /**
+     * @var FreeboxMessageProducer
+     */
+    public $messageProducer;
+
     public function testGenerateArchiveAndUpload()
     {
+        $this->messageProducer = new FreeboxMessageProducer($this->connection);
+        $this->messageProducer->setLogger($this->logger);
+
         $fileName = 'superfilename.txt';
         $userId = 42;
         $queue = 'warez.freebox.generate_archive_and_upload';

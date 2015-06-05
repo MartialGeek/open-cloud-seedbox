@@ -5,14 +5,14 @@ namespace Martial\Warez\MessageQueuing\Freebox;
 use Doctrine\DBAL\Connection;
 use Martial\Warez\MessageQueuing\AbstractMessageQueuing;
 use Martial\Warez\Upload\Freebox\FreeboxManager;
-use Martial\Warez\User\UserService;
+use Martial\Warez\User\UserServiceInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class FreeboxMessageConsumer extends AbstractMessageQueuing
 {
     /**
-     * @var UserService
+     * @var UserServiceInterface
      */
     private $userService;
 
@@ -22,9 +22,9 @@ class FreeboxMessageConsumer extends AbstractMessageQueuing
     private $freeboxManager;
 
     /**
-     * @param UserService $userService
+     * @param UserServiceInterface $userService
      */
-    public function setUserService(UserService $userService)
+    public function setUserService(UserServiceInterface $userService)
     {
         $this->userService = $userService;
     }
