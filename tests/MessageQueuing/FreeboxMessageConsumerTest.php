@@ -18,6 +18,16 @@ class FreeboxMessageConsumerTest extends AbstractMessageQueuing
     public $userService;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    public $consoleOutput;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    public $dbalConnection;
+
+    /**
      * @var FreeboxMessageConsumer
      */
     public $messageConsumer;
@@ -31,22 +41,82 @@ class FreeboxMessageConsumerTest extends AbstractMessageQueuing
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->dbalConnection = $this
+            ->getMockBuilder('\Doctrine\DBAL\Connection')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->userService = $this->getMock('\Martial\Warez\User\UserServiceInterface');
         $this->messageConsumer = new FreeboxMessageConsumer($this->connection);
         $this->messageConsumer->setLogger($this->logger);
         $this->messageConsumer->setFreeboxManager($this->freeboxManager);
         $this->messageConsumer->setUserService($this->userService);
+        $this->consoleOutput = $this->getMock('\Symfony\Component\Console\Output\OutputInterface');
     }
 
     public function testGenerateArchiveAndUpload()
     {
-        $dbalConnection = $this
-            ->getMockBuilder('\Doctrine\DBAL\Connection')
+        $this->generateArchiveAndUpload();
+    }
+
+    public function testConsumeGenerateArchiveAndUploadMessage()
+    {
+        $message = $this
+            ->getMockBuilder('\PhpAmqpLib\Message\AMQPMessage')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $consoleOutput = $this->getMock('\Symfony\Component\Console\Output\OutputInterface');
+        $message->body = '{"userId":"42","fileName":"/path/to/file.txt"}';
+        $loggerMessage = 'New message received: ' . $message->body;
 
+        $this
+            ->logger
+            ->expects($this->once())
+            ->method('info')
+            ->with($loggerMessage);
+
+        $this
+            ->consoleOutput
+            ->expects($this->once())
+            ->method('writeln')
+            ->with($loggerMessage);
+
+        $data = json_decode($message->body, true);
+
+        $this
+            ->dbalConnection
+            ->expects($this->once())
+            ->method('connect');
+
+        $user = $this
+            ->getMockBuilder('\Martial\Warez\User\Entity\User')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this
+            ->userService
+            ->expects($this->once())
+            ->method('find')
+            ->with($data['userId'])
+            ->willReturn($user);
+
+        $this
+            ->freeboxManager
+            ->expects($this->once())
+            ->method('generateArchiveAndUpload')
+            ->with($data['fileName'], $user);
+
+        $this
+            ->dbalConnection
+            ->expects($this->once())
+            ->method('close');
+
+        $this->generateArchiveAndUpload();
+        $this->messageConsumer->consumeGenerateArchiveAndUploadMessage($message);
+    }
+
+    private function generateArchiveAndUpload()
+    {
         $queue = FreeboxQueues::GENERATE_ARCHIVE_AND_UPLOAD;
 
         $this
@@ -66,9 +136,9 @@ class FreeboxMessageConsumerTest extends AbstractMessageQueuing
                 true,
                 false,
                 false,
-                $this->isInstanceOf('\Closure')
+                $this->isType('array')
             );
 
-        $this->messageConsumer->generateArchiveAndUpload($dbalConnection, $consoleOutput);
+        $this->messageConsumer->generateArchiveAndUpload($this->dbalConnection, $this->consoleOutput);
     }
 }

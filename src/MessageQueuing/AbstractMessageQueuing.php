@@ -11,7 +11,7 @@ abstract class AbstractMessageQueuing
     /**
      * @var AMQPStreamConnection
      */
-    protected $connection;
+    protected $brokerConnection;
 
     /**
      * @var AMQPChannel
@@ -29,14 +29,14 @@ abstract class AbstractMessageQueuing
      */
     public function __construct(AMQPStreamConnection $connection, $channelId = null)
     {
-        $this->connection = $connection;
-        $this->channel = $this->connection->channel($channelId);
+        $this->brokerConnection = $connection;
+        $this->channel = $this->brokerConnection->channel($channelId);
     }
 
     public function __destruct()
     {
         $this->channel->close();
-        $this->connection->close();
+        $this->brokerConnection->close();
     }
 
     /**

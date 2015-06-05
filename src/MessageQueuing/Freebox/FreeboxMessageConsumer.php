@@ -22,6 +22,16 @@ class FreeboxMessageConsumer extends AbstractMessageQueuing
     private $freeboxManager;
 
     /**
+     * @var Connection
+     */
+    private $dbalConnection;
+
+    /**
+     * @var OutputInterface
+     */
+    private $output;
+
+    /**
      * @param UserServiceInterface $userService
      */
     public function setUserService(UserServiceInterface $userService)
@@ -45,6 +55,8 @@ class FreeboxMessageConsumer extends AbstractMessageQueuing
      */
     public function generateArchiveAndUpload(Connection $connection, OutputInterface $output)
     {
+        $this->dbalConnection = $connection;
+        $this->output = $output;
         $queue = FreeboxQueues::GENERATE_ARCHIVE_AND_UPLOAD;
         $this->channel->queue_declare($queue, false, false, false, false);
         $this->channel->basic_consume(
@@ -54,27 +66,30 @@ class FreeboxMessageConsumer extends AbstractMessageQueuing
             true,
             false,
             false,
-            function (AMQPMessage $msg) use ($connection, $output) {
-                if ($this->logger) {
-                    $this->logger->info('New message received: ' . $msg->body);
-                }
-
-                $output->writeln('New message received: ' . $msg->body);
-                $data = json_decode($msg->body, true);
-                $connection->connect();
-                $user = $this->userService->find($data['userId']);
-
-                if (!$user) {
-                    throw new \InvalidArgumentException('The user with the ID ' . $data['userId'] . ' could not be found.');
-                }
-
-                $this->freeboxManager->generateArchiveAndUpload($data['fileName'], $user);
-                $connection->close();
-            }
+            [$this, 'consumeGenerateArchiveAndUploadMessage']
         );
 
         while (count($this->channel->callbacks)) {
             $this->channel->wait();
         }
+    }
+
+    public function consumeGenerateArchiveAndUploadMessage(AMQPMessage $message)
+    {
+        if ($this->logger) {
+            $this->logger->info('New message received: ' . $message->body);
+        }
+
+        $this->output->writeln('New message received: ' . $message->body);
+        $data = json_decode($message->body, true);
+        $this->dbalConnection->connect();
+        $user = $this->userService->find($data['userId']);
+
+        if (!$user) {
+            throw new \InvalidArgumentException('The user with the ID ' . $data['userId'] . ' could not be found.');
+        }
+
+        $this->freeboxManager->generateArchiveAndUpload($data['fileName'], $user);
+        $this->dbalConnection->close();
     }
 }
