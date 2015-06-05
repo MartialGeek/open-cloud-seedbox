@@ -61,6 +61,46 @@ class FreeboxMessageConsumerTest extends AbstractMessageQueuing
 
     public function testConsumeGenerateArchiveAndUploadMessage()
     {
+        $this->consumeGenerateArchiveAndUploadMessage();
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testConsumeGenerateArchiveUploadMessageWithNotFoundUser()
+    {
+        $this->consumeGenerateArchiveAndUploadMessage('user_not_found');
+    }
+
+    private function generateArchiveAndUpload()
+    {
+        $queue = FreeboxQueues::GENERATE_ARCHIVE_AND_UPLOAD;
+
+        $this
+            ->channel
+            ->expects($this->once())
+            ->method('queue_declare')
+            ->with($queue, false, false, false, false);
+
+        $this
+            ->channel
+            ->expects($this->once())
+            ->method('basic_consume')
+            ->with(
+                $queue,
+                '',
+                false,
+                true,
+                false,
+                false,
+                $this->isType('array')
+            );
+
+        $this->messageConsumer->generateArchiveAndUpload($this->dbalConnection, $this->consoleOutput);
+    }
+
+    public function consumeGenerateArchiveAndUploadMessage($behavior = '')
+    {
         $message = $this
             ->getMockBuilder('\PhpAmqpLib\Message\AMQPMessage')
             ->disableOriginalConstructor()
@@ -98,13 +138,15 @@ class FreeboxMessageConsumerTest extends AbstractMessageQueuing
             ->expects($this->once())
             ->method('find')
             ->with($data['userId'])
-            ->willReturn($user);
+            ->willReturn('user_not_found' == $behavior ? null : $user);
 
-        $this
-            ->freeboxManager
-            ->expects($this->once())
-            ->method('generateArchiveAndUpload')
-            ->with($data['fileName'], $user);
+        if ($behavior != 'user_not_found') {
+            $this
+                ->freeboxManager
+                ->expects($this->once())
+                ->method('generateArchiveAndUpload')
+                ->with($data['fileName'], $user);
+        }
 
         $this
             ->dbalConnection
@@ -113,32 +155,5 @@ class FreeboxMessageConsumerTest extends AbstractMessageQueuing
 
         $this->generateArchiveAndUpload();
         $this->messageConsumer->consumeGenerateArchiveAndUploadMessage($message);
-    }
-
-    private function generateArchiveAndUpload()
-    {
-        $queue = FreeboxQueues::GENERATE_ARCHIVE_AND_UPLOAD;
-
-        $this
-            ->channel
-            ->expects($this->once())
-            ->method('queue_declare')
-            ->with($queue, false, false, false, false);
-
-        $this
-            ->channel
-            ->expects($this->once())
-            ->method('basic_consume')
-            ->with(
-                $queue,
-                '',
-                false,
-                true,
-                false,
-                false,
-                $this->isType('array')
-            );
-
-        $this->messageConsumer->generateArchiveAndUpload($this->dbalConnection, $this->consoleOutput);
     }
 }

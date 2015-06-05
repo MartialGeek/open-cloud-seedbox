@@ -86,6 +86,7 @@ class FreeboxMessageConsumer extends AbstractMessageQueuing
         $user = $this->userService->find($data['userId']);
 
         if (!$user) {
+            $this->dbalConnection->close();
             throw new \InvalidArgumentException('The user with the ID ' . $data['userId'] . ' could not be found.');
         }
 
