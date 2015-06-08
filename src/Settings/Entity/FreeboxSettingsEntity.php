@@ -136,10 +136,13 @@ class FreeboxSettingsEntity
 
     /**
      * @param string $transportPort
+     * @return self
      */
     public function setTransportPort($transportPort)
     {
         $this->transportPort = $transportPort;
+
+        return $this;
     }
 
     /**
