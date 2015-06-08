@@ -14,6 +14,7 @@ class FreeboxSettingsDataTransformerTest extends \PHPUnit_Framework_TestCase
         $entity = new FreeboxSettingsEntity();
 
         $entity
+            ->setId(42)
             ->setTransportHost($toArray['transportHost'])
             ->setTransportPort($toArray['transportPort'])
             ->setAppId($toArray['appId'])
@@ -26,6 +27,7 @@ class FreeboxSettingsDataTransformerTest extends \PHPUnit_Framework_TestCase
 
         $result = $transformer->toArray($entity);
         $this->assertSame($toArray, $result);
+        $this->assertSame(42, $entity->getId());
     }
 
     public function testToObject()
