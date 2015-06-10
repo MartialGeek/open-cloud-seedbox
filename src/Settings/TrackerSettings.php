@@ -56,11 +56,11 @@ class TrackerSettings
      */
     public function updateSettings(TrackerSettingsEntity $settings, User $user)
     {
-        $currentSettings =$this->getSettings($user);
-        $this->decodeTrackerPassword($currentSettings);
+        $currentSettings = $this->getSettings($user);
+        $newPassword = $settings->getPassword();
 
-        if ($currentSettings->getPassword() != $settings->getPassword() && !is_null($settings->getPassword())) {
-            $currentSettings->setPassword($settings->getPassword());
+        if ($currentSettings->getPassword() != $newPassword && !is_null($newPassword)) {
+            $currentSettings->setPassword($newPassword);
             $this->encodeTrackerPassword($currentSettings);
         }
 
