@@ -50,6 +50,18 @@ class User
     protected $password;
 
     /**
+     * @var string
+     * @Column(type="string", length=255, name="cookie_token_id", unique=true, nullable=true)
+     */
+    protected $cookieTokenId;
+
+    /**
+     * @var string
+     * @Column(type="string", length=255, name="cookie_token_hash")
+     */
+    protected $cookieTokenHash;
+
+    /**
      * @var TrackerSettingsEntity
      * @OneToOne(targetEntity="Martial\Warez\Settings\Entity\TrackerSettingsEntity", mappedBy="user")
      */
@@ -145,6 +157,44 @@ class User
     public function setPassword($password)
     {
         $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCookieTokenId()
+    {
+        return $this->cookieTokenId;
+    }
+
+    /**
+     * @param string $cookieTokenId
+     * @return User
+     */
+    public function setCookieTokenId($cookieTokenId)
+    {
+        $this->cookieTokenId = $cookieTokenId;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCookieTokenHash()
+    {
+        return $this->cookieTokenHash;
+    }
+
+    /**
+     * @param string $cookieTokenHash
+     * @return User
+     */
+    public function setCookieTokenHash($cookieTokenHash)
+    {
+        $this->cookieTokenHash = $cookieTokenHash;
 
         return $this;
     }

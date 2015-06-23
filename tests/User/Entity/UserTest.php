@@ -14,6 +14,8 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $username = 'johndoe';
         $email = 'john.doe@gmail.com';
         $password = password_hash(uniqid(), PASSWORD_BCRYPT);
+        $cookieTokenId = uniqid();
+        $cookieTokenHash = sha1($password);
         $trackerSettings = new TrackerSettingsEntity();
         $freeboxSettings = new FreeboxSettingsEntity();
         $createdAt = new \DateTime('-1 month');
@@ -25,6 +27,8 @@ class UserTest extends \PHPUnit_Framework_TestCase
             ->setUsername($username)
             ->setEmail($email)
             ->setPassword($password)
+            ->setCookieTokenId($cookieTokenId)
+            ->setCookieTokenHash($cookieTokenHash)
             ->setTrackerSettings($trackerSettings)
             ->setFreeboxSettings($freeboxSettings)
             ->setCreatedAt($createdAt)
@@ -34,6 +38,8 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($username, $user->getUsername());
         $this->assertSame($email, $user->getEmail());
         $this->assertSame($password, $user->getPassword());
+        $this->assertSame($cookieTokenId, $user->getCookieTokenId());
+        $this->assertSame($cookieTokenHash, $user->getCookieTokenHash());
         $this->assertSame($trackerSettings, $user->getTrackerSettings());
         $this->assertSame($freeboxSettings, $user->getFreeboxSettings());
         $this->assertSame($createdAt, $user->getCreatedAt());
