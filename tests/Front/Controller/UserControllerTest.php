@@ -29,6 +29,11 @@ class UserControllerTest extends ControllerTestCase
      */
     public $user;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    public $cookieTokenizer;
+
     public function testLoginSuccess()
     {
         $this->login(self::LOGIN_SUCCESS);
@@ -100,6 +105,26 @@ class UserControllerTest extends ControllerTestCase
                     ->expects($this->once())
                     ->method('getId')
                     ->will($this->returnValue(123));
+
+                $cookieToken = $this->getMock('\Martial\Warez\Security\CookieTokenInterface');
+
+                $cookieToken
+                    ->expects($this->once())
+                    ->method('getTokenId')
+                    ->willReturn(uniqid());
+
+                $cookieToken
+                    ->expects($this->once())
+                    ->method('getTokenHash')
+                    ->willReturn(uniqid());
+
+                $this
+                    ->cookieTokenizer
+                    ->expects($this->once())
+                    ->method('generateAndStoreToken')
+                    ->with($user)
+                    ->willReturn($cookieToken);
+
                 $this->sessionSet([
                     'connected' => true,
                     'username' => $username,
@@ -148,7 +173,7 @@ class UserControllerTest extends ControllerTestCase
     protected function defineDependencies()
     {
         $dependencies = parent::defineDependencies();
-        $dependencies[] = $this->userService;
+        $dependencies[] = $this->cookieTokenizer;
 
         return $dependencies;
     }
@@ -156,6 +181,7 @@ class UserControllerTest extends ControllerTestCase
     protected function setUp()
     {
         $this->userService = $this->getMock('\Martial\Warez\User\UserServiceInterface');
+        $this->cookieTokenizer = $this->getMock('\Martial\Warez\Security\CookieTokenizerInterface');
 
         $this->user = $this
             ->getMockBuilder('\Martial\Warez\User\Entity\User')

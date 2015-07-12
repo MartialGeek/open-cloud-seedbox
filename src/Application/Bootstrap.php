@@ -17,6 +17,7 @@ use Martial\Warez\MessageQueuing\Freebox\FreeboxMessageConsumer;
 use Martial\Warez\MessageQueuing\Freebox\FreeboxMessageProducer;
 use Martial\Warez\Security\AuthenticationProvider;
 use Martial\Warez\Security\BlowfishHashPassword;
+use Martial\Warez\Security\CookieTokenizer;
 use Martial\Warez\Security\Firewall;
 use Martial\Warez\Security\OpenSSLEncoder;
 use Martial\Warez\Settings\FreeboxSettings;
@@ -121,9 +122,7 @@ class Bootstrap
             ->register(new ServiceControllerServiceProvider())
             ->register(new TwigServiceProvider(), $this->config['twig'])
             ->register(new MonologServiceProvider(), $this->config['monolog'])
-            ->register(new SessionServiceProvider(), [
-                'session.storage.options' => $this->config['session']
-            ])
+            ->register(new SessionServiceProvider())
             ->register(new FormServiceProvider())
             ->register(new ValidatorServiceProvider())
             ->register(new TranslationServiceProvider(), $this->config['translator'])
@@ -195,6 +194,10 @@ class Bootstrap
                 $config['security']['encoder']['password'],
                 $config['security']['encoder']['salt']
             );
+        });
+
+        $app['security.cookie.tokenizer'] = $app->share(function() use ($app) {
+            return new CookieTokenizer($app['doctrine.entity_manager']);
         });
 
         $app['user.service'] = $app->share(function() use ($app) {

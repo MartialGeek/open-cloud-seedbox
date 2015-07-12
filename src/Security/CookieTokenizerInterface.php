@@ -3,7 +3,6 @@
 namespace Martial\Warez\Security;
 
 use Martial\Warez\User\Entity\User;
-use Security\CookieTokenNotFoundException;
 
 interface CookieTokenizerInterface
 {

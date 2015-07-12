@@ -15,7 +15,10 @@ $bootstrap->registerControllers([
         'class' => '\Martial\Warez\Front\Controller\HomeController'
     ],
     'user.controller' => [
-        'class' => '\Martial\Warez\Front\Controller\UserController'
+        'class' => '\Martial\Warez\Front\Controller\UserController',
+        'dependencies' => [
+            $app['security.cookie.tokenizer']
+        ]
     ],
     'security.controller' => [
         'class' => '\Martial\Warez\Front\Controller\SecurityController'
