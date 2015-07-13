@@ -2,6 +2,8 @@
 
 namespace Martial\Warez\Security;
 
+use Martial\Warez\User\Entity\User;
+
 interface CookieTokenInterface
 {
     /**
@@ -17,4 +19,11 @@ interface CookieTokenInterface
      * @return string
      */
     public function getTokenHash();
+
+    /**
+     * Returns the instance of the User entity.
+     *
+     * @return User
+     */
+    public function getUser();
 }

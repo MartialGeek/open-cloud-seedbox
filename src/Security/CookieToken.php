@@ -2,6 +2,8 @@
 
 namespace Martial\Warez\Security;
 
+use Martial\Warez\User\Entity\User;
+
 class CookieToken implements CookieTokenInterface
 {
     /**
@@ -15,13 +17,20 @@ class CookieToken implements CookieTokenInterface
     private $hash;
 
     /**
+     * @var User
+     */
+    private $user;
+
+    /**
      * @param string $id
      * @param string $hash
+     * @param User $user
      */
-    public function __construct($id, $hash)
+    public function __construct($id, $hash, User $user)
     {
         $this->id = $id;
         $this->hash = $hash;
+        $this->user = $user;
     }
 
     /**
@@ -42,5 +51,15 @@ class CookieToken implements CookieTokenInterface
     public function getTokenHash()
     {
         return $this->hash;
+    }
+
+    /**
+     * Returns the instance of the User entity.
+     *
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->user;
     }
 }

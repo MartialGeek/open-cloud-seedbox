@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class Firewall implements FirewallInterface
+class Firewall implements KernelRequestListenerInterface
 {
     /**
      * @var Session

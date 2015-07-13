@@ -35,7 +35,7 @@ class CookieTokenizer implements CookieTokenizerInterface
         $user->setCookieTokenHash($tokenHash);
         $this->em->flush();
 
-        return new CookieToken($tokenId, $tokenHash);
+        return new CookieToken($tokenId, $tokenHash, $user);
     }
 
     /**
@@ -50,12 +50,12 @@ class CookieTokenizer implements CookieTokenizerInterface
         /**
          * @var User $user
          */
-        $user = $this->em->getRepository('\Martial\Warez\User\Entity\User')->findOneBy(['cookie_token_id' => $id]);
+        $user = $this->em->getRepository('\Martial\Warez\User\Entity\User')->findOneBy(['cookieTokenId' => $id]);
 
         if (is_null($user)) {
             throw new CookieTokenNotFoundException();
         }
 
-        return new CookieToken($user->getCookieTokenId(), $user->getCookieTokenHash());
+        return new CookieToken($user->getCookieTokenId(), $user->getCookieTokenHash(), $user);
     }
 }

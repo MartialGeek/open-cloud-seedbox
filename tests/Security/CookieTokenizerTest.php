@@ -88,7 +88,7 @@ class CookieTokenizerTest extends \PHPUnit_Framework_TestCase
         $repository
             ->expects($this->once())
             ->method('findOneBy')
-            ->with(['cookie_token_id' => $id])
+            ->with(['cookieTokenId' => $id])
             ->willReturn($findResult);
 
         if ($isExist) {

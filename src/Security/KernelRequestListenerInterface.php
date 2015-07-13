@@ -4,7 +4,7 @@ namespace Martial\Warez\Security;
 
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
-interface FirewallInterface
+interface KernelRequestListenerInterface
 {
     /**
      * @param GetResponseEvent $event

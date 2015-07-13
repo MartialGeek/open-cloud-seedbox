@@ -20,6 +20,7 @@ use Martial\Warez\Security\BlowfishHashPassword;
 use Martial\Warez\Security\CookieTokenizer;
 use Martial\Warez\Security\Firewall;
 use Martial\Warez\Security\OpenSSLEncoder;
+use Martial\Warez\Security\RememberMeListener;
 use Martial\Warez\Settings\FreeboxSettings;
 use Martial\Warez\Settings\FreeboxSettingsDataTransformer;
 use Martial\Warez\Settings\TrackerSettings;
@@ -29,7 +30,6 @@ use Martial\Warez\T411\Api\Search\QueryFactory;
 use Martial\Warez\Upload\Freebox\FreeboxAuthenticationProvider;
 use Martial\Warez\Upload\Freebox\FreeboxManager;
 use Martial\Warez\Upload\UploadAdapterFactory;
-use Martial\Warez\Upload\UploadListener;
 use Martial\Warez\Upload\UploadUrlResolver;
 use Martial\Warez\User\UserService;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
@@ -108,9 +108,14 @@ class Bootstrap
         }
 
         $this->app['dispatcher']->addListener('kernel.request', [
+            $this->app['security.remember_me_listener'],
+            'onKernelRequest'
+        ], 10);
+
+        $this->app['dispatcher']->addListener('kernel.request', [
             $this->app['security.firewall'],
             'onKernelRequest'
-        ]);
+        ], 0);
 
         $this->app['twig']->addExtension(new TransmissionExtension());
         $this->app['twig']->addExtension(new FileExtension());
@@ -198,6 +203,10 @@ class Bootstrap
 
         $app['security.cookie.tokenizer'] = $app->share(function() use ($app) {
             return new CookieTokenizer($app['doctrine.entity_manager']);
+        });
+
+        $app['security.remember_me_listener'] = $app->share(function() use ($app) {
+            return new RememberMeListener($app['security.cookie.tokenizer'], $app['session']);
         });
 
         $app['user.service'] = $app->share(function() use ($app) {
