@@ -28,8 +28,8 @@ class CookieTokenizer implements CookieTokenizerInterface
      */
     public function generateAndStoreToken(User $user)
     {
-        $tokenId = uniqid($user->getUsername());
-        $tokenHash = sha1($user->getPassword());
+        $tokenId = password_hash($user->getUsername(), PASSWORD_BCRYPT);
+        $tokenHash = password_hash($user->getPassword(), PASSWORD_BCRYPT);
 
         $user->setCookieTokenId($tokenId);
         $user->setCookieTokenHash($tokenHash);
