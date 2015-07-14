@@ -2,12 +2,15 @@
 
 namespace Martial\Warez\Command;
 
+use Doctrine\ORM\Tools\Console\ConsoleRunner;
+use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 use Martial\Warez\Command\Message\Listen;
 use Martial\Warez\Command\User\UserCreate;
 use Martial\Warez\Command\Assets\AssetsInstall;
 use Martial\Warez\Command\Server\ServerRun;
 use Silex\Application as SilexApplication;
 use Symfony\Component\Console\Application as BaseApplication;
+use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\ProcessBuilder;
 
@@ -48,17 +51,24 @@ class Application extends BaseApplication
             throw new \InvalidArgumentException('The destination_path key is required in the assets configuration.');
         }
 
-        $this->add(new AssetsInstall(
-            new Filesystem(),
-            $this->config['assets']['source_paths'],
-            $this->config['assets']['destination_path']
-        ));
+        $this->setHelperSet(new HelperSet([
+            'em' => new EntityManagerHelper($this->app['doctrine.entity_manager']),
+        ]));
 
-        $this->add(new ServerRun(new ProcessBuilder(), $this->config['project_root']));
-        $this->add(new UserCreate($this->app['user.service']));
-        $this->add(new Listen(
-            $this->app['message_queuing.freebox.consumer'],
-            $this->app['doctrine.entity_manager']->getConnection()
-        ));
+        ConsoleRunner::addCommands($this);
+
+        $this->addCommands([
+            new AssetsInstall(
+                new Filesystem(),
+                $this->config['assets']['source_paths'],
+                $this->config['assets']['destination_path']
+            ),
+            new ServerRun(new ProcessBuilder(), $this->config['project_root']),
+            new UserCreate($this->app['user.service']),
+            new Listen(
+                $this->app['message_queuing.freebox.consumer'],
+                $this->app['doctrine.entity_manager']->getConnection()
+            ),
+        ]);
     }
 }
