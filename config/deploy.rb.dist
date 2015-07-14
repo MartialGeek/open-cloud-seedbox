@@ -38,6 +38,7 @@ before "deploy:publishing", "npm:install_dependencies"
 before "deploy:publishing", "bower:install_dependencies"
 before "deploy:publishing", "grunt:build"
 before "deploy:publishing", "assets:install"
+before "deploy:publishing", "migrations:migrate"
 
 namespace :deploy do
 
