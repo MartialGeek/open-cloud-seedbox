@@ -72,7 +72,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $services = [
             'user.service' => $this->getMock('\Martial\Warez\User\UserServiceInterface'),
             'message_queuing.freebox.consumer' => $freeboxConsumer,
-            'doctrine.entity_manager' => $entityManager
+            'doctrine.entity_manager' => $entityManager,
+            'db' => []
         ];
 
         $this->services = $services;

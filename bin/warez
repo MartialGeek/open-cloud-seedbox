@@ -2,15 +2,18 @@
 <?php
 
 use Martial\Warez\Application\Bootstrap;
-use Martial\Warez\Command\Application;
-use Silex\Application as SilexApplication;
+use Silex\Application;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 $config = require __DIR__ . '/../config/app.php';
-$config['application']['env'] = 'prod';
+$config['application']['env'] = 'dev';
 
-$silex = new SilexApplication();
-Bootstrap::createApplication($silex, $config);
-$app = new Application($silex, $config);
-$app->run();
+$app = new Application();
+Bootstrap::createApplication($app, $config);
+
+$app['console']->registerCommands([
+    new \Martial\Warez\Migrations\DoctrineMigrationsProvider($app['console'])
+]);
+
+$app['console']->run();

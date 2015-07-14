@@ -8,6 +8,7 @@ use Doctrine\Common\Cache\FilesystemCache;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
 use GuzzleHttp\Client as GuzzleClient;
+use Martial\Warez\Command\Application as CLIApplication;
 use Martial\Warez\Download\TransmissionManager;
 use Martial\Warez\Filesystem\ZipArchiver;
 use Martial\Warez\Front\Controller\AbstractController;
@@ -328,6 +329,10 @@ class Bootstrap
             $consumer->setLogger($app['logger']);
 
             return $consumer;
+        });
+
+        $app['console'] = $app->share(function() use ($app) {
+            return new CLIApplication($app, $this->config);
         });
     }
 

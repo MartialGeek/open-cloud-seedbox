@@ -65,6 +65,12 @@ return [
             ],
             'cache_dir' => __DIR__ . '/../var/cache/doctrine/cache',
             'proxy_dir' => __DIR__ . '/../var/cache/doctrine/proxy',
+        ],
+        'migrations' => [
+            'migrations.directory'  => __DIR__ . '/../data/migrations',
+            'migrations.name'       => 'Warez Migrations',
+            'migrations.namespace'  => 'Martial\Warez\Migrations',
+            'migrations.table_name' => 'warez_migrations',
         ]
     ],
     'security' => [

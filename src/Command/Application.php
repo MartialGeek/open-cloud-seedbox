@@ -36,8 +36,9 @@ class Application extends BaseApplication
 
     /**
      * @todo Extract the validation of the configuration in a separate component.
+     * @param CommandProviderInterface[] $commandProviders
      */
-    protected function registerCommands()
+    public function registerCommands(array $commandProviders = [])
     {
         if (!isset($this->config['assets'])) {
             throw new \InvalidArgumentException('Missing assets configuration.');
@@ -56,6 +57,24 @@ class Application extends BaseApplication
         ]));
 
         ConsoleRunner::addCommands($this);
+
+        foreach ($commandProviders as $provider) {
+            if (!is_object($provider)) {
+                throw new \InvalidArgumentException(sprintf(
+                    'The arguments passed to the method %s must implement \Martial\Warez\Command\CommandProviderInterface',
+                    __CLASS__ . '::' . __METHOD__
+                ));
+            }
+
+            if (!($provider instanceof CommandProviderInterface)) {
+                throw new \InvalidArgumentException(sprintf(
+                    'The class %s does not implement \Martial\Warez\Command\CommandProviderInterface',
+                    get_class($provider)
+                ));
+            }
+
+            $provider->registerCommands($this->app, $this->config);
+        }
 
         $this->addCommands([
             new AssetsInstall(
