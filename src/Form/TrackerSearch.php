@@ -2,7 +2,7 @@
 
 namespace Martial\Warez\Form;
 
-use Martial\Warez\T411\Api\Category\Category;
+use Martial\T411\Api\Category\Category;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;

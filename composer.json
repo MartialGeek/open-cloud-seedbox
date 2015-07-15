@@ -31,7 +31,8 @@
         "alchemy/zippy": "~0.2.1",
         "videlalvaro/php-amqplib": "~2.5.0",
         "kurl/silex-doctrine-migrations-provider": "~0.1",
-        "doctrine/migrations": "~1.0@dev"
+        "doctrine/migrations": "~1.0@dev",
+        "martial/t411-api-client": "~1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.4"

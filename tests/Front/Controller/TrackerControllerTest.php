@@ -252,7 +252,7 @@ class TrackerControllerTest extends ControllerTestCase
 
     protected function defineDependencies()
     {
-        $this->client = $this->getMock('\Martial\Warez\T411\Api\ClientInterface');
+        $this->client = $this->getMock('\Martial\T411\Api\ClientInterface');
         $this->userService = $this->getMock('\Martial\Warez\User\UserServiceInterface');
         $this->settings = $this
             ->getMockBuilder('\Martial\Warez\Settings\TrackerSettings')
@@ -292,6 +292,6 @@ class TrackerControllerTest extends ControllerTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->trackerToken = $this->getMock('\Martial\Warez\T411\Api\Authentication\TokenInterface');
+        $this->trackerToken = $this->getMock('\Martial\T411\Api\Authentication\TokenInterface');
     }
 }

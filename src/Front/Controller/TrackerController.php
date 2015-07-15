@@ -7,7 +7,7 @@ use Martial\Warez\Download\TorrentClientInterface;
 use Martial\Warez\Download\TransmissionSessionTrait;
 use Martial\Warez\Form\TrackerSearch;
 use Martial\Warez\Settings\TrackerSettings;
-use Martial\Warez\T411\Api\ClientInterface;
+use Martial\T411\Api\ClientInterface;
 use Martial\Warez\User\UserServiceInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;

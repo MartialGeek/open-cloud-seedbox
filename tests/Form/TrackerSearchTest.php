@@ -117,7 +117,7 @@ class TrackerSearchTest extends FormTestCase
      */
     private function getCategory()
     {
-        return $this->getMock('\Martial\Warez\T411\Api\Category\CategoryInterface');
+        return $this->getMock('\Martial\T411\Api\Category\CategoryInterface');
     }
 
     /**

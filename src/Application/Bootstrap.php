@@ -25,9 +25,9 @@ use Martial\Warez\Security\RememberMeListener;
 use Martial\Warez\Settings\FreeboxSettings;
 use Martial\Warez\Settings\FreeboxSettingsDataTransformer;
 use Martial\Warez\Settings\TrackerSettings;
-use Martial\Warez\T411\Api\Client;
-use Martial\Warez\T411\Api\Data\DataTransformer;
-use Martial\Warez\T411\Api\Search\QueryFactory;
+use Martial\T411\Api\Client;
+use Martial\T411\Api\Data\DataTransformer;
+use Martial\T411\Api\Search\QueryFactory;
 use Martial\Warez\Upload\Freebox\FreeboxAuthenticationProvider;
 use Martial\Warez\Upload\Freebox\FreeboxManager;
 use Martial\Warez\Upload\UploadAdapterFactory;
@@ -37,6 +37,7 @@ use PhpAmqpLib\Connection\AMQPStreamConnection;
 use Silex\Application;
 use Silex\Provider\DoctrineServiceProvider;
 use Silex\Provider\FormServiceProvider;
+use Silex\Provider\HttpFragmentServiceProvider;
 use Silex\Provider\MonologServiceProvider;
 use Silex\Provider\ServiceControllerServiceProvider;
 use Silex\Provider\SessionServiceProvider;
@@ -133,7 +134,8 @@ class Bootstrap
             ->register(new ValidatorServiceProvider())
             ->register(new TranslationServiceProvider(), $this->config['translator'])
             ->register(new UrlGeneratorServiceProvider())
-            ->register(new DoctrineServiceProvider(), $this->config['doctrine']['dbal']);
+            ->register(new DoctrineServiceProvider(), $this->config['doctrine']['dbal'])
+            ->register(new HttpFragmentServiceProvider());
     }
 
     protected function registerServices()
