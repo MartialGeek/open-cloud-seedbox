@@ -6,14 +6,14 @@ namespace Martial\Warez\Upload\Freebox;
  * This interface is designed to manage the login and authorization features of the Freebox V6 API.
  *
  * First, obtain an app_token with your application parameters. Then track the authorization status (the user must
- * accept your app via the Freebox front panel). Once the status is granted, you can ask for an session_token.
+ * accept your app via the Freebox front panel). Once the status is granted, you can ask for a session_token.
  *
  * <code>
  * $provider = new [YourImplementationOfThisInterface];
  *
  * $appTokenData = $provider->getApplicationToken([
- *     'app_id'        => 'io.vendor-name.warez',
- *     'app_name'      => 'Warez Companion',
+ *     'app_id'        => 'io.vendor-name.app-name',
+ *     'app_name'      => 'My Awesome App',
  *     'app_version'   => '1.0.0',
  *     'device_name'   => 'Seedbox of John'
  * ]);
@@ -22,7 +22,7 @@ namespace Martial\Warez\Upload\Freebox;
  *
  * if (FreeboxAuthenticationProviderInterface::AUTHORIZATION_STATUS_GRANTED == $authStatus) {
  *     $sessionData = $provider->openSession([
- *         'app_id' => 'io.vendor-name.warez',
+ *         'app_id' => 'io.vendor-name.app-name',
  *         'app_token' => $appTokenData['result']['app_token'],
  *         'challenge' => $authStatus['result']['challenge']
  *     ]);
