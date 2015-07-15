@@ -10,7 +10,6 @@ use Martial\Warez\T411\Api\Authentication\TokenInterface;
 use Martial\Warez\T411\Api\Authentication\UserNotFoundException;
 use Martial\Warez\T411\Api\Authentication\WrongPasswordException;
 use Martial\Warez\T411\Api\Category\CategoryInterface;
-use Martial\Warez\T411\Api\Search\QueryInterface;
 use Martial\Warez\T411\Api\Torrent\TorrentSearchResultInterface;
 use Symfony\Component\HttpFoundation\File\File;
 
