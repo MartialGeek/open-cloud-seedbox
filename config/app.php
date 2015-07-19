@@ -39,6 +39,9 @@ return [
             ],
             'settings' => [
                 __DIR__ . '/../src/Front/View/Settings'
+            ],
+            'file_browser' => [
+                __DIR__ . '/../src/Front/View/FileBrowser'
             ]
         ]
     ],
@@ -107,5 +110,8 @@ return [
                 'vhost' => $parameters['message_queuing_freebox_connection_vhost'],
             ]
         ]
+    ],
+    'file_browser' => [
+        'root_path' => $parameters['file_browser_root_path']
     ]
 ];

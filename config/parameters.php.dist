@@ -24,4 +24,5 @@ return [
     'message_queuing_freebox_connection_user' => '',
     'message_queuing_freebox_connection_password' => '',
     'message_queuing_freebox_connection_vhost' => '',
+    'file_browser_root_path' => '',
 ];

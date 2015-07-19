@@ -56,6 +56,12 @@ $bootstrap->registerControllers([
             'setDownloadDir' => $config['download_dir'],
             'setArchiveDir' => $config['upload']['archive_path']
         ]
+    ],
+    'file_browser.controller' => [
+        'class' => '\Martial\Warez\Front\Controller\FileBrowserController',
+        'dependencies' => [
+            $app['filesystem.file_browser']
+        ]
     ]
 ]);
 
@@ -130,5 +136,9 @@ $app
 $app
     ->get(UploadUrlResolver::UPLOAD_URI, 'upload.controller:upload')
     ->bind('upload_file');
+
+$app
+    ->get('/file-browser', 'file_browser.controller:browse')
+    ->bind('file_browser');
 
 $app->run();

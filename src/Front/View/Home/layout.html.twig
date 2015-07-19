@@ -22,6 +22,9 @@
             <ul class="right">
                 {% if app.session.get('connected') %}
                     {%  set currentPage = app.request.attributes.get('_route') %}
+                    <li{% if currentPage == 'file_browser' %} class="active"{% endif %}>
+                        <a href="{{ path('file_browser') }}">Browse files</a>
+                    </li>
                     <li{% if currentPage == 'tracker_search' %} class="active"{% endif %}>
                         <a href="{{ path('tracker_search') }}">Search torrents</a>
                     </li>
