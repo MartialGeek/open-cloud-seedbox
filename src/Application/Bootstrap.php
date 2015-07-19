@@ -10,6 +10,7 @@ use Doctrine\ORM\Tools\Setup;
 use GuzzleHttp\Client as GuzzleClient;
 use Martial\Warez\Command\Application as CLIApplication;
 use Martial\Warez\Download\TransmissionManager;
+use Martial\Warez\Filesystem\FileBrowser;
 use Martial\Warez\Filesystem\ZipArchiver;
 use Martial\Warez\Front\Controller\AbstractController;
 use Martial\Warez\Front\Twig\FileExtension;
@@ -299,6 +300,10 @@ class Bootstrap
 
         $app['filesystem.archiver.zip'] = $app->share(function() use ($app) {
             return new ZipArchiver($app['zippy']);
+        });
+
+        $app['filesystem.file_browser'] = $app->share(function() use ($app, $config) {
+            return new FileBrowser($config['file_browser']['root_path']);
         });
 
         $app['zippy'] = function() {

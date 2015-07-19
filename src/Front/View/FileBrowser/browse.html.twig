@@ -1,0 +1,32 @@
+{% extends '@home/layout.html.twig' %}
+
+{% block content %}
+    <h2>File browser</h2>
+
+    <table id="file-browser-tab">
+        <thead>
+        <tr>
+            <th class="file-browser-file">File</th>
+            <th class="file-browser-actions">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <td>
+            {% if item.isDir %}
+                <a href="{{ path('file_browser', {'path': item.relativePath}) }}">{{ item.filename }}</a>
+            {% else %}
+                {{ item.filename }}
+            {% endif %}
+                </td>
+                <td>
+                    {% if not item.isDir %}
+                    <a href="{{ path('upload_file', {'filename': item.fullPath}) }}">Download</a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
