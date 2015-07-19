@@ -11,6 +11,14 @@
         </tr>
         </thead>
         <tbody>
+        {% if '/' != app.request.get('path', '/') %}
+        <tr>
+            <td>
+                <a href="{{ path('file_browser', {'path': parentPath(items[0].relativePath)}) }}"><-- parent</a>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        {% endif %}
         {% for item in items %}
             <tr>
                 <td>

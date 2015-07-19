@@ -13,6 +13,7 @@ use Martial\Warez\Download\TransmissionManager;
 use Martial\Warez\Filesystem\FileBrowser;
 use Martial\Warez\Filesystem\ZipArchiver;
 use Martial\Warez\Front\Controller\AbstractController;
+use Martial\Warez\Front\Twig\FileBrowserExtension;
 use Martial\Warez\Front\Twig\FileExtension;
 use Martial\Warez\Front\Twig\TransmissionExtension;
 use Martial\Warez\MessageQueuing\Freebox\FreeboxMessageConsumer;
@@ -122,6 +123,7 @@ class Bootstrap
 
         $this->app['twig']->addExtension(new TransmissionExtension());
         $this->app['twig']->addExtension(new FileExtension());
+        $this->app['twig']->addExtension(new FileBrowserExtension());
     }
 
     protected function registerServiceProviders()
