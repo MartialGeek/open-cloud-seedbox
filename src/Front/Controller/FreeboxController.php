@@ -69,25 +69,31 @@ class FreeboxController extends AbstractController
                 'challenge' => $status['result']['challenge']
             ]);
         } catch (FreeboxAuthorizationDeniedException $e) {
-            $response->setData([
-                'status' => 'denied',
-                'message' => 'The user denied the authorization request.'
-            ], 400);
+            $response
+                ->setData([
+                    'status' => 'denied',
+                    'message' => 'The user denied the authorization request.'
+                ])
+                ->setStatusCode(400);
         } catch (FreeboxAuthorizationPendingException $e) {
             $response->setData([
                 'status' => 'pending',
                 'message' => 'The permission is pending.'
             ]);
         } catch (FreeboxAuthorizationTimeoutException $e) {
-            $response->setData([
-                'status' => 'timeout',
-                'message' => 'The user did not grant the application quickly enough.'
-            ], 400);
+            $response
+                ->setData([
+                    'status' => 'timeout',
+                    'message' => 'The user did not grant the application quickly enough.'
+                ])
+                ->setStatusCode(400);
         } catch (FreeboxAuthorizationException $e) {
-            $response->setData([
-                'status' => 'unknown_error',
-                'message' => 'An unknown error occurred during the authorization demand.'
-            ], 500);
+            $response
+                ->setData([
+                    'status' => 'unknown_error',
+                    'message' => 'An unknown error occurred during the authorization demand.'
+                ])
+                ->setStatusCode(500);
         }
 
         return $response;
