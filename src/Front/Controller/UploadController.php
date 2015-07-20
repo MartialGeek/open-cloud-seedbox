@@ -2,6 +2,7 @@
 
 namespace Martial\Warez\Front\Controller;
 
+use Martial\Warez\Upload\Freebox\FreeboxManager;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,16 +39,19 @@ class UploadController
     public function upload(Request $request)
     {
         $filename = $request->query->get('filename');
+        $uploadType = $request->query->get('upload-type', FreeboxManager::UPLOAD_TYPE_REGULAR);
         $file = new File($filename);
         $response = new BinaryFileResponse($file);
         $response->headers->set('Content-Type', $file->getMimeType() . '; charset=UTF-8');
 
-        $response
-            ->setContentDisposition(
-                ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-                $file->getFilename()
-            )
-            ->deleteFileAfterSend(true);
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $file->getFilename()
+        );
+
+        if ($uploadType == FreeboxManager::UPLOAD_TYPE_ARCHIVE) {
+            $response->deleteFileAfterSend(true);
+        }
 
         return $response;
     }
