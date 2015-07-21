@@ -44,13 +44,13 @@ class FileBrowser implements FileBrowserInterface
 
         if (!file_exists($fullPath)) {
             $e = new PathNotFoundException('Path not found.');
-            $e->setPath($fullPath);
+            $e->setPath($path);
             throw $e;
         }
 
         if (strpos($path, '../') !== false) {
             $e = new PermissionDeniedException('Path with ../ characters are not allowed.');
-            $e->setPath($fullPath);
+            $e->setPath($path);
             throw $e;
         }
 
@@ -58,7 +58,7 @@ class FileBrowser implements FileBrowserInterface
 
         if (!is_readable($fullPath)) {
             $e = new PermissionDeniedException('Path not readable.');
-            $e->setPath($fullPath);
+            $e->setPath($path);
             throw $e;
         }
 

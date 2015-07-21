@@ -19,7 +19,10 @@ $(function() {
     };
 
     var getCurrentPath = function() {
-        var uri = window.location.pathname;
+        return extractPathFromUri(window.location.pathname)
+    };
+
+    var extractPathFromUri = function(uri) {
         var path = uri.substr(uriMap.browsePath.length, uri.length);
 
         return path == '' ? '/' : path.substr(1);
@@ -27,11 +30,20 @@ $(function() {
 
     var browse = function(path, callback) {
         var uri = getBrowsePathUri(path);
+        var currentPath = getCurrentPath();
 
-        $.get(uri, function(res) {
-            callback(res);
-            window.history.pushState({'html': res, 'pageTitle': path}, path, uri);
-        }, 'json');
+        $
+            .getJSON(uri, function(res) {
+                callback(res);
+                window.history.pushState({'html': res, 'pageTitle': path}, path, uri);
+            })
+            .fail(function(data) {
+                $('.main-content').first().addFlash('alert', data.responseJSON.message);
+
+                if (uri != getBrowsePathUri(currentPath)) {
+                    browse(currentPath, buildFileTab);
+                }
+            });
     };
 
     var tableBody = $('#file-browser-tab').find('tbody');
