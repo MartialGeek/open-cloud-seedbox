@@ -28,20 +28,20 @@ $(function() {
         return path == '' ? '/' : path.substr(1);
     };
 
-    var browse = function(path, callback) {
+    var browse = function(path) {
         var uri = getBrowsePathUri(path);
         var currentPath = getCurrentPath();
 
         $
             .getJSON(uri, function(res) {
-                callback(res);
+                buildFileTab(res);
                 window.history.pushState({'html': res, 'pageTitle': path}, path, uri);
             })
             .fail(function(data) {
                 $('.main-content').first().addFlash('alert', data.responseJSON.message);
 
                 if (uri != getBrowsePathUri(currentPath)) {
-                    browse(currentPath, buildFileTab);
+                    browse(currentPath);
                 }
             });
     };
@@ -61,7 +61,33 @@ $(function() {
                 '</td><td>&nbsp;</td></tr>';
         }
 
+        var directories = [];
+        var files = [];
+
         res.items.forEach(function(item) {
+            if (item.isDir) {
+                directories.push(item);
+            } else {
+                files.push(item);
+            }
+        });
+
+        var sortItemsAlphabetically = function(a, b) {
+            if (a.filename > b.filename) {
+                return 1;
+            }
+
+            if (a.filename < b.filename) {
+                return -1;
+            }
+
+            return 0;
+        };
+
+        directories.sort(sortItemsAlphabetically);
+        files.sort(sortItemsAlphabetically);
+
+        var buildRows = function(item) {
             if (item.filename.charAt(0) == '.') {
                 return;
             }
@@ -83,7 +109,10 @@ $(function() {
             }
 
             html += '</td>';
-        });
+        };
+
+        directories.forEach(buildRows);
+        files.forEach(buildRows);
 
         tableBody.html(html);
     };
@@ -93,8 +122,8 @@ $(function() {
 
         event.preventDefault();
         tableBody.html('');
-        browse(path, buildFileTab);
+        browse(path);
     });
 
-    browse(getCurrentPath(), buildFileTab);
+    browse(getCurrentPath());
 });
