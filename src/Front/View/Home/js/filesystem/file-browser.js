@@ -62,6 +62,10 @@ $(function() {
         }
 
         res.items.forEach(function(item) {
+            if (item.filename.charAt(0) == '.') {
+                return;
+            }
+
             html+= '<tr><td>';
 
             if (item.isDir) {
