@@ -113,5 +113,8 @@ return [
     ],
     'file_browser' => [
         'root_path' => $parameters['file_browser_root_path']
+    ],
+    'serializer' => [
+        'cache_dir' => __DIR__ . '/../var/cache/serializer'
     ]
 ];

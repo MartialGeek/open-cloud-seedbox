@@ -36,10 +36,17 @@ class FileBrowser implements FileBrowserInterface
      * @param string $path
      * @return File[]
      * @throws PermissionDeniedException
+     * @throws PathNotFoundException
      */
     public function browse($path)
     {
         $fullPath = $this->rootPath . $path;
+
+        if (!file_exists($fullPath)) {
+            $e = new PathNotFoundException('Path not found.');
+            $e->setPath($fullPath);
+            throw $e;
+        }
 
         if (strpos($path, '../') !== false) {
             $e = new PermissionDeniedException('Path with ../ characters are not allowed.');

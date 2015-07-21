@@ -3,11 +3,15 @@
 namespace Martial\Warez\Application;
 
 use Alchemy\Zippy\Zippy;
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\FilesystemCache;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
 use GuzzleHttp\Client as GuzzleClient;
+use JMS\Serializer\JsonSerializationVisitor;
+use JMS\Serializer\Naming\IdenticalPropertyNamingStrategy;
+use JMS\Serializer\SerializerBuilder;
 use Martial\Warez\Command\Application as CLIApplication;
 use Martial\Warez\Download\TransmissionManager;
 use Martial\Warez\Filesystem\FileBrowser;
@@ -124,6 +128,11 @@ class Bootstrap
         $this->app['twig']->addExtension(new TransmissionExtension());
         $this->app['twig']->addExtension(new FileExtension());
         $this->app['twig']->addExtension(new FileBrowserExtension());
+
+        AnnotationRegistry::registerAutoloadNamespace(
+            'JMS\Serializer\Annotation',
+            __DIR__ . '/../../vendor/jms/serializer/src'
+        );
     }
 
     protected function registerServiceProviders()
@@ -342,6 +351,17 @@ class Bootstrap
 
         $app['console'] = $app->share(function() use ($app) {
             return new CLIApplication($app, $this->config);
+        });
+
+        $app['serializer'] = $app->share(function() use ($app, $config) {
+            $jsonSerializer = new JsonSerializationVisitor(new IdenticalPropertyNamingStrategy());
+            $jsonSerializer->setOptions(JSON_UNESCAPED_SLASHES);
+
+            return SerializerBuilder::create()
+                ->setSerializationVisitor('json', $jsonSerializer)
+                ->setCacheDir($config['serializer']['cache_dir'])
+                ->setDebug($app['debug'])
+                ->build();
         });
     }
 

@@ -11,30 +11,11 @@
         </tr>
         </thead>
         <tbody>
-        {% if '/' != app.request.get('path', '/') %}
-        <tr>
-            <td>
-                <a href="{{ path('file_browser', {'path': parentPath(items[0].relativePath)}) }}"><-- parent</a>
-            </td>
-            <td>&nbsp;</td>
-        </tr>
-        {% endif %}
-        {% for item in items %}
-            <tr>
-                <td>
-            {% if item.isDir %}
-                <a href="{{ path('file_browser', {'path': item.relativePath}) }}">{{ item.filename }}</a>
-            {% else %}
-                {{ item.filename }}
-            {% endif %}
-                </td>
-                <td>
-                    {% if not item.isDir %}
-                    <a href="{{ path('upload_file', {'filename': item.fullPath}) }}">Download</a>
-                    {% endif %}
-                </td>
-            </tr>
-        {% endfor %}
         </tbody>
     </table>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="/js/filesystem/file-browser.js"></script>
 {% endblock %}

@@ -60,7 +60,8 @@ $bootstrap->registerControllers([
     'file_browser.controller' => [
         'class' => '\Martial\Warez\Front\Controller\FileBrowserController',
         'dependencies' => [
-            $app['filesystem.file_browser']
+            $app['filesystem.file_browser'],
+            $app['serializer']
         ]
     ]
 ]);
@@ -140,5 +141,11 @@ $app
 $app
     ->get('/file-browser', 'file_browser.controller:browse')
     ->bind('file_browser');
+
+$app
+    ->get('/file-browser/path/{path}', 'file_browser.controller:path')
+    ->value('path', '/')
+    ->assert('path', '.+')
+    ->bind('file_browser_path');
 
 $app->run();

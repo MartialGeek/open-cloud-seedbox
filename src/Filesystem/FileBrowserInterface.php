@@ -11,6 +11,7 @@ interface FileBrowserInterface
      * @param string $path
      * @return File[]
      * @throws PermissionDeniedException
+     * @throws PathNotFoundException
      */
     public function browse($path);
 }
