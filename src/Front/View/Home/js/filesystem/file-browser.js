@@ -18,6 +18,13 @@ $(function() {
         return uriMap.upload + '/?filename=' + filePath;
     };
 
+    var getCurrentPath = function() {
+        var uri = window.location.pathname;
+        var path = uri.substr(uriMap.browsePath.length, uri.length);
+
+        return path == '' ? '/' : path.substr(1);
+    };
+
     var browse = function(path, callback) {
         var uri = getBrowsePathUri(path);
 
@@ -73,5 +80,5 @@ $(function() {
         browse(path, buildFileTab);
     });
 
-    browse('/', buildFileTab);
+    browse(getCurrentPath(), buildFileTab);
 });

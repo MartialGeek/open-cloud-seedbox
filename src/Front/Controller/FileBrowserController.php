@@ -9,7 +9,6 @@ use Martial\Warez\Filesystem\PermissionDeniedException;
 use Martial\Warez\User\UserServiceInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -51,36 +50,24 @@ class FileBrowserController extends AbstractController
     }
 
     /**
-     * @param Request $request
      * @return Response
      */
-    public function browse(Request $request)
+    public function browse()
     {
-        $path = $request->get('path', '/');
-
-        try {
-            $items = $this->fileBrowser->browse($path);
-        } catch (PermissionDeniedException $e) {
-            $message = sprintf(
-                'Unable to open the directory %s with this error message: "%s"',
-                $e->getPath(),
-                $e->getMessage()
-            );
-            $this->session->getFlashBag()->add('error', $message);
-
-            return new RedirectResponse($this->urlGenerator->generate('file_browser', ['path' => '/']));
-        }
-
-        return new Response($this->twig->render('@file_browser/browse.html.twig', ['items' => $items]));
+        return new Response($this->twig->render('@file_browser/browse.html.twig'));
     }
 
     /**
-     * @param $path
+     * @param Request $request
+     * @param string $path
      * @return JsonResponse
-     * @throws \Exception
      */
-    public function path($path)
+    public function path(Request $request, $path)
     {
+        if (!$request->isXmlHttpRequest()) {
+            return $this->browse();
+        }
+
         $response = new JsonResponse();
 
         if ('/' != $path) {
