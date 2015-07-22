@@ -19,14 +19,30 @@ fileBrowser.File = function(data) {
  * Returns a list of the files in the given path.
  *
  * @param {string} path
+ * @param {Object} context
  * @returns {fileBrowser.File[]}
  */
-fileBrowser.File.list = function(path) {
+fileBrowser.File.list = function(path, context) {
     if (path == "/") {
         path = "";
     }
 
-    return m.request({method: "GET", url: "/api/file-browser/path" + path, type: fileBrowser.File});
+    return m.request({
+        method: "GET",
+        url: "/api/file-browser/path" + path,
+        unwrapSuccess: function(response) {
+            var files = [];
+
+            for (var i = 0; i < response.items.length; i++) {
+                files.push(new fileBrowser.File(response.items[i]));
+            }
+
+            context.currentPath = response.path;
+            context.parentPath = response.parentPath;
+
+            return files;
+        }
+    });
 };
 
 /**
@@ -58,8 +74,8 @@ fileBrowser.vm = (function() {
     var vm = {};
 
     vm.init = function() {
-        vm.list = fileBrowser.File.list("/");
-
+        vm.pathContext = {};
+        vm.list = fileBrowser.File.list("/", vm.pathContext);
         vm.sortContext = { order: "desc", type: "alpha" };
 
         vm.sort = function() {
@@ -68,7 +84,7 @@ fileBrowser.vm = (function() {
         };
 
         vm.load = function(path) {
-            vm.list = fileBrowser.File.list(path);
+            vm.list = fileBrowser.File.list(path, vm.pathContext);
         };
     };
 
@@ -98,7 +114,7 @@ fileBrowser.view = function() {
         ]);
     });
 
-    return [
+    var table = [
         m("thead", [
             m("tr", [
                 m("th", { class: "file-browser-file" }, [
@@ -110,9 +126,28 @@ fileBrowser.view = function() {
                 ]),
                 m("th", { class: "file-browser-actions" }, "Actions")
             ])
-        ]),
-        m("tbody", rows)
+        ])
     ];
+
+    var context = fileBrowser.vm.pathContext;
+
+    if (context.currentPath != context.parentPath) {
+        table.push(m("tbody", [
+            m("tr", [
+                m("td", [
+                    m("a", {
+                        "data-path": context.parentPath,
+                        onclick: m.withAttr("data-path", fileBrowser.vm.load)
+                    }, "<-- Parent")
+                ])
+            ]),
+            rows
+        ]));
+    } else {
+        table.push(m("tbody", rows));
+    }
+
+    return table;
 };
 
 m.mount(document.querySelector('#file-browser-tab'), {

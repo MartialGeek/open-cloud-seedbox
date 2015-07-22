@@ -96,7 +96,11 @@ class FileBrowserController extends AbstractController
             return $response;
         }
 
-        $response->setContent($this->serialize($items));
+        $response->setContent($this->serialize([
+            'path' => $path,
+            'parentPath' => dirname($path),
+            'items' => $items
+        ]));
 
         return $response;
     }
