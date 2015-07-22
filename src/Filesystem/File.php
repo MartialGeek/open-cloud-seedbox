@@ -38,7 +38,7 @@ class File
      */
     public function getRelativePath()
     {
-        return ltrim(str_replace($this->rootPath, '', $this->file->getPathname()), '/');
+        return str_replace($this->rootPath, '', $this->file->getPathname());
     }
 
     /**

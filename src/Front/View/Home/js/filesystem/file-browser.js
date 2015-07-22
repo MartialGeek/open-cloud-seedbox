@@ -9,8 +9,12 @@ fileBrowser.File = function(data) {
     this.fullPath = m.prop(data.fullPath);
 };
 
-fileBrowser.File.list = function() {
-    return m.request({method: "GET", url: "/api/file-browser/path", type: fileBrowser.File});
+fileBrowser.File.list = function(path) {
+    if (path == "/") {
+        path = "";
+    }
+
+    return m.request({method: "GET", url: "/api/file-browser/path" + path, type: fileBrowser.File});
 };
 
 fileBrowser.File.sort = function(files, options) {
@@ -36,14 +40,17 @@ fileBrowser.vm = (function() {
     var vm = {};
 
     vm.init = function() {
-        vm.list = fileBrowser.File.list();
+        vm.list = fileBrowser.File.list("/");
 
         vm.sortContext = { order: "desc", type: "alpha" };
 
         vm.sort = function() {
             vm.sortContext.order = vm.sortContext.order == "desc" ? "asc" : "desc";
-
             fileBrowser.File.sort(vm.list(), vm.sortContext);
+        };
+
+        vm.load = function(path) {
+            vm.list = fileBrowser.File.list(path);
         };
     };
 
@@ -64,7 +71,9 @@ fileBrowser.view = function() {
         return m("tr", [
             m("td", file.isDir() ? [
                 m("a", {
-                    href: "/api/file-browser/path/" + file.relativePath()
+                    href: "#",
+                    "data-path": file.relativePath(),
+                    onclick: m.withAttr("data-path", fileBrowser.vm.load)
                 }, file.filename())
             ] : file.filename()),
             m("td", "")
