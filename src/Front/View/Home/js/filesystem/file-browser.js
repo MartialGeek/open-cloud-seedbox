@@ -28,7 +28,7 @@ fileBrowser.controller = function() {
 };
 
 fileBrowser.view = function() {
-    return fileBrowser.vm.list().map(function(file) {
+    var rows = fileBrowser.vm.list().map(function(file) {
         if (file.filename().charAt(0) == '.') {
             return;
         }
@@ -42,9 +42,21 @@ fileBrowser.view = function() {
             m("td", "")
         ]);
     });
+
+    return [
+        m("thead", [
+            m("tr", [
+                m("th", { class: "file-browser-file" }, [
+                    m("a", { href: "#", id: "sort-by-filename" }, "File")
+                ]),
+                m("th", { class: "file-browser-actions" }, "Actions")
+            ])
+        ]),
+        m("tbody", rows)
+    ];
 };
 
-m.mount(document.querySelector('#file-browser-tab tbody'), {
+m.mount(document.querySelector('#file-browser-tab'), {
     controller: fileBrowser.controller,
     view: fileBrowser.view
 });
