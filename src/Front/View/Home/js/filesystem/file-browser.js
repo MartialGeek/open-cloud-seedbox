@@ -2,6 +2,12 @@
 
 var fileBrowser = {};
 
+/**
+ * The File entity.
+ *
+ * @param {Object} data
+ * @constructor
+ */
 fileBrowser.File = function(data) {
     this.filename = m.prop(data.filename);
     this.isDir = m.prop(data.isDir);
@@ -9,6 +15,12 @@ fileBrowser.File = function(data) {
     this.fullPath = m.prop(data.fullPath);
 };
 
+/**
+ * Returns a list of the files in the given path.
+ *
+ * @param {string} path
+ * @returns {fileBrowser.File[]}
+ */
 fileBrowser.File.list = function(path) {
     if (path == "/") {
         path = "";
@@ -17,6 +29,12 @@ fileBrowser.File.list = function(path) {
     return m.request({method: "GET", url: "/api/file-browser/path" + path, type: fileBrowser.File});
 };
 
+/**
+ * Sorts the given files.
+ *
+ * @param {fileBrowser.File[]} files
+ * @param {Object} options
+ */
 fileBrowser.File.sort = function(files, options) {
     options = options || { order: "asc", type: "alpha" };
 
