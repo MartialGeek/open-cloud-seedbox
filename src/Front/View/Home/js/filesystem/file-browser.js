@@ -1,183 +1,50 @@
-$(function() {
-    var uriMap = {
-        browsePath: '/file-browser/path',
-        upload: '/upload'
+'use strict';
+
+var fileBrowser = {};
+
+fileBrowser.File = function(data) {
+    this.filename = m.prop(data.filename);
+    this.isDir = m.prop(data.isDir);
+    this.relativePath = m.prop(data.relativePath);
+    this.fullPath = m.prop(data.fullPath);
+};
+
+fileBrowser.File.list = function() {
+    return m.request({method: "GET", url: "/api/file-browser/path", type: fileBrowser.File});
+};
+
+fileBrowser.vm = (function() {
+    var vm = {};
+
+    vm.init = function() {
+        vm.list = fileBrowser.File.list();
     };
 
-    var getBrowsePathUri = function(path) {
-        var uri = uriMap.browsePath;
+    return vm;
+}());
 
-        if (path != '/') {
-            uri += '/' + path;
+fileBrowser.controller = function() {
+    fileBrowser.vm.init();
+};
+
+fileBrowser.view = function() {
+    return fileBrowser.vm.list().map(function(file) {
+        if (file.filename().charAt(0) == '.') {
+            return;
         }
 
-        return uri;
-    };
-
-    var getUploadUri = function(filePath) {
-        return uriMap.upload + '/?filename=' + filePath;
-    };
-
-    var getCurrentPath = function() {
-        return extractPathFromUri(window.location.pathname)
-    };
-
-    var extractPathFromUri = function(uri) {
-        var path = uri.substr(uriMap.browsePath.length, uri.length);
-
-        return path == '' ? '/' : path.substr(1);
-    };
-
-    var items = [];
-
-    var browse = function(path) {
-        var uri = getBrowsePathUri(path);
-        var currentPath = getCurrentPath();
-
-        $
-            .getJSON(uri, function(res) {
-                items = res.items;
-                buildFileTab(res);
-                window.history.pushState({'html': res, 'pageTitle': path}, path, uri);
-            })
-            .fail(function(data) {
-                $('.main-content').first().addFlash('alert', data.responseJSON.message);
-
-                if (uri != getBrowsePathUri(currentPath)) {
-                    browse(currentPath);
-                }
-            });
-    };
-
-    var sortItemsAlphabetically = function(items, direction) {
-        direction = direction || 'asc';
-
-        items.sort(function(a, b) {
-            var first = direction == 'asc' ? a : b;
-            var second = direction == 'asc' ? b : a;
-
-            if (first.filename > second.filename) {
-                return 1;
-            }
-
-            if (first.filename < second.filename) {
-                return -1;
-            }
-
-            return 0;
-        });
-    };
-
-    var buildLink = function(linkPath, relativePath, text) {
-        return '<a href="' + linkPath + '" data-file-type="directory" data-file-path="' +
-            relativePath + '">' + text + '</a>';
-    };
-
-    var buildRows = function(items, options) {
-        options = options || {
-                sortOrder: 'asc',
-                sortType: 'alpha'
-            };
-
-        var output = '';
-        var directories = [];
-        var files = [];
-
-        var extractDirectoriesAndFiles = (function(items, directories, files) {
-            for (var i = 0; i < items.length; i++) {
-                if (items[i].isDir) {
-                    directories.push(items[i]);
-                } else {
-                    files.push(items[i]);
-                }
-            }
-        });
-
-        extractDirectoriesAndFiles(items, directories, files);
-
-        if (options.sortType == 'alpha') {
-            sortItemsAlphabetically(directories, options.sortOrder);
-            sortItemsAlphabetically(files, options.sortOrder);
-        }
-
-        var buildRow = (function(items) {
-            var output = '';
-
-            for (var i = 0; i < items.length; i++) {
-                if (items[i].filename.charAt(0) == '.') {
-                    return;
-                }
-
-                output+= '<tr><td>';
-
-                if (items[i].isDir) {
-                    output += buildLink(
-                        getBrowsePathUri(items[i].relativePath),
-                        items[i].relativePath,
-                        items[i].filename
-                    );
-                } else {
-                    output += items[i].filename;
-                }
-
-                output += '</td><td>';
-
-                if (!items[i].isDir) {
-                    output += '<a href="' + getUploadUri(items[i].fullPath) + '">Download</a>'
-                } else {
-                    output += '&nbsp;'
-                }
-
-                output += '</td>';
-            }
-
-            return output;
-        });
-
-        output += buildRow(directories);
-        output += buildRow(files);
-
-        return output;
-    };
-
-    var tableBody = $('#file-browser-tab').find('tbody');
-
-    var buildFileTab = function(res) {
-        var html = '';
-
-        if (res.path != '/') {
-            html += '<tr id="parent-link"><td>' +
-                buildLink(getBrowsePathUri(res.parentPath), res.parentPath, '<-- Parent') +
-                '</td><td>&nbsp;</td></tr>';
-        }
-
-        html += buildRows(res.items);
-
-        tableBody.html(html);
-    };
-
-    $(document).on('click', 'a[data-file-type=directory]', function(event) {
-        var path = $(this).attr('data-file-path');
-
-        event.preventDefault();
-        tableBody.html('');
-        browse(path);
+        return m("tr", [
+            m("td", file.isDir() ? [
+                m("a", {
+                    href: "/api/file-browser/path/" + file.relativePath()
+                }, file.filename())
+            ] : file.filename()),
+            m("td", "")
+        ]);
     });
+};
 
-    var sortContext = {
-        sortType: 'alpha',
-        sortOrder: 'asc'
-    };
-
-    $('#sort-by-filename').on('click', function() {
-        var parentLink = $('#parent-link');
-        var currentSortOrder = sortContext.sortOrder;
-
-        tableBody.html('');
-        tableBody.append(parentLink);
-        sortContext.sortOrder = currentSortOrder == 'asc' ? 'desc' : 'asc';
-        tableBody.append(buildRows(items, sortContext));
-    });
-
-    browse(getCurrentPath());
+m.mount(document.querySelector('#file-browser-tab tbody'), {
+    controller: fileBrowser.controller,
+    view: fileBrowser.view
 });

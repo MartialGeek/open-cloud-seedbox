@@ -143,7 +143,7 @@ $app
     ->bind('file_browser');
 
 $app
-    ->get('/file-browser/path/{path}', 'file_browser.controller:path')
+    ->get('/api/file-browser/path/{path}', 'file_browser.controller:path')
     ->value('path', '/')
     ->assert('path', '.+')
     ->bind('file_browser_path');

@@ -9,7 +9,6 @@ use Martial\Warez\Filesystem\PermissionDeniedException;
 use Martial\Warez\User\UserServiceInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -58,16 +57,11 @@ class FileBrowserController extends AbstractController
     }
 
     /**
-     * @param Request $request
      * @param string $path
      * @return JsonResponse
      */
-    public function path(Request $request, $path)
+    public function path($path)
     {
-        if (!$request->isXmlHttpRequest()) {
-            return $this->browse();
-        }
-
         $response = new JsonResponse();
 
         if ('/' != $path) {
@@ -102,13 +96,7 @@ class FileBrowserController extends AbstractController
             return $response;
         }
 
-        $response->setContent($this->serialize(
-            [
-                'path' => $path,
-                'parentPath' => dirname($path),
-                'items' => $items
-            ])
-        );
+        $response->setContent($this->serialize($items));
 
         return $response;
     }
