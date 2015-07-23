@@ -23,8 +23,8 @@ fileBrowser.File = function(data) {
  * @returns {fileBrowser.File[]}
  */
 fileBrowser.File.list = function(path, context) {
-    if (path == "/") {
-        path = "";
+    if (path != "") {
+        path = "/" + path;
     }
 
     return m.request({
@@ -73,26 +73,24 @@ fileBrowser.File.sort = function(files, options) {
 fileBrowser.vm = (function() {
     var vm = {};
 
-    vm.init = function() {
-        vm.pathContext = {};
-        vm.list = fileBrowser.File.list("/", vm.pathContext);
-        vm.sortContext = { order: "desc", type: "alpha" };
+    vm.pathContext = {};
+    vm.sortContext = { order: "desc", type: "alpha" };
+    vm.list = Array;
 
-        vm.sort = function() {
-            vm.sortContext.order = vm.sortContext.order == "desc" ? "asc" : "desc";
-            fileBrowser.File.sort(vm.list(), vm.sortContext);
-        };
+    vm.find = function(path) {
+        vm.list = fileBrowser.File.list(path, vm.pathContext);
+    };
 
-        vm.load = function(path) {
-            vm.list = fileBrowser.File.list(path, vm.pathContext);
-        };
+    vm.sort = function() {
+        vm.sortContext.order = vm.sortContext.order == "desc" ? "asc" : "desc";
+        fileBrowser.File.sort(vm.list(), vm.sortContext);
     };
 
     return vm;
 }());
 
 fileBrowser.controller = function() {
-    fileBrowser.vm.init();
+    fileBrowser.vm.find(m.route.param('path'));
 };
 
 fileBrowser.view = function() {
@@ -104,11 +102,7 @@ fileBrowser.view = function() {
 
         return m("tr", [
             m("td", file.isDir() ? [
-                m("a", {
-                    href: "#",
-                    "data-path": file.relativePath(),
-                    onclick: m.withAttr("data-path", fileBrowser.vm.load)
-                }, file.filename())
+                m("a[href='" + file.relativePath() + "']" , { config: m.route }, file.filename())
             ] : file.filename()),
             m("td", "")
         ]);
@@ -118,11 +112,7 @@ fileBrowser.view = function() {
         m("thead", [
             m("tr", [
                 m("th", { class: "file-browser-file" }, [
-                    m("a", {
-                        href: "#",
-                        id: "sort-by-filename",
-                        onclick: fileBrowser.vm.sort
-                    }, "File")
+                    m("a", { onclick: fileBrowser.vm.sort }, "File")
                 ]),
                 m("th", { class: "file-browser-actions" }, "Actions")
             ])
@@ -135,10 +125,7 @@ fileBrowser.view = function() {
         table.push(m("tbody", [
             m("tr", [
                 m("td", [
-                    m("a", {
-                        "data-path": context.parentPath,
-                        onclick: m.withAttr("data-path", fileBrowser.vm.load)
-                    }, "<-- Parent")
+                    m("a[href='" + context.parentPath + "']", { config: m.route }, "<-- Parent")
                 ])
             ]),
             rows
@@ -150,7 +137,8 @@ fileBrowser.view = function() {
     return table;
 };
 
-m.mount(document.querySelector('#file-browser-tab'), {
-    controller: fileBrowser.controller,
-    view: fileBrowser.view
+m.route.mode = "hash";
+
+m.route(document.querySelector("#file-browser-tab"), "/", {
+    "/:path...": fileBrowser
 });
