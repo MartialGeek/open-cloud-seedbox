@@ -137,7 +137,7 @@ fileBrowser.view = function() {
     });
 
     var sortOrder = m.route.param('sort') == "asc" ? "desc" : "asc";
-    var currentPath = m.route.param('path') == "" ? "/" : m.route.param('path');
+    var currentPath = m.route.param('path') == "" ? "/" : "/" + m.route.param('path');
 
     var table = [
         m("thead", [
