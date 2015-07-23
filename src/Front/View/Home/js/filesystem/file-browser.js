@@ -96,8 +96,6 @@ fileBrowser.FileList.sort = function(files, options) {
 fileBrowser.vm = (function() {
     var vm = {};
 
-    vm.sortContext = { order: "asc", type: "alpha" };
-
     /**
      * Stores a list of the files found in the given path.
      *
@@ -111,8 +109,7 @@ fileBrowser.vm = (function() {
      * Sorts the files.
      */
     vm.sort = function() {
-        vm.sortContext.order = vm.sortContext.order == "desc" ? "asc" : "desc";
-        fileBrowser.FileList.sort(vm.list().files(), vm.sortContext);
+        fileBrowser.FileList.sort(vm.list().files(), { order: m.route.param('sort'), type: "alpha" });
     };
 
     return vm;
@@ -123,6 +120,8 @@ fileBrowser.controller = function() {
 };
 
 fileBrowser.view = function() {
+    fileBrowser.vm.sort();
+
     var fileList = fileBrowser.vm.list();
     var rows = fileList.files().map(function(file) {
         if (file.filename().charAt(0) == '.') {
@@ -131,17 +130,23 @@ fileBrowser.view = function() {
 
         return m("tr", [
             m("td", file.isDir() ? [
-                m("a[href='" + file.relativePath() + "']" , { config: m.route }, file.filename())
+                m("a[href='" + file.relativePath() + "?sort=asc']" , { config: m.route }, file.filename())
             ] : file.filename()),
             m("td", "")
         ]);
     });
 
+    var sortOrder = m.route.param('sort') == "asc" ? "desc" : "asc";
+    var currentPath = m.route.param('path') == "" ? "/" : m.route.param('path');
+
     var table = [
         m("thead", [
             m("tr", [
                 m("th", { class: "file-browser-file" }, [
-                    m("a", { onclick: fileBrowser.vm.sort }, "File")
+                    m("a[href='" + currentPath + "?sort=" + sortOrder + "']", {
+                        onclick: fileBrowser.vm.sort,
+                        config: m.route
+                    }, "File")
                 ]),
                 m("th", { class: "file-browser-actions" }, "Actions")
             ])
@@ -152,7 +157,7 @@ fileBrowser.view = function() {
         table.push(m("tbody", [
             m("tr", [
                 m("td", [
-                    m("a[href='" + fileList.parentPath() + "']", { config: m.route }, "<-- Parent")
+                    m("a[href='" + fileList.parentPath() + "?sort=asc']", { config: m.route }, "<-- Parent")
                 ])
             ]),
             rows
@@ -166,6 +171,6 @@ fileBrowser.view = function() {
 
 m.route.mode = "hash";
 
-m.route(document.querySelector("#file-browser-tab"), "/", {
+m.route(document.querySelector("#file-browser-tab"), "/?sort=asc", {
     "/:path...": fileBrowser
 });
