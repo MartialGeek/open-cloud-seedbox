@@ -128,11 +128,19 @@ fileBrowser.view = function() {
             return;
         }
 
+        var action = "";
+
+        if (!file.isDir()) {
+            action = [
+                m("a[href='/upload/?filename=" + file.fullPath() + "']", "Download")
+            ];
+        }
+
         return m("tr", [
             m("td", file.isDir() ? [
                 m("a[href='" + file.relativePath() + "?sort=asc']" , { config: m.route }, file.filename())
             ] : file.filename()),
-            m("td", "")
+            m("td", action)
         ]);
     });
 
