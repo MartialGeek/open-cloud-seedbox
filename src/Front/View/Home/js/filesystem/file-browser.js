@@ -5,7 +5,11 @@ var fileBrowser = {};
 /**
  * The File entity.
  *
- * @param {Object} data
+ * @param {Object} data - An object containing the file data.
+ * @param {string} data.filename - The name of the file.
+ * @param {bool} data.isDir - If the file is a directory.
+ * @param {string} data.relativePath - The relative path of the file.
+ * @param {string} data.fullPath - The full path of the file in filesystem.
  * @constructor
  */
 fileBrowser.File = function(data) {
@@ -16,13 +20,29 @@ fileBrowser.File = function(data) {
 };
 
 /**
- * Returns a list of the files in the given path.
+ * Contains a list of files.
  *
- * @param {string} path
- * @param {Object} context
- * @returns {fileBrowser.File[]}
+ * @param {Object} data - An object containing the files, the current path and the parent path.
+ * @param {fileBrowser.File[]} data.files - An array of files.
+ * @param {string} data.currentPath - The path of the fileset.
+ * @param {string} data.parentPath - The parent path of the fileset.
+ * @constructor
  */
-fileBrowser.File.list = function(path, context) {
+fileBrowser.FileList = function(data) {
+    this.files = m.prop(data.files);
+    this.currentPath = m.prop(data.currentPath);
+    this.parentPath = m.prop(data.parentPath);
+};
+
+fileBrowser.Repository = {};
+
+/**
+ * Retrieves the files from the given path.
+ *
+ * @param {string} path - The path of the files.
+ * @returns {_mithril.MithrilPromise<T>|fileBrowser.FileList}
+ */
+fileBrowser.Repository.findInPath = function(path) {
     if (path != "") {
         path = "/" + path;
     }
@@ -37,10 +57,11 @@ fileBrowser.File.list = function(path, context) {
                 files.push(new fileBrowser.File(response.items[i]));
             }
 
-            context.currentPath = response.path;
-            context.parentPath = response.parentPath;
-
-            return files;
+            return new fileBrowser.FileList({
+                files: files,
+                currentPath: response.path,
+                parentPath: response.parentPath
+            });
         }
     });
 };
@@ -49,9 +70,11 @@ fileBrowser.File.list = function(path, context) {
  * Sorts the given files.
  *
  * @param {fileBrowser.File[]} files
- * @param {Object} options
+ * @param {Object} [options]
+ * @param {string} [options.order=asc]
+ * @param {string} [options.type=alpha]
  */
-fileBrowser.File.sort = function(files, options) {
+fileBrowser.FileList.sort = function(files, options) {
     options = options || { order: "asc", type: "alpha" };
 
     files.sort(function(a, b) {
@@ -73,17 +96,23 @@ fileBrowser.File.sort = function(files, options) {
 fileBrowser.vm = (function() {
     var vm = {};
 
-    vm.pathContext = {};
-    vm.sortContext = { order: "desc", type: "alpha" };
-    vm.list = Array;
+    vm.sortContext = { order: "asc", type: "alpha" };
 
+    /**
+     * Stores a list of the files found in the given path.
+     *
+     * @param {string} path - The path of the files.
+     */
     vm.find = function(path) {
-        vm.list = fileBrowser.File.list(path, vm.pathContext);
+        vm.list = fileBrowser.Repository.findInPath(path);
     };
 
+    /**
+     * Sorts the files.
+     */
     vm.sort = function() {
         vm.sortContext.order = vm.sortContext.order == "desc" ? "asc" : "desc";
-        fileBrowser.File.sort(vm.list(), vm.sortContext);
+        fileBrowser.FileList.sort(vm.list().files(), vm.sortContext);
     };
 
     return vm;
@@ -94,8 +123,8 @@ fileBrowser.controller = function() {
 };
 
 fileBrowser.view = function() {
-    var files = fileBrowser.vm.list();
-    var rows = files.map(function(file) {
+    var fileList = fileBrowser.vm.list();
+    var rows = fileList.files().map(function(file) {
         if (file.filename().charAt(0) == '.') {
             return;
         }
@@ -119,13 +148,11 @@ fileBrowser.view = function() {
         ])
     ];
 
-    var context = fileBrowser.vm.pathContext;
-
-    if (context.currentPath != context.parentPath) {
+    if (fileList.currentPath() != fileList.parentPath()) {
         table.push(m("tbody", [
             m("tr", [
                 m("td", [
-                    m("a[href='" + context.parentPath + "']", { config: m.route }, "<-- Parent")
+                    m("a[href='" + fileList.parentPath() + "']", { config: m.route }, "<-- Parent")
                 ])
             ]),
             rows
