@@ -81,11 +81,11 @@ fileBrowser.FileList.sort = function(files, options) {
         var first = options.order == 'asc' ? a : b;
         var second = options.order == 'asc' ? b : a;
 
-        if (first.filename() > second.filename()) {
+        if (first.filename().toLowerCase() > second.filename().toLowerCase()) {
             return 1;
         }
 
-        if (first.filename() < second.filename()) {
+        if (first.filename().toLowerCase() < second.filename().toLowerCase()) {
             return -1;
         }
 
