@@ -131,14 +131,13 @@ fileBrowser.view = function() {
      * @returns {Array}
      */
     var buildBreadcrumb = function(fileList) {
-        var breadcrumb = [];
 
-        fileList.currentPath().split("/").forEach(function(path, index, fullPath) {
+        return fileList.currentPath().split("/").map(function(path, index, fullPath) {
             if (index > 0 && path == "") {
                 return;
             }
 
-            var displayedPath = path == "" ? "/" : path;
+            var displayedPath = path == "" ? "Root" : path;
             var link = "/";
 
             if (index > 1) {
@@ -147,14 +146,8 @@ fileBrowser.view = function() {
 
             link += path;
 
-            breadcrumb.push(m(buildLink(link), { config: m.route }, displayedPath));
-
-            if (fullPath.length - 1 > index) {
-                breadcrumb.push(" > ");
-            }
+            return m(buildLink(link), { config: m.route }, displayedPath);
         });
-
-        return breadcrumb;
     };
 
     /**
@@ -231,8 +224,14 @@ fileBrowser.view = function() {
     var currentPath = m.route.param('path') == "" ? "/" : "/" + m.route.param('path');
 
     return [
-        m("p", buildBreadcrumb(fileList).map(function(path) {
-            return path;
+        m("ul.breadcrumbs", buildBreadcrumb(fileList).map(function(path, index, tab) {
+            var tag = "li";
+
+            if (tab.length == index + 1) {
+                tag = ".current";
+            }
+
+            return m(tag, path);
         })),
         m("table[id='file-browser-tab']", [
             m("thead", [
