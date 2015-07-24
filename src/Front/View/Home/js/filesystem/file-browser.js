@@ -132,13 +132,13 @@ fileBrowser.view = function() {
 
         if (!file.isDir()) {
             action = [
-                m("a[href='/upload/?filename=" + file.fullPath() + "']", "Download")
+                m("a[href='/upload/?filename=" + encodeURI(file.fullPath()) + "']", "Download")
             ];
         }
 
         return m("tr", [
             m("td", file.isDir() ? [
-                m("a[href='" + file.relativePath() + "?sort=asc']" , { config: m.route }, file.filename())
+                m("a[href='" + encodeURI(file.relativePath()) + "?sort=asc']" , { config: m.route }, file.filename())
             ] : file.filename()),
             m("td", action)
         ]);
@@ -151,7 +151,7 @@ fileBrowser.view = function() {
         m("thead", [
             m("tr", [
                 m("th", { class: "file-browser-file" }, [
-                    m("a[href='" + currentPath + "?sort=" + sortOrder + "']", {
+                    m("a[href='" + encodeURI(currentPath) + "?sort=" + sortOrder + "']", {
                         onclick: fileBrowser.vm.sort,
                         config: m.route
                     }, "File")
@@ -165,7 +165,7 @@ fileBrowser.view = function() {
         table.push(m("tbody", [
             m("tr", [
                 m("td", [
-                    m("a[href='" + fileList.parentPath() + "?sort=asc']", { config: m.route }, "<-- Parent")
+                    m("a[href='" + encodeURI(fileList.parentPath()) + "?sort=asc']", { config: m.route }, "<-- Parent")
                 ])
             ]),
             rows
