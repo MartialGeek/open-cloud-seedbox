@@ -6,7 +6,7 @@ namespace :assets do
         on roles(:app) do |host|
             within fetch(:release_path) do
                info "Installing the assets on #{host}"
-               execute :php, "./bin/warez", "assets:install"
+               execute :php, "./bin/seedbox", "assets:install"
             end
         end
     end

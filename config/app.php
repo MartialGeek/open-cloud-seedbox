@@ -71,9 +71,9 @@ return [
         ],
         'migrations' => [
             'migrations.directory'  => __DIR__ . '/../data/migrations',
-            'migrations.name'       => 'Warez Migrations',
+            'migrations.name'       => 'Seedbox Migrations',
             'migrations.namespace'  => 'Martial\Warez\Migrations',
-            'migrations.table_name' => 'warez_migrations',
+            'migrations.table_name' => 'seedbox_migrations',
         ]
     ],
     'security' => [

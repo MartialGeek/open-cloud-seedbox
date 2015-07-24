@@ -23,7 +23,7 @@ $misc_packages = [
     'git'
 ]
 
-$project_path  = "/var/www/warez"
+$project_path  = "/var/www/open-cloud-seedbox"
 $document_root = "${$project_path}/web"
 $env_path_line = 'PATH=$HOME/.composer/vendor/bin:/opt/nodejs/bin:$PATH'
 $profile_bash_script = '/home/vagrant/.profile'
@@ -98,22 +98,22 @@ exec { 'add_composer_path':
     unless => "grep '${$env_path_line}' ${$profile_bash_script}"
 }
 
-nginx::resource::vhost { 'warez.dev':
+nginx::resource::vhost { 'seedbox.dev':
     www_root             => $document_root,
     use_default_location => false,
     index_files          => ['index.php']
 }
 
-nginx::resource::location { 'warez_root':
-    vhost               => 'warez.dev',
+nginx::resource::location { 'seedbox_root':
+    vhost               => 'seedbox.dev',
     location            => '/',
     location_custom_cfg => {
         try_files   => '$uri $uri/ /index.php?$query_string'
     }
 }
 
-nginx::resource::location { 'warez_php':
-    vhost              => 'warez.dev',
+nginx::resource::location { 'seedbox_php':
+    vhost              => 'seedbox.dev',
     fastcgi            => 'unix:/var/run/php5-fpm.sock',
     location           => '~ index.php(/|$)',
     fastcgi_param      => {
@@ -123,12 +123,12 @@ nginx::resource::location { 'warez_php':
 }
 
 class { 'mysql::server':
-    root_password => 'warezisfun'
+    root_password => 'seedbox'
 }
 
-mysql::db { 'warez':
-    user     => 'warez',
-    password => 'warez',
+mysql::db { 'seedbox':
+    user     => 'seedbox',
+    password => 'seedbox',
     host     => 'localhost',
     grant    => ['ALL'],
 }
@@ -149,9 +149,9 @@ user { 'debian-transmission':
     require => Package['transmission-daemon']
 }
 
-file { '/var/www/warez/config/parameters.php':
+file { '/var/www/open-cloud-seedbox/config/parameters.php':
     ensure  => present,
-    content => file('/var/www/warez/data/provisioning/files/parameters.php'),
+    content => file('/var/www/open-cloud-seedbox/data/provisioning/files/parameters.php'),
 
 }
 
@@ -162,7 +162,7 @@ service { 'transmission-daemon':
 
 file { '/etc/transmission-daemon/settings.json':
     ensure  => present,
-    content => file('/var/www/warez/data/provisioning/files/transmission-settings.json'),
+    content => file('/var/www/open-cloud-seedbox/data/provisioning/files/transmission-settings.json'),
     owner   => 'debian-transmission',
     group   => 'debian-transmission',
     mode    => 0600,
@@ -179,7 +179,7 @@ file { '/home/vagrant/.composer':
 
 file { '/home/vagrant/.composer/auth.json':
     ensure  => present,
-    content => file('/var/www/warez/data/provisioning/files/composer-auth.json'),
+    content => file('/var/www/open-cloud-seedbox/data/provisioning/files/composer-auth.json'),
     owner   => 'vagrant',
     group   => 'vagrant',
     mode    => 0600,
@@ -225,7 +225,7 @@ exec { 'build_assets':
 }
 
 exec { 'symlink_assets':
-    command => "${project_path}/bin/warez assets:install",
+    command => "${project_path}/bin/seedbox assets:install",
     require => [
         Exec['build_assets'],
         Class['rabbitmq']
@@ -237,24 +237,24 @@ exec { 'symlink_assets':
 exec { 'update_sql_schema':
     command => "${project_path}/bin/doctrine orm:schema-tool:update --force",
     require => [
-        File['/var/www/warez/config/parameters.php'],
+        File['/var/www/open-cloud-seedbox/config/parameters.php'],
         Exec['install_composer_dependencies'],
-        Mysql::Db['warez'],
+        Mysql::Db['seedbox'],
     ],
     cwd     => $project_path,
     user    => 'vagrant'
 }
 
-exec { 'create_warez_user':
-    command => "${project_path}/bin/warez user:create NiceUser nice-user@warez.io warezisfun",
+exec { 'create_seedbox_user':
+    command => "${project_path}/bin/seedbox user:create NiceUser nice-user@seedbox.io myseedbox",
     require => Exec['update_sql_schema'],
     cwd     => $project_path,
     user    => 'vagrant',
-    notify  => Exec['touch /home/vagrant/.warez_user_created'],
-    unless  => 'ls /home/vagrant/.warez_user_created'
+    notify  => Exec['touch /home/vagrant/.seedbox_user_created'],
+    unless  => 'ls /home/vagrant/.seedbox_user_created'
 }
 
-exec { 'touch /home/vagrant/.warez_user_created':
+exec { 'touch /home/vagrant/.seedbox_user_created':
     user        => 'vagrant',
     refreshonly => true
 }
@@ -265,15 +265,15 @@ class { 'rabbitmq':
     config_variables => { loopback_users => [] }
 }
 
-rabbitmq_user { 'warez':
-    password => 'warez'
+rabbitmq_user { 'seedbox':
+    password => 'seedbox'
 }
 
-rabbitmq_vhost { 'warez':
+rabbitmq_vhost { 'seedbox':
     ensure => present
 }
 
-rabbitmq_user_permissions { 'warez@warez':
+rabbitmq_user_permissions { 'seedbox@seedbox':
     configure_permission => '.*',
     read_permission      => '.*',
     write_permission     => '.*'

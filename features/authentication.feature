@@ -6,7 +6,7 @@ Feature: Authentication
 
   Scenario: Authentication
     Given I am on the homepage
-    When I fill in "login_email" with "behat@warez.io"
+    When I fill in "login_email" with "behat@seedbox.io"
     And I fill in "login_password" with "behatroxx"
     And I press "connect_btn"
     Then I should be logged in

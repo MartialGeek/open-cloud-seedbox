@@ -57,7 +57,7 @@ class User
 
     /**
      * @var string
-     * @Column(type="string", length=255, name="cookie_token_hash")
+     * @Column(type="string", length=255, name="cookie_token_hash", nullable=true)
      */
     protected $cookieTokenHash;
 

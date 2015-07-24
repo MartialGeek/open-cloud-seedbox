@@ -16,7 +16,7 @@ use Silex\Application;
 class FeatureContext extends MinkContext implements Context, SnippetAcceptingContext
 {
     const TEST_USER_NAME = 'Behat';
-    const TEST_USER_EMAIL = 'behat@warez.io';
+    const TEST_USER_EMAIL = 'behat@seedbox.io';
     const TEST_USER_PASSWORD = 'behatroxx';
 
     /**

@@ -4,7 +4,7 @@
         type="application/xml"
         schematypens="http://relaxng.org/ns/structure/1.0"?>
 
-<project name="Warez build file" basedir="." default="build">
+<project name="Open Cloud Seedbox build file" basedir="." default="build">
     <property name="binDir" value="${project.basedir}/bin" />
     <property name="buildDir" value="${project.basedir}/build" />
 

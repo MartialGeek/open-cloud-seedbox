@@ -16,4 +16,5 @@ config/parameters.php
 config/deploy.rb
 config/deploy/*.rb
 build/
+data/provisioning/files/composer-auth.json
 

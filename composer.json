@@ -1,6 +1,6 @@
 {
-    "name": "martial/warez",
-    "description": "My warez tool!",
+    "name": "martial/open-cloud-seedbox",
+    "description": "An interface for your seedbox.",
     "license": "GPL-V2",
     "authors": [
         {
@@ -47,5 +47,5 @@
     "config": {
         "bin-dir": "bin/"
     },
-    "bin": ["bin/warez"]
+    "bin": ["bin/seedbox"]
 }
