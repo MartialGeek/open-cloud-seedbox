@@ -22,6 +22,13 @@ Fork the project and clone it.
 git clone git@github.com:MyUserName/warez.git
 ```
 
+### Generate a GitHub token
+
+The provided Vagrant box embeds Composer, and it needs a GitHub token to install and update the project
+dependencies. Open [this page of your profile](https://github.com/settings/tokens/new) and generate a new
+token with the default parameters. Copy the generated token, open the file data/provisioning/files/composer-auth.json
+and replace the empty string of the "github.com" json attribute by your token.
+
 ### Run the box
 
 Go into your application path and run the Vagrant box. A Puppet provisioning will install the packages needed by
