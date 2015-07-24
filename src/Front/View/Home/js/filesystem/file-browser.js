@@ -120,65 +120,122 @@ fileBrowser.controller = function() {
 };
 
 fileBrowser.view = function() {
-    fileBrowser.vm.sort();
+    /**
+     * Builds the breadcrumb as an array.
+     *
+     * @param {fileBrowser.FileList} fileList - The file list.
+     * @returns {Array}
+     */
+    var buildBreadcrumb = function(fileList) {
+        var breadcrumb = [];
+
+        fileList.currentPath().split("/").forEach(function(path, index, fullPath) {
+            if (index > 0 && path == "") {
+                return;
+            }
+
+            var displayedPath = path == "" ? "/" : path;
+            var link = "/";
+
+            if (index > 1) {
+                link += fullPath[index - 1] + "/";
+            }
+
+            link += path;
+
+            breadcrumb.push(m("a[href='" + encodeURI(link) + "']", { config: m.route }, displayedPath));
+
+            if (fullPath.length - 1 > index) {
+                breadcrumb.push(" > ");
+            }
+        });
+
+        return breadcrumb;
+    };
+
+    /**
+     * Builds the rows of the table.
+     *
+     * @param {fileBrowser.FileList} fileList - The file list.
+     * @returns {Object}
+     */
+    var buildRows = function(fileList) {
+        fileBrowser.vm.sort();
+
+        return fileList.files().map(function(file) {
+            if (file.filename().charAt(0) == '.') {
+                return;
+            }
+
+            var action = "";
+
+            if (!file.isDir()) {
+                action = [
+                    m("a[href='/upload/?filename=" + encodeURI(file.fullPath()) + "']", "Download")
+                ];
+            }
+
+            return m("tr", [
+                m("td", file.isDir() ? [
+                    m("a[href='" + encodeURI(file.relativePath()) + "?sort=asc']" , { config: m.route }, file.filename())
+                ] : file.filename()),
+                m("td", action)
+            ]);
+        });
+    };
+
+    /**
+     * Builds the table body.
+     *
+     * @param {fileBrowser.FileList} fileList - The file list.
+     * @returns {Object}
+     */
+    var buildTableBody = function(fileList) {
+        var tbody;
+
+        if (fileList.currentPath() != fileList.parentPath()) {
+            tbody = m("tbody", [
+                m("tr", [
+                    m("td", [
+                        m("a[href='" + encodeURI(fileList.parentPath()) + "?sort=asc']", { config: m.route }, "<-- Parent")
+                    ])
+                ]),
+                buildRows(fileList)
+            ]);
+        } else {
+            tbody = m("tbody", buildRows(fileList));
+        }
+
+        return tbody;
+    };
 
     var fileList = fileBrowser.vm.list();
-    var rows = fileList.files().map(function(file) {
-        if (file.filename().charAt(0) == '.') {
-            return;
-        }
-
-        var action = "";
-
-        if (!file.isDir()) {
-            action = [
-                m("a[href='/upload/?filename=" + encodeURI(file.fullPath()) + "']", "Download")
-            ];
-        }
-
-        return m("tr", [
-            m("td", file.isDir() ? [
-                m("a[href='" + encodeURI(file.relativePath()) + "?sort=asc']" , { config: m.route }, file.filename())
-            ] : file.filename()),
-            m("td", action)
-        ]);
-    });
-
     var sortOrder = m.route.param('sort') == "asc" ? "desc" : "asc";
     var currentPath = m.route.param('path') == "" ? "/" : "/" + m.route.param('path');
 
-    var table = [
-        m("thead", [
-            m("tr", [
-                m("th", { class: "file-browser-file" }, [
-                    m("a[href='" + encodeURI(currentPath) + "?sort=" + sortOrder + "']", {
-                        onclick: fileBrowser.vm.sort,
-                        config: m.route
-                    }, "File")
-                ]),
-                m("th", { class: "file-browser-actions" }, "Actions")
-            ])
-        ])
-    ];
-
-    if (fileList.currentPath() != fileList.parentPath()) {
-        table.push(m("tbody", [
-            m("tr", [
-                m("td", [
-                    m("a[href='" + encodeURI(fileList.parentPath()) + "?sort=asc']", { config: m.route }, "<-- Parent")
+    return [
+        m("p", buildBreadcrumb(fileList).map(function(path) {
+            return path;
+        })),
+        m("table[id='file-browser-tab']", [
+            m("thead", [
+                m("tr", [
+                    m("th", { class: "file-browser-file" }, [
+                        m("a[href='" + encodeURI(currentPath) + "?sort=" + sortOrder + "']", {
+                            onclick: fileBrowser.vm.sort,
+                            config: m.route
+                        }, "File")
+                    ]),
+                    m("th", { class: "file-browser-actions" }, "Actions")
                 ])
             ]),
-            rows
-        ]));
-    } else {
-        table.push(m("tbody", rows));
-    }
-
-    return table;
+            buildTableBody(fileList)
+        ])
+    ];
 };
 
 m.route.mode = "hash";
 
-m.route(document.querySelector("#file-browser-tab"), "/?sort=asc", {
+m.route(document.querySelector("#browser"), "/?sort=asc", {
     "/:path...": fileBrowser
 });
