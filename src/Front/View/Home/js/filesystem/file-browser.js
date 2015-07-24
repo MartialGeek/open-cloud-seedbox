@@ -116,6 +116,10 @@ fileBrowser.vm = (function() {
 }());
 
 fileBrowser.controller = function() {
+    if (undefined == m.route.param('sort')) {
+        m.route("/" + m.route.param('path') + "?sort=asc");
+    }
+
     fileBrowser.vm.find(m.route.param('path'));
 };
 
@@ -143,7 +147,7 @@ fileBrowser.view = function() {
 
             link += path;
 
-            breadcrumb.push(m("a[href='" + encodeURI(link) + "']", { config: m.route }, displayedPath));
+            breadcrumb.push(m(buildLink(link), { config: m.route }, displayedPath));
 
             if (fullPath.length - 1 > index) {
                 breadcrumb.push(" > ");
@@ -177,7 +181,7 @@ fileBrowser.view = function() {
 
             return m("tr", [
                 m("td", file.isDir() ? [
-                    m("a[href='" + encodeURI(file.relativePath()) + "?sort=asc']" , { config: m.route }, file.filename())
+                    m(buildLink(file.relativePath()) , { config: m.route }, file.filename())
                 ] : file.filename()),
                 m("td", action)
             ]);
@@ -197,7 +201,7 @@ fileBrowser.view = function() {
             tbody = m("tbody", [
                 m("tr", [
                     m("td", [
-                        m("a[href='" + encodeURI(fileList.parentPath()) + "?sort=asc']", { config: m.route }, "<-- Parent")
+                        m(buildLink(fileList.parentPath()), { config: m.route }, "<-- Parent")
                     ])
                 ]),
                 buildRows(fileList)
@@ -207,6 +211,19 @@ fileBrowser.view = function() {
         }
 
         return tbody;
+    };
+
+    /**
+     * Builds a file link.
+     *
+     * @param {string} path - The href path.
+     * @param {string} [sortOrder=asc] - The sort order.
+     * @returns {string}
+     */
+    var buildLink = function(path, sortOrder) {
+        sortOrder = sortOrder || "asc";
+
+        return "a[href='" + encodeURI(path) + "?sort=" + sortOrder + "']";
     };
 
     var fileList = fileBrowser.vm.list();
@@ -221,10 +238,7 @@ fileBrowser.view = function() {
             m("thead", [
                 m("tr", [
                     m("th", { class: "file-browser-file" }, [
-                        m("a[href='" + encodeURI(currentPath) + "?sort=" + sortOrder + "']", {
-                            onclick: fileBrowser.vm.sort,
-                            config: m.route
-                        }, "File")
+                        m(buildLink(currentPath, sortOrder), { onclick: fileBrowser.vm.sort, config: m.route }, "File")
                     ]),
                     m("th", { class: "file-browser-actions" }, "Actions")
                 ])
