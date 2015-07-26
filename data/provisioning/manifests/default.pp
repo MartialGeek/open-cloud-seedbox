@@ -278,3 +278,9 @@ rabbitmq_user_permissions { 'seedbox@seedbox':
     read_permission      => '.*',
     write_permission     => '.*'
 }
+
+rabbitmq_queue { 'ocs.freebox.generate_archive_and_upload@seedbox':
+    user => 'guest',
+    password => 'guest',
+    ensure => present
+}
