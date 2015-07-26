@@ -18,7 +18,7 @@ class FreeboxMessageProducerTest extends AbstractMessageQueuing
 
         $fileName = 'superfilename.txt';
         $userId = 42;
-        $queue = 'warez.freebox.generate_archive_and_upload';
+        $queue = 'ocs.freebox.generate_archive_and_upload';
 
         $this
             ->channel

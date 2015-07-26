@@ -28,7 +28,7 @@ class Application extends BaseApplication
 
     public function __construct(SilexApplication $application, array $config = array())
     {
-        parent::__construct('Warez console', '0.0.0');
+        parent::__construct('Open Cloud Seedbox console', '0.1.0');
         $this->app = $application;
         $this->config = $config;
         $this->registerCommands();

@@ -31,7 +31,7 @@ class UserCreate extends Command
     {
         $this
             ->setName('user:create')
-            ->setDescription('Create a new Warez user.')
+            ->setDescription('Create a new OCS user.')
             ->addArgument('username', InputArgument::REQUIRED, 'The name used by the user.')
             ->addArgument('email', InputArgument::REQUIRED, 'The email of the user.')
             ->addArgument('password', InputArgument::REQUIRED, 'The password of the user.');

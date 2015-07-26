@@ -91,8 +91,8 @@ class FreeboxAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     protected function getApplicationToken($success = true)
     {
         $params = [
-            'app_id' => 'io.john-do.warez',
-            'app_name' => 'Warez Companion',
+            'app_id' => 'io.john-do.seedbox',
+            'app_name' => 'Open Cloud Seedbox',
             'app_version' => '1.0.0',
             'device_name' => 'Seedbox'
         ];

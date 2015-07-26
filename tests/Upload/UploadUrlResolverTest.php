@@ -28,7 +28,7 @@ class UploadUrlResolverTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->host = 'http://warez.dev';
+        $this->host = 'http://seedbox.dev';
         $this->resolver = new UploadUrlResolver();
         $this->resolver->setHost($this->host);
         $this->filePath = '/path/to/file.txt';

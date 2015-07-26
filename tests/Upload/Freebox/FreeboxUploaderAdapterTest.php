@@ -59,8 +59,8 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
         $this->httpClient = $this->getMock('\GuzzleHttp\ClientInterface');
         $this->urlResolver = $this->getMock('\Martial\OpenCloudSeedbox\Upload\UploadUrlResolverInterface');
         $this->config = [
-            'app_id' => 'net.warez-manager',
-            'app_name' => 'Warez Manager',
+            'app_id' => 'net.open-cloud-seedbox',
+            'app_name' => 'Open Cloud Seedbox',
             'app_version' => '1.0',
             'device_name' => 'seedbox'
         ];
@@ -81,7 +81,7 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
         $freeboxUrl = 'http://66.66.66.66:8888';
         $uploadedFile = new File('/tmp/file', false);
         $filename = urlencode('/path/to/file.avi');
-        $uploadUrl = 'http://www.warez.io/files/download/?filename=' . $filename . '&upload-type=' . $uploadType;
+        $uploadUrl = 'http://www.seedbox.io/files/download/?filename=' . $filename . '&upload-type=' . $uploadType;
         $sessionToken = uniqid();
 
         $addDownloadResponse = $this->createResponse();
