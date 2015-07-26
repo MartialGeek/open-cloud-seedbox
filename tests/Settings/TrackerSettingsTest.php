@@ -68,14 +68,11 @@ class TrackerSettingsTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEmptySettings()
     {
-        $clearPassword = null;
-        $encodedPassword = null;
         $currentSettings = null;
 
         $repo = $this->getMock('\Doctrine\Common\Persistence\ObjectRepository');
         $this->getRepository($repo);
         $this->findOneByUser($repo, $currentSettings);
-        $this->decodePassword($encodedPassword, $clearPassword);
 
         $result = $this->trackerSettings->getSettings($this->user);
         $this->assertInstanceOf('\Martial\OpenCloudSeedbox\Settings\Entity\TrackerSettingsEntity', $result);

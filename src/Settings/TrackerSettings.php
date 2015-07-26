@@ -7,7 +7,7 @@ use Martial\OpenCloudSeedbox\Security\EncoderInterface;
 use Martial\OpenCloudSeedbox\Settings\Entity\TrackerSettingsEntity;
 use Martial\OpenCloudSeedbox\User\Entity\User;
 
-class TrackerSettings
+class TrackerSettings implements SettingsManagerInterface
 {
     /**
      * @var EncoderInterface
@@ -54,7 +54,7 @@ class TrackerSettings
      * @param TrackerSettingsEntity $settings
      * @param User $user
      */
-    public function updateSettings(TrackerSettingsEntity $settings, User $user)
+    public function updateSettings($settings, User $user)
     {
         $currentSettings = $this->getSettings($user);
         $newPassword = $settings->getPassword();
@@ -71,6 +71,17 @@ class TrackerSettings
         }
 
         $this->em->flush();
+    }
+
+    /**
+     * Returns true if the settings are complete.
+     *
+     * @param TrackerSettingsEntity $settings
+     * @return bool
+     */
+    public function isComplete($settings)
+    {
+        return $settings->getPassword() && $settings->getUsername();
     }
 
     /**
@@ -91,7 +102,11 @@ class TrackerSettings
      */
     private function decodeTrackerPassword(TrackerSettingsEntity $settings)
     {
-        $clearPassword = $this->encoder->decode($settings->getPassword());
-        $settings->setPassword($clearPassword);
+        $encodedPassword = $settings->getPassword();
+
+        if (!empty($encodedPassword)) {
+            $clearPassword = $this->encoder->decode($encodedPassword);
+            $settings->setPassword($clearPassword);
+        }
     }
 }

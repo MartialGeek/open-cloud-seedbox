@@ -240,6 +240,12 @@ class TrackerControllerTest extends ControllerTestCase
                 ->willReturn($trackerPassword);
 
             $this
+                ->settings
+                ->expects($this->once())
+                ->method('isComplete')
+                ->willReturn(true);
+
+            $this
                 ->client
                 ->expects($this->once())
                 ->method('authenticate')

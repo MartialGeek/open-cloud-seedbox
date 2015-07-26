@@ -6,10 +6,13 @@ use Martial\OpenCloudSeedbox\Download\TorrentClientException;
 use Martial\OpenCloudSeedbox\Download\TorrentClientInterface;
 use Martial\OpenCloudSeedbox\Download\TransmissionSessionTrait;
 use Martial\OpenCloudSeedbox\Form\TrackerSearch;
+use Martial\OpenCloudSeedbox\Settings\IncompleteSettingsException;
+use Martial\OpenCloudSeedbox\Settings\SettingsManagerInterface;
 use Martial\OpenCloudSeedbox\Settings\TrackerSettings;
 use Martial\T411\Api\ClientInterface;
 use Martial\OpenCloudSeedbox\User\UserServiceInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -41,7 +44,7 @@ class TrackerController extends AbstractController
      * @param UrlGeneratorInterface $urlGenerator
      * @param UserServiceInterface $userService
      * @param ClientInterface $client
-     * @param TrackerSettings $settingsManager
+     * @param SettingsManagerInterface $settingsManager
      * @param TorrentClientInterface $torrentClient
      */
     public function __construct(
@@ -51,7 +54,7 @@ class TrackerController extends AbstractController
         UrlGeneratorInterface $urlGenerator,
         UserServiceInterface $userService,
         ClientInterface $client,
-        TrackerSettings $settingsManager,
+        SettingsManagerInterface $settingsManager,
         TorrentClientInterface $torrentClient
     ) {
         $this->client = $client;
@@ -62,7 +65,14 @@ class TrackerController extends AbstractController
 
     public function search(Request $request)
     {
-        $this->checkTrackerAuthentication();
+        try {
+            $this->checkTrackerAuthentication();
+        } catch (IncompleteSettingsException $e) {
+            $this->session->getFlashBag()->add('error', $e->getMessage());
+
+            return new RedirectResponse($this->urlGenerator->generate('homepage'));
+        }
+
         $token = $this->session->get('api_token');
         $categories = $this->client->getCategories($token);
         $searchForm = $this->formFactory->create(new TrackerSearch(), null, ['categories' => $categories]);
@@ -84,7 +94,14 @@ class TrackerController extends AbstractController
 
     public function download($torrentId)
     {
-        $this->checkTrackerAuthentication();
+        try {
+            $this->checkTrackerAuthentication();
+        } catch (IncompleteSettingsException $e) {
+            $this->session->getFlashBag()->add('error', $e->getMessage());
+
+            return new RedirectResponse($this->urlGenerator->generate('homepage'));
+        }
+
         $torrent = $this->client->download($this->session->get('api_token'), $torrentId);
         $sessionId = $this->getSessionId($this->session, $this->torrentClient);
 
@@ -101,6 +118,12 @@ class TrackerController extends AbstractController
     {
         if (!$this->session->has('api_token')) {
             $settings = $this->settingsManager->getSettings($this->getUser());
+
+            if (!$this->settingsManager->isComplete($settings)) {
+                throw new IncompleteSettingsException(
+                    'Your must complete your settings before using the torrent search.'
+                );
+            }
 
             $this->session->set('api_token', $this->client->authenticate(
                 $settings->getUsername(),
