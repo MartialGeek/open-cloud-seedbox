@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\Form;
+namespace Martial\OpenCloudSeedbox\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;

@@ -1,8 +1,8 @@
 <?php
 
-namespace Martial\Warez\MessageQueuing\Freebox;
+namespace Martial\OpenCloudSeedbox\MessageQueuing\Freebox;
 
-use Martial\Warez\MessageQueuing\AbstractMessageQueuing;
+use Martial\OpenCloudSeedbox\MessageQueuing\AbstractMessageQueuing;
 use PhpAmqpLib\Message\AMQPMessage;
 
 class FreeboxMessageProducer extends AbstractMessageQueuing

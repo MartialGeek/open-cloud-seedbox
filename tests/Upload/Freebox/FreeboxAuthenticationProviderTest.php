@@ -1,8 +1,8 @@
 <?php
 
-namespace Martial\Warez\Tests\Upload\Freebox;
+namespace Martial\OpenCloudSeedbox\Tests\Upload\Freebox;
 
-use Martial\Warez\Upload\Freebox\FreeboxAuthenticationProvider;
+use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthenticationProvider;
 
 class FreeboxAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -37,7 +37,7 @@ class FreeboxAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Martial\Warez\Upload\Freebox\FreeboxAuthenticationException
+     * @expectedException \Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthenticationException
      */
     public function testGetApplicationTokenShouldThrowAnExceptionOnError()
     {
@@ -50,7 +50,7 @@ class FreeboxAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Martial\Warez\Upload\Freebox\FreeboxAuthenticationException
+     * @expectedException \Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthenticationException
      */
     public function testGetAuthorizationStatusShouldThrowAnExceptionOnError()
     {
@@ -68,7 +68,7 @@ class FreeboxAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Martial\Warez\Upload\Freebox\FreeboxAuthenticationException
+     * @expectedException \Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthenticationException
      */
     public function testGetConnectionStatusShouldTrowAnExceptionOnError()
     {
@@ -81,7 +81,7 @@ class FreeboxAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Martial\Warez\Upload\Freebox\FreeboxAuthenticationException
+     * @expectedException \Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthenticationException
      */
     public function testOpenSessionShouldThrowAnExceptionOnError()
     {

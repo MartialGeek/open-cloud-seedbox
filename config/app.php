@@ -72,7 +72,7 @@ return [
         'migrations' => [
             'migrations.directory'  => __DIR__ . '/../data/migrations',
             'migrations.name'       => 'Seedbox Migrations',
-            'migrations.namespace'  => 'Martial\Warez\Migrations',
+            'migrations.namespace'  => 'Martial\OpenCloudSeedbox\Migrations',
             'migrations.table_name' => 'seedbox_migrations',
         ]
     ],

@@ -1,9 +1,9 @@
 <?php
 
-namespace Martial\Warez\Tests\Command\Server;
+namespace Martial\OpenCloudSeedbox\Tests\Command\Server;
 
 
-use Martial\Warez\Command\Server\ServerRun;
+use Martial\OpenCloudSeedbox\Command\Server\ServerRun;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class ServerRunTest extends \PHPUnit_Framework_TestCase

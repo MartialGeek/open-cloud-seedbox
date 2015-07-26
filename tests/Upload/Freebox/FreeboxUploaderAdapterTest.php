@@ -1,9 +1,9 @@
 <?php
 
-namespace Martial\Warez\Tests\Upload\Freebox;
+namespace Martial\OpenCloudSeedbox\Tests\Upload\Freebox;
 
-use Martial\Warez\Upload\Freebox\FreeboxUploaderAdapter;
-use Martial\Warez\Upload\UploadException;
+use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxUploaderAdapter;
+use Martial\OpenCloudSeedbox\Upload\UploadException;
 use Symfony\Component\HttpFoundation\File\File;
 
 class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
@@ -50,14 +50,14 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
         }
 
         if (!$exceptionThrown) {
-            $this->fail('The expected exception \Martial\Warez\Upload\UploadException was not thrown.');
+            $this->fail('The expected exception \Martial\OpenCloudSeedbox\Upload\UploadException was not thrown.');
         }
     }
 
     protected function setUp()
     {
         $this->httpClient = $this->getMock('\GuzzleHttp\ClientInterface');
-        $this->urlResolver = $this->getMock('\Martial\Warez\Upload\UploadUrlResolverInterface');
+        $this->urlResolver = $this->getMock('\Martial\OpenCloudSeedbox\Upload\UploadUrlResolverInterface');
         $this->config = [
             'app_id' => 'net.warez-manager',
             'app_name' => 'Warez Manager',

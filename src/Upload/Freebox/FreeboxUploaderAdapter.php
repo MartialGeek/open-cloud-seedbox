@@ -1,11 +1,11 @@
 <?php
 
-namespace Martial\Warez\Upload\Freebox;
+namespace Martial\OpenCloudSeedbox\Upload\Freebox;
 
 use GuzzleHttp\ClientInterface;
-use Martial\Warez\Upload\UploadException;
-use Martial\Warez\Upload\UploadInterface;
-use Martial\Warez\Upload\UploadUrlResolverInterface;
+use Martial\OpenCloudSeedbox\Upload\UploadException;
+use Martial\OpenCloudSeedbox\Upload\UploadInterface;
+use Martial\OpenCloudSeedbox\Upload\UploadUrlResolverInterface;
 use Symfony\Component\HttpFoundation\File\File;
 
 class FreeboxUploaderAdapter implements UploadInterface

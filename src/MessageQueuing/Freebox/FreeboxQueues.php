@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\MessageQueuing\Freebox;
+namespace Martial\OpenCloudSeedbox\MessageQueuing\Freebox;
 
 class FreeboxQueues
 {

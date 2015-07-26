@@ -1,8 +1,8 @@
 <?php
 
-namespace Martial\Warez\Security;
+namespace Martial\OpenCloudSeedbox\Security;
 
-use Martial\Warez\User\Entity\User;
+use Martial\OpenCloudSeedbox\User\Entity\User;
 
 interface CookieTokenInterface
 {

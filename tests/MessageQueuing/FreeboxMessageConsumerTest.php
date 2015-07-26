@@ -1,9 +1,9 @@
 <?php
 
-namespace Martial\Warez\Tests\MessageQueuing;
+namespace Martial\OpenCloudSeedbox\Tests\MessageQueuing;
 
-use Martial\Warez\MessageQueuing\Freebox\FreeboxMessageConsumer;
-use Martial\Warez\MessageQueuing\Freebox\FreeboxQueues;
+use Martial\OpenCloudSeedbox\MessageQueuing\Freebox\FreeboxMessageConsumer;
+use Martial\OpenCloudSeedbox\MessageQueuing\Freebox\FreeboxQueues;
 
 class FreeboxMessageConsumerTest extends AbstractMessageQueuing
 {
@@ -37,7 +37,7 @@ class FreeboxMessageConsumerTest extends AbstractMessageQueuing
         parent::setUp();
 
         $this->freeboxManager = $this
-            ->getMockBuilder('\Martial\Warez\Upload\Freebox\FreeboxManager')
+            ->getMockBuilder('\Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxManager')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -46,7 +46,7 @@ class FreeboxMessageConsumerTest extends AbstractMessageQueuing
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->userService = $this->getMock('\Martial\Warez\User\UserServiceInterface');
+        $this->userService = $this->getMock('\Martial\OpenCloudSeedbox\User\UserServiceInterface');
         $this->messageConsumer = new FreeboxMessageConsumer($this->connection);
         $this->messageConsumer->setLogger($this->logger);
         $this->messageConsumer->setFreeboxManager($this->freeboxManager);
@@ -129,7 +129,7 @@ class FreeboxMessageConsumerTest extends AbstractMessageQueuing
             ->method('connect');
 
         $user = $this
-            ->getMockBuilder('\Martial\Warez\User\Entity\User')
+            ->getMockBuilder('\Martial\OpenCloudSeedbox\User\Entity\User')
             ->disableOriginalConstructor()
             ->getMock();
 

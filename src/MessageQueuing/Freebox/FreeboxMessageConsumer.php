@@ -1,11 +1,11 @@
 <?php
 
-namespace Martial\Warez\MessageQueuing\Freebox;
+namespace Martial\OpenCloudSeedbox\MessageQueuing\Freebox;
 
 use Doctrine\DBAL\Connection;
-use Martial\Warez\MessageQueuing\AbstractMessageQueuing;
-use Martial\Warez\Upload\Freebox\FreeboxManager;
-use Martial\Warez\User\UserServiceInterface;
+use Martial\OpenCloudSeedbox\MessageQueuing\AbstractMessageQueuing;
+use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxManager;
+use Martial\OpenCloudSeedbox\User\UserServiceInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Symfony\Component\Console\Output\OutputInterface;
 

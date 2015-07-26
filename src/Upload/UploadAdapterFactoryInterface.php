@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\Upload;
+namespace Martial\OpenCloudSeedbox\Upload;
 
 interface UploadAdapterFactoryInterface
 {

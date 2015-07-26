@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\Filesystem;
+namespace Martial\OpenCloudSeedbox\Filesystem;
 
 class PermissionDeniedException extends AbstractFileBrowserException
 {

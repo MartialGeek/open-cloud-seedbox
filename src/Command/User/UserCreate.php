@@ -1,11 +1,11 @@
 <?php
 
-namespace Martial\Warez\Command\User;
+namespace Martial\OpenCloudSeedbox\Command\User;
 
-use Martial\Warez\User\EmailAlreadyExistsException;
-use Martial\Warez\User\Entity\User;
-use Martial\Warez\User\UsernameAlreadyExistsException;
-use Martial\Warez\User\UserServiceInterface;
+use Martial\OpenCloudSeedbox\User\EmailAlreadyExistsException;
+use Martial\OpenCloudSeedbox\User\Entity\User;
+use Martial\OpenCloudSeedbox\User\UsernameAlreadyExistsException;
+use Martial\OpenCloudSeedbox\User\UserServiceInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

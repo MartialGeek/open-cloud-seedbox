@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\Tests\Form;
+namespace Martial\OpenCloudSeedbox\Tests\Form;
 
 use Symfony\Component\Form\FormTypeInterface;
 

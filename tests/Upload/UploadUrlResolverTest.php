@@ -1,8 +1,8 @@
 <?php
 
-namespace Martial\Warez\Tests\Upload;
+namespace Martial\OpenCloudSeedbox\Tests\Upload;
 
-use Martial\Warez\Upload\UploadUrlResolver;
+use Martial\OpenCloudSeedbox\Upload\UploadUrlResolver;
 
 class UploadUrlResolverTest extends \PHPUnit_Framework_TestCase
 {

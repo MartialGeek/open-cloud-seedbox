@@ -1,8 +1,8 @@
 <?php
 
-namespace Martial\Warez\Tests\Settings;
+namespace Martial\OpenCloudSeedbox\Tests\Settings;
 
-use Martial\Warez\Settings\TrackerSettings;
+use Martial\OpenCloudSeedbox\Settings\TrackerSettings;
 
 class TrackerSettingsTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,12 +28,12 @@ class TrackerSettingsTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->encoder = $this->getMock('\Martial\Warez\Security\EncoderInterface');
+        $this->encoder = $this->getMock('\Martial\OpenCloudSeedbox\Security\EncoderInterface');
         $this->em = $this->getMock('\Doctrine\ORM\EntityManagerInterface');
         $this->trackerSettings = new TrackerSettings($this->encoder, $this->em);
 
         $this->user = $this
-            ->getMockBuilder('\Martial\Warez\User\Entity\User')
+            ->getMockBuilder('\Martial\OpenCloudSeedbox\User\Entity\User')
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -78,7 +78,7 @@ class TrackerSettingsTest extends \PHPUnit_Framework_TestCase
         $this->decodePassword($encodedPassword, $clearPassword);
 
         $result = $this->trackerSettings->getSettings($this->user);
-        $this->assertInstanceOf('\Martial\Warez\Settings\Entity\TrackerSettingsEntity', $result);
+        $this->assertInstanceOf('\Martial\OpenCloudSeedbox\Settings\Entity\TrackerSettingsEntity', $result);
         $this->assertSame($this->user, $result->getUser());
     }
 
@@ -157,7 +157,7 @@ class TrackerSettingsTest extends \PHPUnit_Framework_TestCase
     private function getSettingsEntity()
     {
         return $this
-            ->getMockBuilder('\Martial\Warez\Settings\Entity\TrackerSettingsEntity')
+            ->getMockBuilder('\Martial\OpenCloudSeedbox\Settings\Entity\TrackerSettingsEntity')
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -171,7 +171,7 @@ class TrackerSettingsTest extends \PHPUnit_Framework_TestCase
             ->em
             ->expects($this->once())
             ->method('getRepository')
-            ->with('\Martial\Warez\Settings\Entity\TrackerSettingsEntity')
+            ->with('\Martial\OpenCloudSeedbox\Settings\Entity\TrackerSettingsEntity')
             ->willReturn($repo);
     }
 

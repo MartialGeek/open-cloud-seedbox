@@ -1,9 +1,9 @@
 <?php
 
-namespace Martial\Warez\Upload;
+namespace Martial\OpenCloudSeedbox\Upload;
 
 use GuzzleHttp\ClientInterface;
-use Martial\Warez\Upload\Freebox\FreeboxUploaderAdapter;
+use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxUploaderAdapter;
 
 class UploadAdapterFactory implements UploadAdapterFactoryInterface
 {

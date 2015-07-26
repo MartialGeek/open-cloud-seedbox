@@ -1,9 +1,9 @@
 <?php
 
-namespace Martial\Warez\Tests\Security;
+namespace Martial\OpenCloudSeedbox\Tests\Security;
 
-use Martial\Warez\Security\AuthenticationProvider;
-use Martial\Warez\User\Entity\User;
+use Martial\OpenCloudSeedbox\Security\AuthenticationProvider;
+use Martial\OpenCloudSeedbox\User\Entity\User;
 
 class AuthenticationProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -56,7 +56,7 @@ class AuthenticationProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->passwordHash = $this->getMock('\Martial\Warez\Security\PasswordHashInterface');
+        $this->passwordHash = $this->getMock('\Martial\OpenCloudSeedbox\Security\PasswordHashInterface');
         $this->clearPassword = 'aSuperP@ssw0rd';
         $this->user = new User();
         $this->user

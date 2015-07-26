@@ -1,9 +1,9 @@
 <?php
 
-namespace Martial\Warez\Tests\Download;
+namespace Martial\OpenCloudSeedbox\Tests\Download;
 
 use GuzzleHttp\Exception\RequestException;
-use Martial\Warez\Download\TransmissionManager;
+use Martial\OpenCloudSeedbox\Download\TransmissionManager;
 
 class TransmissionManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -48,7 +48,7 @@ class TransmissionManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Martial\Warez\Download\TorrentClientException
+     * @expectedException \Martial\OpenCloudSeedbox\Download\TorrentClientException
      */
     public function testAddToQueueWithFailure()
     {

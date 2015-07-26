@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\Settings\Entity;
+namespace Martial\OpenCloudSeedbox\Settings\Entity;
 
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -9,11 +9,11 @@ use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\Table;
-use Martial\Warez\User\Entity\User;
+use Martial\OpenCloudSeedbox\User\Entity\User;
 
 /**
  * Class FreeboxSettingsEntity
- * @package Martial\Warez\Settings\Entity
+ * @package Martial\OpenCloudSeedbox\Settings\Entity
  * @Entity
  * @Table(name="settings_freebox")
  */
@@ -83,7 +83,7 @@ class FreeboxSettingsEntity
 
     /**
      * @var User
-     * @OneToOne(targetEntity="Martial\Warez\User\Entity\User", inversedBy="freeboxSettings")
+     * @OneToOne(targetEntity="Martial\OpenCloudSeedbox\User\Entity\User", inversedBy="freeboxSettings")
      * @JoinColumn(name="user_id", referencedColumnName="id")
      */
     protected $user;

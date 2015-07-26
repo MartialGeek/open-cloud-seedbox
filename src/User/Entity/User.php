@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\User\Entity;
+namespace Martial\OpenCloudSeedbox\User\Entity;
 
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -11,13 +11,13 @@ use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\PrePersist;
 use Doctrine\ORM\Mapping\PreUpdate;
 use Doctrine\ORM\Mapping\Table;
-use Martial\Warez\Settings\Entity\FreeboxSettingsEntity;
-use Martial\Warez\Settings\Entity\TrackerSettingsEntity;
+use Martial\OpenCloudSeedbox\Settings\Entity\FreeboxSettingsEntity;
+use Martial\OpenCloudSeedbox\Settings\Entity\TrackerSettingsEntity;
 
 /**
  * Class User
- * @package Martial\Warez\User
- * @Entity(repositoryClass="\Martial\Warez\User\Repository\UserRepository")
+ * @package Martial\OpenCloudSeedbox\User
+ * @Entity(repositoryClass="\Martial\OpenCloudSeedbox\User\Repository\UserRepository")
  * @Table(name="users")
  * @HasLifecycleCallbacks
  */
@@ -63,13 +63,13 @@ class User
 
     /**
      * @var TrackerSettingsEntity
-     * @OneToOne(targetEntity="Martial\Warez\Settings\Entity\TrackerSettingsEntity", mappedBy="user")
+     * @OneToOne(targetEntity="Martial\OpenCloudSeedbox\Settings\Entity\TrackerSettingsEntity", mappedBy="user")
      */
     protected $trackerSettings;
 
     /**
      * @var FreeboxSettingsEntity
-     * @OneToOne(targetEntity="Martial\Warez\Settings\Entity\FreeboxSettingsEntity", mappedBy="user")
+     * @OneToOne(targetEntity="Martial\OpenCloudSeedbox\Settings\Entity\FreeboxSettingsEntity", mappedBy="user")
      */
     protected $freeboxSettings;
 

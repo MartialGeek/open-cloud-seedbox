@@ -1,8 +1,8 @@
 <?php
 
-namespace Martial\Warez\Tests\Form;
+namespace Martial\OpenCloudSeedbox\Tests\Form;
 
-use Martial\Warez\Form\FreeboxSettings;
+use Martial\OpenCloudSeedbox\Form\FreeboxSettings;
 use Symfony\Component\Form\FormTypeInterface;
 
 class FreeboxSettingsTest extends FormTestCase
@@ -36,7 +36,7 @@ class FreeboxSettingsTest extends FormTestCase
             ->resolver
             ->expects($this->once())
             ->method('setDefaults')
-            ->with($this->equalTo(['data_class' => '\Martial\Warez\Settings\Entity\FreeboxSettingsEntity']))
+            ->with($this->equalTo(['data_class' => '\Martial\OpenCloudSeedbox\Settings\Entity\FreeboxSettingsEntity']))
             ->will($this->returnValue($this->resolver));
 
         $this->getForm()->setDefaultOptions($this->resolver);

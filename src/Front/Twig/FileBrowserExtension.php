@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\Front\Twig;
+namespace Martial\OpenCloudSeedbox\Front\Twig;
 
 class FileBrowserExtension extends \Twig_Extension
 {

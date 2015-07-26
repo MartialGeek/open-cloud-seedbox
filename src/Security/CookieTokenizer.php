@@ -1,9 +1,9 @@
 <?php
 
-namespace Martial\Warez\Security;
+namespace Martial\OpenCloudSeedbox\Security;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Martial\Warez\User\Entity\User;
+use Martial\OpenCloudSeedbox\User\Entity\User;
 
 class CookieTokenizer implements CookieTokenizerInterface
 {
@@ -50,7 +50,7 @@ class CookieTokenizer implements CookieTokenizerInterface
         /**
          * @var User $user
          */
-        $user = $this->em->getRepository('\Martial\Warez\User\Entity\User')->findOneBy(['cookieTokenId' => $id]);
+        $user = $this->em->getRepository('\Martial\OpenCloudSeedbox\User\Entity\User')->findOneBy(['cookieTokenId' => $id]);
 
         if (is_null($user)) {
             throw new CookieTokenNotFoundException();

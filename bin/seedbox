@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-use Martial\Warez\Application\Bootstrap;
+use Martial\OpenCloudSeedbox\Application\Bootstrap;
 use Silex\Application;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -13,7 +13,7 @@ $app = new Application();
 Bootstrap::createApplication($app, $config);
 
 $app['console']->registerCommands([
-    new \Martial\Warez\Migrations\DoctrineMigrationsProvider($app['console'])
+    new \Martial\OpenCloudSeedbox\Migrations\DoctrineMigrationsProvider($app['console'])
 ]);
 
 $app['console']->run();

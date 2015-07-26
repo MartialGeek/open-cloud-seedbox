@@ -1,10 +1,10 @@
 <?php
 
-namespace Martial\Warez\Tests\User;
+namespace Martial\OpenCloudSeedbox\Tests\User;
 
 use Doctrine\ORM\NoResultException;
-use Martial\Warez\User\Entity\User;
-use Martial\Warez\User\UserService;
+use Martial\OpenCloudSeedbox\User\Entity\User;
+use Martial\OpenCloudSeedbox\User\UserService;
 
 class UserServiceTest extends \PHPUnit_Framework_TestCase
 {
@@ -65,7 +65,7 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Martial\Warez\User\EmailAlreadyExistsException
+     * @expectedException \Martial\OpenCloudSeedbox\User\EmailAlreadyExistsException
      */
     public function testRegisterUserShouldThrowAnExceptionWhenAnEmailIsAlreadyExist()
     {
@@ -73,7 +73,7 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Martial\Warez\User\UsernameAlreadyExistsException
+     * @expectedException \Martial\OpenCloudSeedbox\User\UsernameAlreadyExistsException
      */
     public function testRegisterUserShouldThrowAnExceptionWhenAnUsernameIsAlreadyExist()
     {
@@ -110,7 +110,7 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Martial\Warez\User\UserNotFoundException
+     * @expectedException \Martial\OpenCloudSeedbox\User\UserNotFoundException
      */
     public function testAuthenticateUserShouldThrowAnExceptionWhenTheUserWasNotFound()
     {
@@ -118,7 +118,7 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Martial\Warez\Security\BadCredentialsException
+     * @expectedException \Martial\OpenCloudSeedbox\Security\BadCredentialsException
      */
     public function testAuthenticateUserShouldThrowAnExceptionOnInvalidCredentials()
     {
@@ -131,7 +131,7 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Martial\Warez\User\UserNotFoundException
+     * @expectedException \Martial\OpenCloudSeedbox\User\UserNotFoundException
      */
     public function testFindUserShouldThrowAnExceptionWhenAUserWasNotFound()
     {
@@ -233,7 +233,7 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
             ->em
             ->expects($numberOfCalls)
             ->method('getRepository')
-            ->with($this->equalTo('\Martial\Warez\User\Entity\User'))
+            ->with($this->equalTo('\Martial\OpenCloudSeedbox\User\Entity\User'))
             ->will($this->returnValue($this->repo));
     }
 
@@ -268,16 +268,16 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->authenticationProvider = $this->getMock('\Martial\Warez\Security\AuthenticationProviderInterface');
+        $this->authenticationProvider = $this->getMock('\Martial\OpenCloudSeedbox\Security\AuthenticationProviderInterface');
 
         $this->em = $this
             ->getMockBuilder('\Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->repo = $this->getMock('\Martial\Warez\User\Repository\UserRepositoryInterface');
-        $this->passwordHash = $this->getMock('\Martial\Warez\Security\PasswordHashInterface');
-        $this->profileService = $this->getMock('\Martial\Warez\User\ProfileServiceInterface');
+        $this->repo = $this->getMock('\Martial\OpenCloudSeedbox\User\Repository\UserRepositoryInterface');
+        $this->passwordHash = $this->getMock('\Martial\OpenCloudSeedbox\Security\PasswordHashInterface');
+        $this->profileService = $this->getMock('\Martial\OpenCloudSeedbox\User\ProfileServiceInterface');
         $this->userService = new UserService(
             $this->em,
             $this->authenticationProvider,

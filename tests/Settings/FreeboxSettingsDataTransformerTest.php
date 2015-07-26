@@ -1,9 +1,9 @@
 <?php
 
-namespace Martial\Warez\Tests\Settings;
+namespace Martial\OpenCloudSeedbox\Tests\Settings;
 
-use Martial\Warez\Settings\Entity\FreeboxSettingsEntity;
-use Martial\Warez\Settings\FreeboxSettingsDataTransformer;
+use Martial\OpenCloudSeedbox\Settings\Entity\FreeboxSettingsEntity;
+use Martial\OpenCloudSeedbox\Settings\FreeboxSettingsDataTransformer;
 
 class FreeboxSettingsDataTransformerTest extends \PHPUnit_Framework_TestCase
 {

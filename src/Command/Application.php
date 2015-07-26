@@ -1,13 +1,13 @@
 <?php
 
-namespace Martial\Warez\Command;
+namespace Martial\OpenCloudSeedbox\Command;
 
 use Doctrine\ORM\Tools\Console\ConsoleRunner;
 use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
-use Martial\Warez\Command\Message\Listen;
-use Martial\Warez\Command\User\UserCreate;
-use Martial\Warez\Command\Assets\AssetsInstall;
-use Martial\Warez\Command\Server\ServerRun;
+use Martial\OpenCloudSeedbox\Command\Message\Listen;
+use Martial\OpenCloudSeedbox\Command\User\UserCreate;
+use Martial\OpenCloudSeedbox\Command\Assets\AssetsInstall;
+use Martial\OpenCloudSeedbox\Command\Server\ServerRun;
 use Silex\Application as SilexApplication;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -61,14 +61,14 @@ class Application extends BaseApplication
         foreach ($commandProviders as $provider) {
             if (!is_object($provider)) {
                 throw new \InvalidArgumentException(sprintf(
-                    'The arguments passed to the method %s must implement \Martial\Warez\Command\CommandProviderInterface',
+                    'The arguments passed to the method %s must implement \Martial\OpenCloudSeedbox\Command\CommandProviderInterface',
                     __CLASS__ . '::' . __METHOD__
                 ));
             }
 
             if (!($provider instanceof CommandProviderInterface)) {
                 throw new \InvalidArgumentException(sprintf(
-                    'The class %s does not implement \Martial\Warez\Command\CommandProviderInterface',
+                    'The class %s does not implement \Martial\OpenCloudSeedbox\Command\CommandProviderInterface',
                     get_class($provider)
                 ));
             }

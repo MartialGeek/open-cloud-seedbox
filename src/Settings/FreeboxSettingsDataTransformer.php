@@ -1,8 +1,8 @@
 <?php
 
-namespace Martial\Warez\Settings;
+namespace Martial\OpenCloudSeedbox\Settings;
 
-use Martial\Warez\Settings\Entity\FreeboxSettingsEntity;
+use Martial\OpenCloudSeedbox\Settings\Entity\FreeboxSettingsEntity;
 
 class FreeboxSettingsDataTransformer
 {

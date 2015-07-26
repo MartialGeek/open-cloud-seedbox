@@ -1,10 +1,10 @@
 <?php
 
-namespace Martial\Warez\Tests\Front\Controller;
+namespace Martial\OpenCloudSeedbox\Tests\Front\Controller;
 
-use Martial\Warez\Download\TorrentClientException;
-use Martial\Warez\Form\TrackerSearch;
-use Martial\Warez\Front\Controller\TrackerController;
+use Martial\OpenCloudSeedbox\Download\TorrentClientException;
+use Martial\OpenCloudSeedbox\Form\TrackerSearch;
+use Martial\OpenCloudSeedbox\Front\Controller\TrackerController;
 
 class TrackerControllerTest extends ControllerTestCase
 {
@@ -253,12 +253,12 @@ class TrackerControllerTest extends ControllerTestCase
     protected function defineDependencies()
     {
         $this->client = $this->getMock('\Martial\T411\Api\ClientInterface');
-        $this->userService = $this->getMock('\Martial\Warez\User\UserServiceInterface');
+        $this->userService = $this->getMock('\Martial\OpenCloudSeedbox\User\UserServiceInterface');
         $this->settings = $this
-            ->getMockBuilder('\Martial\Warez\Settings\TrackerSettings')
+            ->getMockBuilder('\Martial\OpenCloudSeedbox\Settings\TrackerSettings')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->torrentClient = $this->getMock('\Martial\Warez\Download\TorrentClientInterface');
+        $this->torrentClient = $this->getMock('\Martial\OpenCloudSeedbox\Download\TorrentClientInterface');
 
         $dependencies = parent::defineDependencies();
         $dependencies[] = $this->client;
@@ -275,7 +275,7 @@ class TrackerControllerTest extends ControllerTestCase
      */
     protected function getControllerClassName()
     {
-        return '\Martial\Warez\Front\Controller\TrackerController';
+        return '\Martial\OpenCloudSeedbox\Front\Controller\TrackerController';
     }
 
     protected function setUp()
@@ -283,12 +283,12 @@ class TrackerControllerTest extends ControllerTestCase
         parent::setUp();
 
         $this->user = $this
-            ->getMockBuilder('\Martial\Warez\User\Entity\User')
+            ->getMockBuilder('\Martial\OpenCloudSeedbox\User\Entity\User')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->entity = $this
-            ->getMockBuilder('\Martial\Warez\Settings\Entity\TrackerSettingsEntity')
+            ->getMockBuilder('\Martial\OpenCloudSeedbox\Settings\Entity\TrackerSettingsEntity')
             ->disableOriginalConstructor()
             ->getMock();
 

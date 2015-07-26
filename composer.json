@@ -40,8 +40,8 @@
     },
     "autoload": {
         "psr-4": {
-          "Martial\\Warez\\": "src/",
-          "Martial\\Warez\\Tests\\": "tests/"
+          "Martial\\OpenCloudSeedbox\\": "src/",
+          "Martial\\OpenCloudSeedbox\\Tests\\": "tests/"
         }
     },
     "config": {

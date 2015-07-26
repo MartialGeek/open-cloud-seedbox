@@ -1,7 +1,7 @@
 <?php
 
-use Martial\Warez\Application\Bootstrap;
-use Martial\Warez\Upload\UploadUrlResolver;
+use Martial\OpenCloudSeedbox\Application\Bootstrap;
+use Martial\OpenCloudSeedbox\Upload\UploadUrlResolver;
 use Silex\Application;
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -12,19 +12,19 @@ $bootstrap = new Bootstrap($app, $config);
 
 $bootstrap->registerControllers([
     'home.controller' => [
-        'class' => '\Martial\Warez\Front\Controller\HomeController'
+        'class' => '\Martial\OpenCloudSeedbox\Front\Controller\HomeController'
     ],
     'user.controller' => [
-        'class' => '\Martial\Warez\Front\Controller\UserController',
+        'class' => '\Martial\OpenCloudSeedbox\Front\Controller\UserController',
         'dependencies' => [
             $app['security.cookie.tokenizer']
         ]
     ],
     'security.controller' => [
-        'class' => '\Martial\Warez\Front\Controller\SecurityController'
+        'class' => '\Martial\OpenCloudSeedbox\Front\Controller\SecurityController'
     ],
     'tracker.controller' => [
-        'class' => '\Martial\Warez\Front\Controller\TrackerController',
+        'class' => '\Martial\OpenCloudSeedbox\Front\Controller\TrackerController',
         'dependencies' => [
             $app['t411.api.client'],
             $app['settings.tracker'],
@@ -32,33 +32,33 @@ $bootstrap->registerControllers([
         ]
     ],
     'transmission.controller' => [
-        'class' => '\Martial\Warez\Front\Controller\TransmissionController',
+        'class' => '\Martial\OpenCloudSeedbox\Front\Controller\TransmissionController',
         'dependencies' => [
             $app['transmission.manager']
         ]
     ],
     'settings.controller' => [
-        'class' => '\Martial\Warez\Front\Controller\SettingsController',
+        'class' => '\Martial\OpenCloudSeedbox\Front\Controller\SettingsController',
         'dependencies' => [
             $app['settings.freebox'],
             $app['settings.tracker']
         ]
     ],
     'freebox.controller' => [
-        'class' => '\Martial\Warez\Front\Controller\FreeboxController',
+        'class' => '\Martial\OpenCloudSeedbox\Front\Controller\FreeboxController',
         'dependencies' => [
             $app['upload.freebox.manager']
         ],
     ],
     'upload.controller' => [
-        'class' => '\Martial\Warez\Front\Controller\UploadController',
+        'class' => '\Martial\OpenCloudSeedbox\Front\Controller\UploadController',
         'calls' => [
             'setDownloadDir' => $config['download_dir'],
             'setArchiveDir' => $config['upload']['archive_path']
         ]
     ],
     'file_browser.controller' => [
-        'class' => '\Martial\Warez\Front\Controller\FileBrowserController',
+        'class' => '\Martial\OpenCloudSeedbox\Front\Controller\FileBrowserController',
         'dependencies' => [
             $app['filesystem.file_browser'],
             $app['serializer']

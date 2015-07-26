@@ -1,12 +1,12 @@
 <?php
 
-namespace Martial\Warez\Front\Controller;
+namespace Martial\OpenCloudSeedbox\Front\Controller;
 
-use Martial\Warez\Form\Login;
-use Martial\Warez\Security\BadCredentialsException;
-use Martial\Warez\Security\CookieTokenizerInterface;
-use Martial\Warez\User\UserNotFoundException;
-use Martial\Warez\User\UserServiceInterface;
+use Martial\OpenCloudSeedbox\Form\Login;
+use Martial\OpenCloudSeedbox\Security\BadCredentialsException;
+use Martial\OpenCloudSeedbox\Security\CookieTokenizerInterface;
+use Martial\OpenCloudSeedbox\User\UserNotFoundException;
+use Martial\OpenCloudSeedbox\User\UserServiceInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;

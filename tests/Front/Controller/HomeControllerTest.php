@@ -1,9 +1,9 @@
 <?php
 
-namespace Martial\Warez\Tests\Front\Controller;
+namespace Martial\OpenCloudSeedbox\Tests\Front\Controller;
 
-use Martial\Warez\Form\Login;
-use Martial\Warez\Front\Controller\HomeController;
+use Martial\OpenCloudSeedbox\Form\Login;
+use Martial\OpenCloudSeedbox\Front\Controller\HomeController;
 
 class HomeControllerTest extends ControllerTestCase
 {
@@ -30,6 +30,6 @@ class HomeControllerTest extends ControllerTestCase
      */
     protected function getControllerClassName()
     {
-        return '\Martial\Warez\Front\Controller\HomeController';
+        return '\Martial\OpenCloudSeedbox\Front\Controller\HomeController';
     }
 }

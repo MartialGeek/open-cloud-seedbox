@@ -1,16 +1,16 @@
 <?php
 
-namespace Martial\Warez\Upload\Freebox;
+namespace Martial\OpenCloudSeedbox\Upload\Freebox;
 
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
-use Martial\Warez\Filesystem\ZipArchiver;
-use Martial\Warez\MessageQueuing\Freebox\FreeboxMessageProducer;
-use Martial\Warez\Settings\Entity\FreeboxSettingsEntity;
-use Martial\Warez\Settings\FreeboxSettings;
-use Martial\Warez\Settings\FreeboxSettingsDataTransformer;
-use Martial\Warez\Upload\UploadInterface;
-use Martial\Warez\User\Entity\User;
+use Martial\OpenCloudSeedbox\Filesystem\ZipArchiver;
+use Martial\OpenCloudSeedbox\MessageQueuing\Freebox\FreeboxMessageProducer;
+use Martial\OpenCloudSeedbox\Settings\Entity\FreeboxSettingsEntity;
+use Martial\OpenCloudSeedbox\Settings\FreeboxSettings;
+use Martial\OpenCloudSeedbox\Settings\FreeboxSettingsDataTransformer;
+use Martial\OpenCloudSeedbox\Upload\UploadInterface;
+use Martial\OpenCloudSeedbox\User\Entity\User;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;

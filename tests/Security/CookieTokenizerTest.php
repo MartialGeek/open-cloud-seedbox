@@ -1,8 +1,8 @@
 <?php
 
-namespace Martial\Warez\Tests\Security;
+namespace Martial\OpenCloudSeedbox\Tests\Security;
 
-use Martial\Warez\Security\CookieTokenizer;
+use Martial\OpenCloudSeedbox\Security\CookieTokenizer;
 
 class CookieTokenizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,7 +24,7 @@ class CookieTokenizerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->user = $this
-            ->getMockBuilder('\Martial\Warez\User\Entity\User')
+            ->getMockBuilder('\Martial\OpenCloudSeedbox\User\Entity\User')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -54,7 +54,7 @@ class CookieTokenizerTest extends \PHPUnit_Framework_TestCase
             ->method('flush');
 
         $token = $this->tokenizer->generateAndStoreToken($this->user);
-        $this->assertInstanceOf('\Martial\Warez\Security\CookieTokenInterface', $token);
+        $this->assertInstanceOf('\Martial\OpenCloudSeedbox\Security\CookieTokenInterface', $token);
         $this->assertInternalType('string', $token->getTokenId());
         $this->assertInternalType('string', $token->getTokenHash());
     }
@@ -65,7 +65,7 @@ class CookieTokenizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Martial\Warez\Security\CookieTokenNotFoundException
+     * @expectedException \Martial\OpenCloudSeedbox\Security\CookieTokenNotFoundException
      */
     public function testFindNonExistingToken()
     {
@@ -108,7 +108,7 @@ class CookieTokenizerTest extends \PHPUnit_Framework_TestCase
         $result = $this->tokenizer->findToken($id);
 
         if ($isExist) {
-            $this->assertInstanceOf('\Martial\Warez\Security\CookieToken', $result);
+            $this->assertInstanceOf('\Martial\OpenCloudSeedbox\Security\CookieToken', $result);
             $this->assertSame($id, $result->getTokenId());
             $this->assertSame($hash, $result->getTokenHash());
         }

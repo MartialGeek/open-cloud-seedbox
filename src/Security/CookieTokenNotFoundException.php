@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\Security;
+namespace Martial\OpenCloudSeedbox\Security;
 
 class CookieTokenNotFoundException extends \Exception
 {

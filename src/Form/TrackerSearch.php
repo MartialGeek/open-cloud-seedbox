@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\Form;
+namespace Martial\OpenCloudSeedbox\Form;
 
 use Martial\T411\Api\Category\Category;
 use Symfony\Component\Form\AbstractType;

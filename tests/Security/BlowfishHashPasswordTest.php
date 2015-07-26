@@ -1,9 +1,9 @@
 <?php
 
-namespace Martial\Warez\Tests\Security;
+namespace Martial\OpenCloudSeedbox\Tests\Security;
 
 
-use Martial\Warez\Security\BlowfishHashPassword;
+use Martial\OpenCloudSeedbox\Security\BlowfishHashPassword;
 
 class BlowfishHashPasswordTest extends \PHPUnit_Framework_TestCase
 {

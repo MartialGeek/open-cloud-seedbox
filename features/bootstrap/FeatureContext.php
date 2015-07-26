@@ -4,10 +4,10 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\MinkExtension\Context\MinkContext;
 use Doctrine\ORM\EntityManager;
-use Martial\Warez\Application\Bootstrap;
-use Martial\Warez\User\Entity\User;
-use Martial\Warez\User\Repository\UserRepositoryInterface;
-use Martial\Warez\User\UserService;
+use Martial\OpenCloudSeedbox\Application\Bootstrap;
+use Martial\OpenCloudSeedbox\User\Entity\User;
+use Martial\OpenCloudSeedbox\User\Repository\UserRepositoryInterface;
+use Martial\OpenCloudSeedbox\User\UserService;
 use Silex\Application;
 
 /**
@@ -82,7 +82,7 @@ class FeatureContext extends MinkContext implements Context, SnippetAcceptingCon
         /**
          * @var UserRepositoryInterface $repo
          */
-        $repo = $em->getRepository('\Martial\Warez\User\Entity\User');
+        $repo = $em->getRepository('\Martial\OpenCloudSeedbox\User\Entity\User');
         $user = $repo->findUserByEmail(self::$testUser->getEmail());
         $em->remove($user);
         $em->flush();

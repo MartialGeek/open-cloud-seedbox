@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\MessageQueuing;
+namespace Martial\OpenCloudSeedbox\MessageQueuing;
 
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;

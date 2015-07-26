@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\Front\Twig;
+namespace Martial\OpenCloudSeedbox\Front\Twig;
 
 
 class FileExtension extends \Twig_Extension

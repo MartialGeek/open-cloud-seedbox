@@ -1,9 +1,9 @@
 <?php
 
-namespace Martial\Warez\Command\Message;
+namespace Martial\OpenCloudSeedbox\Command\Message;
 
 use Doctrine\DBAL\Connection;
-use Martial\Warez\MessageQueuing\Freebox\FreeboxMessageConsumer;
+use Martial\OpenCloudSeedbox\MessageQueuing\Freebox\FreeboxMessageConsumer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

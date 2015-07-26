@@ -1,9 +1,9 @@
 <?php
 
-namespace Martial\Warez\Tests\Settings;
+namespace Martial\OpenCloudSeedbox\Tests\Settings;
 
-use Martial\Warez\Settings\Entity\FreeboxSettingsEntity;
-use Martial\Warez\Settings\FreeboxSettings;
+use Martial\OpenCloudSeedbox\Settings\Entity\FreeboxSettingsEntity;
+use Martial\OpenCloudSeedbox\Settings\FreeboxSettings;
 
 class FreeboxSettingsTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,7 +28,7 @@ class FreeboxSettingsTest extends \PHPUnit_Framework_TestCase
         $this->settingsManager = new FreeboxSettings($this->em);
 
         $this->user = $this
-            ->getMockBuilder('\Martial\Warez\User\Entity\User')
+            ->getMockBuilder('\Martial\OpenCloudSeedbox\User\Entity\User')
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -49,7 +49,7 @@ class FreeboxSettingsTest extends \PHPUnit_Framework_TestCase
         $this->findOneBy($repo, ['user' => $this->user], null);
 
         $result = $this->settingsManager->getSettings($this->user);
-        $this->assertInstanceOf('\Martial\Warez\Settings\Entity\FreeboxSettingsEntity', $result);
+        $this->assertInstanceOf('\Martial\OpenCloudSeedbox\Settings\Entity\FreeboxSettingsEntity', $result);
         $this->assertSame($this->user, $result->getUser());
     }
 
@@ -82,7 +82,7 @@ class FreeboxSettingsTest extends \PHPUnit_Framework_TestCase
             ->em
             ->expects($this->once())
             ->method('getRepository')
-            ->with('\Martial\Warez\Settings\Entity\FreeboxSettingsEntity')
+            ->with('\Martial\OpenCloudSeedbox\Settings\Entity\FreeboxSettingsEntity')
             ->willReturn($repo);
 
         return $repo;
@@ -158,7 +158,7 @@ class FreeboxSettingsTest extends \PHPUnit_Framework_TestCase
     private function getSettingsEntity()
     {
         return $this
-            ->getMockBuilder('\Martial\Warez\Settings\Entity\FreeboxSettingsEntity')
+            ->getMockBuilder('\Martial\OpenCloudSeedbox\Settings\Entity\FreeboxSettingsEntity')
             ->disableOriginalConstructor()
             ->getMock();
     }

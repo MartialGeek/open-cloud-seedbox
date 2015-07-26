@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\Command\Server;
+namespace Martial\OpenCloudSeedbox\Command\Server;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

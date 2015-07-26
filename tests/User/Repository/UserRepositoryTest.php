@@ -1,8 +1,8 @@
 <?php
 
-namespace Martial\Warez\Tests\User\Repository;
+namespace Martial\OpenCloudSeedbox\Tests\User\Repository;
 
-use Martial\Warez\User\Repository\UserRepository;
+use Martial\OpenCloudSeedbox\User\Repository\UserRepository;
 
 class UserRepositoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -134,7 +134,7 @@ class UserRepositoryTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->query = $this
-            ->getMockBuilder('\Martial\Warez\Tests\Resources\StubDoctrineQuery')
+            ->getMockBuilder('\Martial\OpenCloudSeedbox\Tests\Resources\StubDoctrineQuery')
             ->disableOriginalConstructor()
             ->getMock();
 

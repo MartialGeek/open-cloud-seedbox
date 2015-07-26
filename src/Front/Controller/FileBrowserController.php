@@ -1,12 +1,12 @@
 <?php
 
-namespace Martial\Warez\Front\Controller;
+namespace Martial\OpenCloudSeedbox\Front\Controller;
 
 use JMS\Serializer\SerializerInterface;
-use Martial\Warez\Filesystem\FileBrowserInterface;
-use Martial\Warez\Filesystem\PathNotFoundException;
-use Martial\Warez\Filesystem\PermissionDeniedException;
-use Martial\Warez\User\UserServiceInterface;
+use Martial\OpenCloudSeedbox\Filesystem\FileBrowserInterface;
+use Martial\OpenCloudSeedbox\Filesystem\PathNotFoundException;
+use Martial\OpenCloudSeedbox\Filesystem\PermissionDeniedException;
+use Martial\OpenCloudSeedbox\User\UserServiceInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;

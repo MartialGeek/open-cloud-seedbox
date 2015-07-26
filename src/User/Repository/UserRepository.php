@@ -1,10 +1,10 @@
 <?php
 
-namespace Martial\Warez\User\Repository;
+namespace Martial\OpenCloudSeedbox\User\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NoResultException;
-use Martial\Warez\User\Entity\User;
+use Martial\OpenCloudSeedbox\User\Entity\User;
 
 class UserRepository extends EntityRepository implements UserRepositoryInterface
 {

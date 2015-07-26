@@ -1,14 +1,14 @@
 <?php
 
-namespace Martial\Warez\User;
+namespace Martial\OpenCloudSeedbox\User;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\NoResultException;
-use Martial\Warez\Security\AuthenticationProviderInterface;
-use Martial\Warez\Security\BadCredentialsException;
-use Martial\Warez\Security\PasswordHashInterface;
-use Martial\Warez\User\Entity\User;
-use Martial\Warez\User\Repository\UserRepositoryInterface;
+use Martial\OpenCloudSeedbox\Security\AuthenticationProviderInterface;
+use Martial\OpenCloudSeedbox\Security\BadCredentialsException;
+use Martial\OpenCloudSeedbox\Security\PasswordHashInterface;
+use Martial\OpenCloudSeedbox\User\Entity\User;
+use Martial\OpenCloudSeedbox\User\Repository\UserRepositoryInterface;
 
 class UserService implements UserServiceInterface
 {
@@ -138,6 +138,6 @@ class UserService implements UserServiceInterface
      */
     protected function getRepository()
     {
-        return $this->em->getRepository('\Martial\Warez\User\Entity\User');
+        return $this->em->getRepository('\Martial\OpenCloudSeedbox\User\Entity\User');
     }
 }

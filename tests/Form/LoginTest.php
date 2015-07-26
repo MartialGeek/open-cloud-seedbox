@@ -1,8 +1,8 @@
 <?php
 
-namespace Martial\Warez\Tests\Form;
+namespace Martial\OpenCloudSeedbox\Tests\Form;
 
-use Martial\Warez\Form\Login;
+use Martial\OpenCloudSeedbox\Form\Login;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Length;

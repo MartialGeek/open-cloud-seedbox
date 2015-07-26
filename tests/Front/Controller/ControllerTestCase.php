@@ -1,8 +1,8 @@
 <?php
 
-namespace Martial\Warez\Tests\Front\Controller;
+namespace Martial\OpenCloudSeedbox\Tests\Front\Controller;
 
-use Martial\Warez\Front\Controller\AbstractController;
+use Martial\OpenCloudSeedbox\Front\Controller\AbstractController;
 use Symfony\Component\Form\FormTypeInterface;
 
 abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
@@ -96,7 +96,7 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
         $this->request->request = $this->requestParameterBag;
         $this->request->query = $this->queryParameterBag;
         $this->flashBag = $this->getMock('\Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface');
-        $this->userService = $this->getMock('\Martial\Warez\User\UserServiceInterface');
+        $this->userService = $this->getMock('\Martial\OpenCloudSeedbox\User\UserServiceInterface');
         $this->createController();
     }
 

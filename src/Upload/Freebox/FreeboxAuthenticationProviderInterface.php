@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\Upload\Freebox;
+namespace Martial\OpenCloudSeedbox\Upload\Freebox;
 
 /**
  * This interface is designed to manage the login and authorization features of the Freebox V6 API.
@@ -33,7 +33,7 @@ namespace Martial\Warez\Upload\Freebox;
  * }
  *
  * @see http://dev.freebox.fr/sdk/os/login/
- * @package Martial\Warez\Upload\Freebox
+ * @package Martial\OpenCloudSeedbox\Upload\Freebox
  */
 interface FreeboxAuthenticationProviderInterface
 {

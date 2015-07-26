@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\User;
+namespace Martial\OpenCloudSeedbox\User;
 
 
 class EmailAlreadyExistsException extends \Exception

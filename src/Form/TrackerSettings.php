@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\Form;
+namespace Martial\OpenCloudSeedbox\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -27,7 +27,7 @@ class TrackerSettings extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => '\Martial\Warez\Settings\Entity\TrackerSettingsEntity'
+            'data_class' => '\Martial\OpenCloudSeedbox\Settings\Entity\TrackerSettingsEntity'
         ]);
     }
 

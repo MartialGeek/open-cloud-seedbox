@@ -1,8 +1,8 @@
 <?php
 
-namespace Martial\Warez\Tests\Command\Assets;
+namespace Martial\OpenCloudSeedbox\Tests\Command\Assets;
 
-use Martial\Warez\Command\Assets\AssetsInstall;
+use Martial\OpenCloudSeedbox\Command\Assets\AssetsInstall;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class AssetsInstallTest extends \PHPUnit_Framework_TestCase

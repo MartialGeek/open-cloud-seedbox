@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\Form;
+namespace Martial\OpenCloudSeedbox\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -23,7 +23,7 @@ class FreeboxSettings extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => '\Martial\Warez\Settings\Entity\FreeboxSettingsEntity'
+            'data_class' => '\Martial\OpenCloudSeedbox\Settings\Entity\FreeboxSettingsEntity'
         ]);
     }
 

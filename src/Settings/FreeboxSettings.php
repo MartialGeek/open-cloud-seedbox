@@ -1,10 +1,10 @@
 <?php
 
-namespace Martial\Warez\Settings;
+namespace Martial\OpenCloudSeedbox\Settings;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Martial\Warez\Settings\Entity\FreeboxSettingsEntity;
-use Martial\Warez\User\Entity\User;
+use Martial\OpenCloudSeedbox\Settings\Entity\FreeboxSettingsEntity;
+use Martial\OpenCloudSeedbox\User\Entity\User;
 
 class FreeboxSettings
 {
@@ -29,7 +29,7 @@ class FreeboxSettings
     {
         $settings = $this
             ->em
-            ->getRepository('\Martial\Warez\Settings\Entity\FreeboxSettingsEntity')
+            ->getRepository('\Martial\OpenCloudSeedbox\Settings\Entity\FreeboxSettingsEntity')
             ->findOneBy(['user' => $user]);
 
         if (is_null($settings)) {

@@ -1,13 +1,13 @@
 <?php
 
-namespace Martial\Warez\Migrations;
+namespace Martial\OpenCloudSeedbox\Migrations;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand;
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
 use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 use Kurl\Silex\Provider\DoctrineMigrationsProvider as KurlDoctrineMigrationsProvider;
-use Martial\Warez\Command\CommandProviderInterface;
+use Martial\OpenCloudSeedbox\Command\CommandProviderInterface;
 use Silex\Application;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;

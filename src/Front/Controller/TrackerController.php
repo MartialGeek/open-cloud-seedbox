@@ -1,14 +1,14 @@
 <?php
 
-namespace Martial\Warez\Front\Controller;
+namespace Martial\OpenCloudSeedbox\Front\Controller;
 
-use Martial\Warez\Download\TorrentClientException;
-use Martial\Warez\Download\TorrentClientInterface;
-use Martial\Warez\Download\TransmissionSessionTrait;
-use Martial\Warez\Form\TrackerSearch;
-use Martial\Warez\Settings\TrackerSettings;
+use Martial\OpenCloudSeedbox\Download\TorrentClientException;
+use Martial\OpenCloudSeedbox\Download\TorrentClientInterface;
+use Martial\OpenCloudSeedbox\Download\TransmissionSessionTrait;
+use Martial\OpenCloudSeedbox\Form\TrackerSearch;
+use Martial\OpenCloudSeedbox\Settings\TrackerSettings;
 use Martial\T411\Api\ClientInterface;
-use Martial\Warez\User\UserServiceInterface;
+use Martial\OpenCloudSeedbox\User\UserServiceInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

@@ -1,8 +1,8 @@
 <?php
 
-namespace Martial\Warez\Front\Controller;
+namespace Martial\OpenCloudSeedbox\Front\Controller;
 
-use Martial\Warez\Upload\Freebox\FreeboxManager;
+use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxManager;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;

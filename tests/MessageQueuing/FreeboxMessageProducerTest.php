@@ -1,8 +1,8 @@
 <?php
 
-namespace Martial\Warez\Tests\MessageQueuing;
+namespace Martial\OpenCloudSeedbox\Tests\MessageQueuing;
 
-use Martial\Warez\MessageQueuing\Freebox\FreeboxMessageProducer;
+use Martial\OpenCloudSeedbox\MessageQueuing\Freebox\FreeboxMessageProducer;
 
 class FreeboxMessageProducerTest extends AbstractMessageQueuing
 {

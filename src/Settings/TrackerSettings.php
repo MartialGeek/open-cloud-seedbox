@@ -1,11 +1,11 @@
 <?php
 
-namespace Martial\Warez\Settings;
+namespace Martial\OpenCloudSeedbox\Settings;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Martial\Warez\Security\EncoderInterface;
-use Martial\Warez\Settings\Entity\TrackerSettingsEntity;
-use Martial\Warez\User\Entity\User;
+use Martial\OpenCloudSeedbox\Security\EncoderInterface;
+use Martial\OpenCloudSeedbox\Settings\Entity\TrackerSettingsEntity;
+use Martial\OpenCloudSeedbox\User\Entity\User;
 
 class TrackerSettings
 {
@@ -37,7 +37,7 @@ class TrackerSettings
     {
         $settings = $this
             ->em
-            ->getRepository('\Martial\Warez\Settings\Entity\TrackerSettingsEntity')
+            ->getRepository('\Martial\OpenCloudSeedbox\Settings\Entity\TrackerSettingsEntity')
             ->findOneBy(['user' => $user]);
 
         if (is_null($settings)) {

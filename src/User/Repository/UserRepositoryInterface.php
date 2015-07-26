@@ -1,11 +1,11 @@
 <?php
 
-namespace Martial\Warez\User\Repository;
+namespace Martial\OpenCloudSeedbox\User\Repository;
 
 use Doctrine\Common\Collections\Selectable;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\NoResultException;
-use Martial\Warez\User\Entity\User;
+use Martial\OpenCloudSeedbox\User\Entity\User;
 
 interface UserRepositoryInterface extends ObjectRepository, Selectable
 {

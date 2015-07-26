@@ -1,15 +1,15 @@
 <?php
 
-namespace Martial\Warez\Front\Controller;
+namespace Martial\OpenCloudSeedbox\Front\Controller;
 
-use Martial\Warez\Form\FreeboxSettings as FreeboxSettingsType;
-use Martial\Warez\Form\TrackerSettings as TrackerSettingsType;
-use Martial\Warez\Settings\Entity\FreeboxSettingsEntity;
-use Martial\Warez\Settings\Entity\TrackerSettingsEntity;
-use Martial\Warez\Settings\FreeboxSettings;
-use Martial\Warez\Settings\TrackerSettings;
-use Martial\Warez\User\Entity\User;
-use Martial\Warez\User\UserServiceInterface;
+use Martial\OpenCloudSeedbox\Form\FreeboxSettings as FreeboxSettingsType;
+use Martial\OpenCloudSeedbox\Form\TrackerSettings as TrackerSettingsType;
+use Martial\OpenCloudSeedbox\Settings\Entity\FreeboxSettingsEntity;
+use Martial\OpenCloudSeedbox\Settings\Entity\TrackerSettingsEntity;
+use Martial\OpenCloudSeedbox\Settings\FreeboxSettings;
+use Martial\OpenCloudSeedbox\Settings\TrackerSettings;
+use Martial\OpenCloudSeedbox\User\Entity\User;
+use Martial\OpenCloudSeedbox\User\UserServiceInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;

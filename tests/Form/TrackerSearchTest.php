@@ -1,8 +1,8 @@
 <?php
 
-namespace Martial\Warez\Tests\Form;
+namespace Martial\OpenCloudSeedbox\Tests\Form;
 
-use Martial\Warez\Form\TrackerSearch;
+use Martial\OpenCloudSeedbox\Form\TrackerSearch;
 use Symfony\Component\Form\FormTypeInterface;
 
 class TrackerSearchTest extends FormTestCase

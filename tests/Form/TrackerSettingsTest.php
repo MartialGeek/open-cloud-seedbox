@@ -1,8 +1,8 @@
 <?php
 
-namespace Martial\Warez\Tests\Form;
+namespace Martial\OpenCloudSeedbox\Tests\Form;
 
-use Martial\Warez\Form\TrackerSettings;
+use Martial\OpenCloudSeedbox\Form\TrackerSettings;
 use Symfony\Component\Form\FormTypeInterface;
 
 class ProfileTest extends FormTestCase
@@ -37,7 +37,7 @@ class ProfileTest extends FormTestCase
             ->resolver
             ->expects($this->once())
             ->method('setDefaults')
-            ->with($this->equalTo(['data_class' => '\Martial\Warez\Settings\Entity\TrackerSettingsEntity']))
+            ->with($this->equalTo(['data_class' => '\Martial\OpenCloudSeedbox\Settings\Entity\TrackerSettingsEntity']))
             ->will($this->returnValue($this->resolver));
 
         $this->getForm()->setDefaultOptions($this->resolver);

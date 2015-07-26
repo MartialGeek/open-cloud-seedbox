@@ -1,8 +1,8 @@
 <?php
 
-namespace Martial\Warez\Tests\Security;
+namespace Martial\OpenCloudSeedbox\Tests\Security;
 
-use Martial\Warez\Security\Firewall;
+use Martial\OpenCloudSeedbox\Security\Firewall;
 
 class FirewallTest extends \PHPUnit_Framework_TestCase
 {

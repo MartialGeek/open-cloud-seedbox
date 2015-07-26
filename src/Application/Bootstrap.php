@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\Application;
+namespace Martial\OpenCloudSeedbox\Application;
 
 use Alchemy\Zippy\Zippy;
 use Doctrine\Common\Annotations\AnnotationRegistry;
@@ -12,33 +12,33 @@ use GuzzleHttp\Client as GuzzleClient;
 use JMS\Serializer\JsonSerializationVisitor;
 use JMS\Serializer\Naming\IdenticalPropertyNamingStrategy;
 use JMS\Serializer\SerializerBuilder;
-use Martial\Warez\Command\Application as CLIApplication;
-use Martial\Warez\Download\TransmissionManager;
-use Martial\Warez\Filesystem\FileBrowser;
-use Martial\Warez\Filesystem\ZipArchiver;
-use Martial\Warez\Front\Controller\AbstractController;
-use Martial\Warez\Front\Twig\FileBrowserExtension;
-use Martial\Warez\Front\Twig\FileExtension;
-use Martial\Warez\Front\Twig\TransmissionExtension;
-use Martial\Warez\MessageQueuing\Freebox\FreeboxMessageConsumer;
-use Martial\Warez\MessageQueuing\Freebox\FreeboxMessageProducer;
-use Martial\Warez\Security\AuthenticationProvider;
-use Martial\Warez\Security\BlowfishHashPassword;
-use Martial\Warez\Security\CookieTokenizer;
-use Martial\Warez\Security\Firewall;
-use Martial\Warez\Security\OpenSSLEncoder;
-use Martial\Warez\Security\RememberMeListener;
-use Martial\Warez\Settings\FreeboxSettings;
-use Martial\Warez\Settings\FreeboxSettingsDataTransformer;
-use Martial\Warez\Settings\TrackerSettings;
+use Martial\OpenCloudSeedbox\Command\Application as CLIApplication;
+use Martial\OpenCloudSeedbox\Download\TransmissionManager;
+use Martial\OpenCloudSeedbox\Filesystem\FileBrowser;
+use Martial\OpenCloudSeedbox\Filesystem\ZipArchiver;
+use Martial\OpenCloudSeedbox\Front\Controller\AbstractController;
+use Martial\OpenCloudSeedbox\Front\Twig\FileBrowserExtension;
+use Martial\OpenCloudSeedbox\Front\Twig\FileExtension;
+use Martial\OpenCloudSeedbox\Front\Twig\TransmissionExtension;
+use Martial\OpenCloudSeedbox\MessageQueuing\Freebox\FreeboxMessageConsumer;
+use Martial\OpenCloudSeedbox\MessageQueuing\Freebox\FreeboxMessageProducer;
+use Martial\OpenCloudSeedbox\Security\AuthenticationProvider;
+use Martial\OpenCloudSeedbox\Security\BlowfishHashPassword;
+use Martial\OpenCloudSeedbox\Security\CookieTokenizer;
+use Martial\OpenCloudSeedbox\Security\Firewall;
+use Martial\OpenCloudSeedbox\Security\OpenSSLEncoder;
+use Martial\OpenCloudSeedbox\Security\RememberMeListener;
+use Martial\OpenCloudSeedbox\Settings\FreeboxSettings;
+use Martial\OpenCloudSeedbox\Settings\FreeboxSettingsDataTransformer;
+use Martial\OpenCloudSeedbox\Settings\TrackerSettings;
 use Martial\T411\Api\Client;
 use Martial\T411\Api\Data\DataTransformer;
 use Martial\T411\Api\Search\QueryFactory;
-use Martial\Warez\Upload\Freebox\FreeboxAuthenticationProvider;
-use Martial\Warez\Upload\Freebox\FreeboxManager;
-use Martial\Warez\Upload\UploadAdapterFactory;
-use Martial\Warez\Upload\UploadUrlResolver;
-use Martial\Warez\User\UserService;
+use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthenticationProvider;
+use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxManager;
+use Martial\OpenCloudSeedbox\Upload\UploadAdapterFactory;
+use Martial\OpenCloudSeedbox\Upload\UploadUrlResolver;
+use Martial\OpenCloudSeedbox\User\UserService;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use Silex\Application;
 use Silex\Provider\DoctrineServiceProvider;
@@ -379,7 +379,7 @@ class Bootstrap
 
         $defaultDependencies = [];
 
-        if ($reflectionClass->isSubclassOf('\Martial\Warez\Front\Controller\AbstractController')) {
+        if ($reflectionClass->isSubclassOf('\Martial\OpenCloudSeedbox\Front\Controller\AbstractController')) {
             $defaultDependencies = [
                 $this->app['twig'],
                 $this->app['form.factory'],

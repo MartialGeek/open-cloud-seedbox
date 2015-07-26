@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\Download;
+namespace Martial\OpenCloudSeedbox\Download;
 
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\RequestException;

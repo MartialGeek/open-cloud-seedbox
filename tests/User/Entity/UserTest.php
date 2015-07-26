@@ -1,10 +1,10 @@
 <?php
 
-namespace Martial\Warez\Tests\User\Entity;
+namespace Martial\OpenCloudSeedbox\Tests\User\Entity;
 
-use Martial\Warez\Settings\Entity\FreeboxSettingsEntity;
-use Martial\Warez\Settings\Entity\TrackerSettingsEntity;
-use Martial\Warez\User\Entity\User;
+use Martial\OpenCloudSeedbox\Settings\Entity\FreeboxSettingsEntity;
+use Martial\OpenCloudSeedbox\Settings\Entity\TrackerSettingsEntity;
+use Martial\OpenCloudSeedbox\User\Entity\User;
 
 class UserTest extends \PHPUnit_Framework_TestCase
 {

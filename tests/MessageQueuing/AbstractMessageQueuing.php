@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\Tests\MessageQueuing;
+namespace Martial\OpenCloudSeedbox\Tests\MessageQueuing;
 
 abstract class AbstractMessageQueuing extends \PHPUnit_Framework_TestCase
 {

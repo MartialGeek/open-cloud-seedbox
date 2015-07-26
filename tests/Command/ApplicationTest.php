@@ -1,8 +1,8 @@
 <?php
 
-namespace Martial\Warez\Tests\Command;
+namespace Martial\OpenCloudSeedbox\Tests\Command;
 
-use Martial\Warez\Command\Application;
+use Martial\OpenCloudSeedbox\Command\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class ApplicationTest extends \PHPUnit_Framework_TestCase
@@ -52,7 +52,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $freeboxConsumer = $this
-            ->getMockBuilder('\Martial\Warez\MessageQueuing\Freebox\FreeboxMessageConsumer')
+            ->getMockBuilder('\Martial\OpenCloudSeedbox\MessageQueuing\Freebox\FreeboxMessageConsumer')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -70,7 +70,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
 
         $services = [
-            'user.service' => $this->getMock('\Martial\Warez\User\UserServiceInterface'),
+            'user.service' => $this->getMock('\Martial\OpenCloudSeedbox\User\UserServiceInterface'),
             'message_queuing.freebox.consumer' => $freeboxConsumer,
             'doctrine.entity_manager' => $entityManager,
             'db' => []

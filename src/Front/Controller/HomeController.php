@@ -1,8 +1,8 @@
 <?php
 
-namespace Martial\Warez\Front\Controller;
+namespace Martial\OpenCloudSeedbox\Front\Controller;
 
-use Martial\Warez\Form\Login;
+use Martial\OpenCloudSeedbox\Form\Login;
 use Symfony\Component\HttpFoundation\Response;
 
 class HomeController extends AbstractController

@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\Command;
+namespace Martial\OpenCloudSeedbox\Command;
 
 use Silex\Application as Silex;
 

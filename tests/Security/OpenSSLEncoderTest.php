@@ -1,8 +1,8 @@
 <?php
 
-namespace Martial\Warez\Tests\Security;
+namespace Martial\OpenCloudSeedbox\Tests\Security;
 
-use Martial\Warez\Security\OpenSSLEncoder;
+use Martial\OpenCloudSeedbox\Security\OpenSSLEncoder;
 
 class OpenSSLEncoderTest extends \PHPUnit_Framework_TestCase
 {

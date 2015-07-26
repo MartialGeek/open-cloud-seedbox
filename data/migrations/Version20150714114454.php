@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\Migrations;
+namespace Martial\OpenCloudSeedbox\Migrations;
 
 use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;

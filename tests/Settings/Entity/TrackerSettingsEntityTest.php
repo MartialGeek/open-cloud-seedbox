@@ -1,9 +1,9 @@
 <?php
 
-namespace Martial\Warez\Tests\Settings\Entity;
+namespace Martial\OpenCloudSeedbox\Tests\Settings\Entity;
 
-use Martial\Warez\Settings\Entity\TrackerSettingsEntity;
-use Martial\Warez\User\Entity\User;
+use Martial\OpenCloudSeedbox\Settings\Entity\TrackerSettingsEntity;
+use Martial\OpenCloudSeedbox\User\Entity\User;
 
 class TrackerSettingsEntityTest extends \PHPUnit_Framework_TestCase
 {

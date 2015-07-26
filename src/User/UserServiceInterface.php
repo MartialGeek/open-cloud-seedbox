@@ -1,9 +1,9 @@
 <?php
 
-namespace Martial\Warez\User;
+namespace Martial\OpenCloudSeedbox\User;
 
-use Martial\Warez\Security\BadCredentialsException;
-use Martial\Warez\User\Entity\User;
+use Martial\OpenCloudSeedbox\Security\BadCredentialsException;
+use Martial\OpenCloudSeedbox\User\Entity\User;
 
 interface UserServiceInterface
 {

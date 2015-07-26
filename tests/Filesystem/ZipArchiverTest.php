@@ -1,8 +1,8 @@
 <?php
 
-namespace Martial\Warez\Tests\Filesystem;
+namespace Martial\OpenCloudSeedbox\Tests\Filesystem;
 
-use Martial\Warez\Filesystem\ZipArchiver;
+use Martial\OpenCloudSeedbox\Filesystem\ZipArchiver;
 
 class ZipArchiverTest extends \PHPUnit_Framework_TestCase
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\Filesystem;
+namespace Martial\OpenCloudSeedbox\Filesystem;
 
 use JMS\Serializer\Annotation as JMS;
 

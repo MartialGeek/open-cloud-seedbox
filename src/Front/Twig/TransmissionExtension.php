@@ -1,8 +1,8 @@
 <?php
 
-namespace Martial\Warez\Front\Twig;
+namespace Martial\OpenCloudSeedbox\Front\Twig;
 
-use Martial\Warez\Download\TransmissionManager;
+use Martial\OpenCloudSeedbox\Download\TransmissionManager;
 
 class TransmissionExtension extends \Twig_Extension
 {

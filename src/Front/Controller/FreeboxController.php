@@ -1,15 +1,15 @@
 <?php
 
-namespace Martial\Warez\Front\Controller;
+namespace Martial\OpenCloudSeedbox\Front\Controller;
 
-use Martial\Warez\Upload\Freebox\FreeboxAuthorizationDeniedException;
-use Martial\Warez\Upload\Freebox\FreeboxAuthenticationException;
-use Martial\Warez\Upload\Freebox\FreeboxAuthorizationException;
-use Martial\Warez\Upload\Freebox\FreeboxAuthorizationPendingException;
-use Martial\Warez\Upload\Freebox\FreeboxAuthorizationTimeoutException;
-use Martial\Warez\Upload\Freebox\FreeboxManager;
-use Martial\Warez\Upload\Freebox\FreeboxSessionException;
-use Martial\Warez\User\UserServiceInterface;
+use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthorizationDeniedException;
+use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthenticationException;
+use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthorizationException;
+use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthorizationPendingException;
+use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthorizationTimeoutException;
+use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxManager;
+use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxSessionException;
+use Martial\OpenCloudSeedbox\User\UserServiceInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

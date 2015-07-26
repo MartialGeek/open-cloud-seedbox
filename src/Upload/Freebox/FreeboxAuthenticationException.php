@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\Upload\Freebox;
+namespace Martial\OpenCloudSeedbox\Upload\Freebox;
 
 
 class FreeboxAuthenticationException extends \Exception

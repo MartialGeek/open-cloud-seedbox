@@ -1,15 +1,15 @@
 <?php
 
-namespace Martial\Warez\Tests\Security;
+namespace Martial\OpenCloudSeedbox\Tests\Security;
 
-use Martial\Warez\Security\CookieToken;
+use Martial\OpenCloudSeedbox\Security\CookieToken;
 
 class CookieTokenTest extends \PHPUnit_Framework_TestCase
 {
     public function testCookieToken()
     {
         $user = $this
-            ->getMockBuilder('\Martial\Warez\User\Entity\User')
+            ->getMockBuilder('\Martial\OpenCloudSeedbox\User\Entity\User')
             ->disableOriginalConstructor()
             ->getMock();
 

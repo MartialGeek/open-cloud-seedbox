@@ -1,10 +1,10 @@
 <?php
 
-namespace Martial\Warez\Front\Controller;
+namespace Martial\OpenCloudSeedbox\Front\Controller;
 
-use Martial\Warez\Download\TorrentClientInterface;
-use Martial\Warez\Download\TransmissionSessionTrait;
-use Martial\Warez\User\UserServiceInterface;
+use Martial\OpenCloudSeedbox\Download\TorrentClientInterface;
+use Martial\OpenCloudSeedbox\Download\TransmissionSessionTrait;
+use Martial\OpenCloudSeedbox\User\UserServiceInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\Session;

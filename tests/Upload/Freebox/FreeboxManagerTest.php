@@ -1,13 +1,13 @@
 <?php
 
-namespace Martial\Warez\Tests\Upload\Freebox;
+namespace Martial\OpenCloudSeedbox\Tests\Upload\Freebox;
 
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Message\Request;
 use GuzzleHttp\Message\Response;
-use Martial\Warez\Upload\Freebox\FreeboxAuthenticationException;
-use Martial\Warez\Upload\Freebox\FreeboxManager;
-use Martial\Warez\Upload\Freebox\FreeboxSessionException;
+use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthenticationException;
+use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxManager;
+use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxSessionException;
 
 class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -78,25 +78,25 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->uploadManager = $this->getMock('\Martial\Warez\Upload\UploadInterface');
+        $this->uploadManager = $this->getMock('\Martial\OpenCloudSeedbox\Upload\UploadInterface');
         $this->httpClient = $this->getMock('\GuzzleHttp\ClientInterface');
         $this->urlGenerator = $this->getMock('\Symfony\Component\Routing\Generator\UrlGeneratorInterface');
 
         $this->authenticationProvider = $this
-            ->getMock('\Martial\Warez\Upload\Freebox\FreeboxAuthenticationProviderInterface');
+            ->getMock('\Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthenticationProviderInterface');
 
         $this->settingsManager = $this
-            ->getMockBuilder('\Martial\Warez\Settings\FreeboxSettings')
+            ->getMockBuilder('\Martial\OpenCloudSeedbox\Settings\FreeboxSettings')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->dataTransformer = $this
-            ->getMockBuilder('\Martial\Warez\Settings\FreeboxSettingsDataTransformer')
+            ->getMockBuilder('\Martial\OpenCloudSeedbox\Settings\FreeboxSettingsDataTransformer')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->archiver = $this
-            ->getMockBuilder('\Martial\Warez\Filesystem\ZipArchiver')
+            ->getMockBuilder('\Martial\OpenCloudSeedbox\Filesystem\ZipArchiver')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -106,12 +106,12 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->messageProducer = $this
-            ->getMockBuilder('\Martial\Warez\MessageQueuing\Freebox\FreeboxMessageProducer')
+            ->getMockBuilder('\Martial\OpenCloudSeedbox\MessageQueuing\Freebox\FreeboxMessageProducer')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->user = $this
-            ->getMockBuilder('\Martial\Warez\User\Entity\User')
+            ->getMockBuilder('\Martial\OpenCloudSeedbox\User\Entity\User')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -172,7 +172,7 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Martial\Warez\Upload\Freebox\FreeboxAuthorizationDeniedException
+     * @expectedException \Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthorizationDeniedException
      */
     public function testTrackAuthorizationStatusDenied()
     {
@@ -180,7 +180,7 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Martial\Warez\Upload\Freebox\FreeboxAuthorizationPendingException
+     * @expectedException \Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthorizationPendingException
      */
     public function testTrackAuthorizationStatusPending()
     {
@@ -188,7 +188,7 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Martial\Warez\Upload\Freebox\FreeboxAuthorizationTimeoutException
+     * @expectedException \Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthorizationTimeoutException
      */
     public function testTrackAuthorizationStatusTimeout()
     {
@@ -196,7 +196,7 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Martial\Warez\Upload\Freebox\FreeboxAuthorizationException
+     * @expectedException \Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthorizationException
      */
     public function testTrackAuthorizationStatusUnknownError()
     {
@@ -233,7 +233,7 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Martial\Warez\Upload\Freebox\FreeboxSessionException
+     * @expectedException \Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxSessionException
      */
     public function testOpenSessionWithAuthenticationError()
     {
@@ -297,7 +297,7 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Martial\Warez\Upload\Freebox\FreeboxSessionException
+     * @expectedException \Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxSessionException
      */
     public function testUploadFileReturnsAnUnknownError()
     {
@@ -317,7 +317,7 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
     private function getSettingsEntity()
     {
         return $this
-            ->getMockBuilder('\Martial\Warez\Settings\Entity\FreeboxSettingsEntity')
+            ->getMockBuilder('\Martial\OpenCloudSeedbox\Settings\Entity\FreeboxSettingsEntity')
             ->disableOriginalConstructor()
             ->getMock();
     }

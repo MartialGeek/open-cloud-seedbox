@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\Tests\Resources;
+namespace Martial\OpenCloudSeedbox\Tests\Resources;
 
 use Doctrine\ORM\AbstractQuery;
 

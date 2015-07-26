@@ -1,6 +1,6 @@
 <?php
 
-namespace Martial\Warez\Security;
+namespace Martial\OpenCloudSeedbox\Security;
 
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
