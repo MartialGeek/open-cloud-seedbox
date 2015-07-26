@@ -6,7 +6,6 @@ use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxManager;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class UploadController
 {
