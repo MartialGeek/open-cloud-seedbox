@@ -50,49 +50,37 @@
     </nav>
 
     <div class="main-content">
-        {% for flashMessage in app.session.flashbag.get('notice') %}
-            <div class="row">
-                <div class="small-12 columns">
+        <div class="row">
+            <div class="small-12 columns">
+                {% for flashMessage in app.session.flashbag.get('notice') %}
                     <div data-alert class="alert-box info radius">
                         {{ flashMessage }}
                         <a href="#" class="close">&times;</a>
                     </div>
-                </div>
-            </div>
-        {% endfor %}
+                {% endfor %}
 
-        {% for flashMessage in app.session.flashbag.get('success') %}
-            <div class="row">
-                <div class="small-12 columns">
+                {% for flashMessage in app.session.flashbag.get('success') %}
                     <div data-alert class="alert-box success radius">
                         {{ flashMessage }}
                         <a href="#" class="close">&times;</a>
                     </div>
-                </div>
-            </div>
-        {% endfor %}
+                {% endfor %}
 
-        {% for flashMessage in app.session.flashbag.get('error') %}
-            <div class="row">
-                <div class="small-12 columns">
+                {% for flashMessage in app.session.flashbag.get('error') %}
                     <div data-alert class="alert-box alert radius">
                         {{ flashMessage }}
                         <a href="#" class="close">&times;</a>
                     </div>
-                </div>
-            </div>
-        {% endfor %}
+                {% endfor %}
 
-        {% for flashMessage in app.session.flashbag.get('warning') %}
-            <div class="row">
-                <div class="small-12 columns">
+                {% for flashMessage in app.session.flashbag.get('warning') %}
                     <div data-alert class="alert-box warning radius">
                         {{ flashMessage }}
                         <a href="#" class="close">&times;</a>
                     </div>
-                </div>
+                {% endfor %}
             </div>
-        {% endfor %}
+        </div>
 
         {% block content %}{% endblock %}
     </div>
