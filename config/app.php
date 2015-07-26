@@ -77,9 +77,9 @@ return [
         ]
     ],
     'security' => [
-        'encoder' => [
-            'password' => $parameters['security_encoder_password'],
-            'salt' => $parameters['security_encoder_salt']
+        'certificate' => [
+            'public' => $parameters['security_certificate_public'],
+            'private' => $parameters['security_certificate_private']
         ]
     ],
     'tracker' => [

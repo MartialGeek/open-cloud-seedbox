@@ -2,34 +2,21 @@
 
 namespace Martial\OpenCloudSeedbox\Security;
 
+use Pikirasa\RSA;
 
 class OpenSSLEncoder implements EncoderInterface
 {
     /**
-     * @var string
+     * @var RSA
      */
-    private $password;
+    private $rsa;
 
     /**
-     * @var string
+     * @param RSA $rsa
      */
-    private $cypherMethod;
-
-    /**
-     * @var string
-     */
-    private $salt;
-
-    /**
-     * @param string $password
-     * @param string $salt
-     * @param string $cypherMethod
-     */
-    public function __construct($password, $salt, $cypherMethod = 'aes-256-ecb')
+    public function __construct(RSA $rsa)
     {
-        $this->password = $password;
-        $this->salt = $salt;
-        $this->cypherMethod = $cypherMethod;
+        $this->rsa = $rsa;
     }
 
     /**
@@ -40,7 +27,7 @@ class OpenSSLEncoder implements EncoderInterface
      */
     public function encode($clearData)
     {
-        return openssl_encrypt($clearData, $this->cypherMethod, $this->password, false, $this->salt);
+        return $this->rsa->encrypt($clearData);
     }
 
     /**
@@ -51,6 +38,6 @@ class OpenSSLEncoder implements EncoderInterface
      */
     public function decode($encodedData)
     {
-        return openssl_decrypt($encodedData, $this->cypherMethod, $this->password, false, $this->salt);
+        return $this->rsa->decrypt($encodedData);
     }
 }

@@ -40,6 +40,7 @@ use Martial\OpenCloudSeedbox\Upload\UploadAdapterFactory;
 use Martial\OpenCloudSeedbox\Upload\UploadUrlResolver;
 use Martial\OpenCloudSeedbox\User\UserService;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
+use Pikirasa\RSA;
 use Silex\Application;
 use Silex\Provider\DoctrineServiceProvider;
 use Silex\Provider\FormServiceProvider;
@@ -210,10 +211,12 @@ class Bootstrap
         });
 
         $app['security.encoder'] = $app->share(function() use ($config) {
-            return new OpenSSLEncoder(
-                $config['security']['encoder']['password'],
-                $config['security']['encoder']['salt']
+            $rsa = new RSA(
+                $config['security']['certificate']['public'],
+                $config['security']['certificate']['private']
             );
+
+            return new OpenSSLEncoder($rsa);
         });
 
         $app['security.cookie.tokenizer'] = $app->share(function() use ($app) {

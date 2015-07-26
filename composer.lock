@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "05dd17f687b9d57e758826f8a41fe00d",
+    "hash": "bd4ded9b26c65b50bbbdbc989855cf49",
     "packages": [
         {
             "name": "alchemy/zippy",
@@ -3541,6 +3541,55 @@
                 "rabbitmq"
             ],
             "time": "2015-06-16 08:18:39"
+        },
+        {
+            "name": "vlucas/pikirasa",
+            "version": "v1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vlucas/pikirasa.git",
+                "reference": "bb27ef66bceffba6c438d0fdd2a02bacbdaa3fde"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vlucas/pikirasa/zipball/bb27ef66bceffba6c438d0fdd2a02bacbdaa3fde",
+                "reference": "bb27ef66bceffba6c438d0fdd2a02bacbdaa3fde",
+                "shasum": ""
+            },
+            "require": {
+                "ext-openssl": "*",
+                "php": ">=5.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Pikirasa": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD"
+            ],
+            "authors": [
+                {
+                    "name": "Vance Lucas",
+                    "email": "vance@vancelucas.com",
+                    "homepage": "http://www.vancelucas.com"
+                }
+            ],
+            "description": "PKI public/private RSA key encryption using the OpenSSL extension",
+            "homepage": "https://github.com/vlucas/pikirasa",
+            "keywords": [
+                "Private Key",
+                "crypt",
+                "cryptography",
+                "encryption",
+                "openssl",
+                "pki",
+                "public key",
+                "rsa"
+            ],
+            "time": "2015-01-17 16:13:09"
         }
     ],
     "packages-dev": [

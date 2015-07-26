@@ -33,7 +33,8 @@
         "kurl/silex-doctrine-migrations-provider": "~0.1",
         "doctrine/migrations": "~1.0@dev",
         "martial/t411-api-client": "~1.0",
-        "jms/serializer": "~1.0.0"
+        "jms/serializer": "~1.0.0",
+        "vlucas/pikirasa": "~1.0.4"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.4"
