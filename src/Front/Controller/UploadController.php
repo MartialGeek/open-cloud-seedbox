@@ -43,11 +43,7 @@ class UploadController
         $file = new File($filename);
         $response = new BinaryFileResponse($file);
         $response->headers->set('Content-Type', $file->getMimeType() . '; charset=UTF-8');
-
-        $response->setContentDisposition(
-            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $file->getFilename()
-        );
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $file->getFilename() . '"');
 
         if ($uploadType == FreeboxManager::UPLOAD_TYPE_ARCHIVE) {
             $response->deleteFileAfterSend(true);
