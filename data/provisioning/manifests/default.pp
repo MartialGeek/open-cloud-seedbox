@@ -228,7 +228,7 @@ exec { 'symlink_assets':
     command => "${project_path}/bin/seedbox assets:install",
     require => [
         Exec['build_assets'],
-        Class['rabbitmq']
+        Rabbitmq_user_permissions['seedbox@seedbox']
     ],
     cwd     => $project_path,
     user    => 'vagrant'
@@ -240,6 +240,7 @@ exec { 'update_sql_schema':
         File['/var/www/open-cloud-seedbox/config/parameters.php'],
         Exec['install_composer_dependencies'],
         Mysql::Db['seedbox'],
+        Class['rabbitmq']
     ],
     cwd     => $project_path,
     user    => 'vagrant'
@@ -247,7 +248,10 @@ exec { 'update_sql_schema':
 
 exec { 'create_seedbox_user':
     command => "${project_path}/bin/seedbox user:create NiceUser nice-user@seedbox.io myseedbox",
-    require => Exec['update_sql_schema'],
+    require => [
+        Exec['update_sql_schema'],
+        Rabbitmq_user_permissions['seedbox@seedbox']
+    ],
     cwd     => $project_path,
     user    => 'vagrant',
     notify  => Exec['touch /home/vagrant/.seedbox_user_created'],
@@ -274,6 +278,12 @@ rabbitmq_vhost { 'seedbox':
 }
 
 rabbitmq_user_permissions { 'seedbox@seedbox':
+    configure_permission => '.*',
+    read_permission      => '.*',
+    write_permission     => '.*'
+}
+
+rabbitmq_user_permissions { 'guest@seedbox':
     configure_permission => '.*',
     read_permission      => '.*',
     write_permission     => '.*'
