@@ -48,7 +48,7 @@ seedbox.dev IP (default to 192.168.0.42):
 
 ```
 127.0.0.1      localhost
-192.168.0.42   seedbox.dev
+172.0.0.42     seedbox.dev
 ```
 
 ### Configure your tracker account
