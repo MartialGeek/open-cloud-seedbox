@@ -155,8 +155,15 @@ file { '/var/www/open-cloud-seedbox/config/parameters.php':
 
 }
 
-service { 'transmission-daemon':
-    ensure => stopped,
+exec { 'start-transmission':
+    command => 'service transmission-daemon start',
+    require => Package['transmission-daemon'],
+    refreshonly => true
+}
+
+exec { 'stop-transmission':
+    command => 'service transmission-daemon stop',
+    before => File['/etc/transmission-daemon/settings.json'],
     require => Package['transmission-daemon']
 }
 
@@ -166,7 +173,7 @@ file { '/etc/transmission-daemon/settings.json':
     owner   => 'debian-transmission',
     group   => 'debian-transmission',
     mode    => 0600,
-    notify  => Service['transmission-daemon'],
+    notify  => Exec['start-transmission'],
     require => File['/home/vagrant/.composer/auth.json']
 }
 
@@ -293,4 +300,16 @@ rabbitmq_queue { 'ocs.freebox.generate_archive_and_upload@seedbox':
     user => 'guest',
     password => 'guest',
     ensure => present
+}
+
+file { '/home/vagrant/seedbox':
+    ensure => directory,
+    owner => 'www-data',
+    group => 'debian-transmission',
+    recurse => true,
+    mode => 0775,
+    require => [
+        Package['transmission-daemon'],
+        Package['nginx']
+    ]
 }

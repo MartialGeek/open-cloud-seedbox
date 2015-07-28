@@ -12,7 +12,7 @@ return [
     'security_certificate_private' => __DIR__ . '/../data/provisioning/files/private_key.pem',
     'upload_adapter' => 'freebox',
     'upload_archive_path' => '/tmp/seedbox_archives',
-    'torrent_files_path' => '/var/lib/seedbox/torrents',
+    'torrent_files_path' => '/home/vagrant/seedbox',
     'transmission_login' => 'seedbox',
     'transmission_password' => 'seedbox',
     'transmission_host' => 'localhost',
