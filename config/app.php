@@ -42,6 +42,9 @@ return [
             ],
             'file_browser' => [
                 __DIR__ . '/../src/Front/View/FileBrowser'
+            ],
+            'error' => [
+                __DIR__ . '/../src/Front/View/Error'
             ]
         ]
     ],

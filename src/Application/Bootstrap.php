@@ -126,6 +126,8 @@ class Bootstrap
             'onKernelRequest'
         ], 0);
 
+        $this->app['dispatcher']->addSubscriber($this->app['application.exception_listener']);
+
         $this->app['twig']->addExtension(new TransmissionExtension());
         $this->app['twig']->addExtension(new FileExtension());
         $this->app['twig']->addExtension(new FileBrowserExtension());
@@ -365,6 +367,13 @@ class Bootstrap
                 ->setCacheDir($config['serializer']['cache_dir'])
                 ->setDebug($app['debug'])
                 ->build();
+        });
+
+        $app['application.exception_listener'] = $app->share(function() use ($app) {
+            return new ExceptionHandler(
+                $this->getControllerInstance('\Martial\OpenCloudSeedbox\Front\Controller\ErrorController'),
+                $app['debug']
+            );
         });
     }
 
