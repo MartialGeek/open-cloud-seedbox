@@ -7,8 +7,9 @@ use GuzzleHttp\Exception\ClientException;
 use Martial\OpenCloudSeedbox\Filesystem\ZipArchiver;
 use Martial\OpenCloudSeedbox\MessageQueuing\Freebox\FreeboxMessageProducer;
 use Martial\OpenCloudSeedbox\Settings\Entity\FreeboxSettingsEntity;
-use Martial\OpenCloudSeedbox\Settings\FreeboxSettings;
 use Martial\OpenCloudSeedbox\Settings\FreeboxSettingsDataTransformer;
+use Martial\OpenCloudSeedbox\Settings\IncompleteSettingsException;
+use Martial\OpenCloudSeedbox\Settings\SettingsManagerInterface;
 use Martial\OpenCloudSeedbox\Upload\UploadInterface;
 use Martial\OpenCloudSeedbox\User\Entity\User;
 use Symfony\Component\Filesystem\Filesystem;
@@ -33,7 +34,7 @@ class FreeboxManager
     private $authentication;
 
     /**
-     * @var FreeboxSettings
+     * @var SettingsManagerInterface
      */
     private $settingsManager;
 
@@ -80,7 +81,7 @@ class FreeboxManager
     /**
      * @param UploadInterface $upload
      * @param FreeboxAuthenticationProviderInterface $authenticationProvider
-     * @param FreeboxSettings $settings
+     * @param SettingsManagerInterface $settings
      * @param FreeboxSettingsDataTransformer $dataTransformer
      * @param ClientInterface $httpClient
      * @param UrlGeneratorInterface $urlGeneratorInterface
@@ -91,7 +92,7 @@ class FreeboxManager
     public function __construct(
         UploadInterface $upload,
         FreeboxAuthenticationProviderInterface $authenticationProvider,
-        FreeboxSettings $settings,
+        SettingsManagerInterface $settings,
         FreeboxSettingsDataTransformer $dataTransformer,
         ClientInterface $httpClient,
         UrlGeneratorInterface $urlGeneratorInterface,
@@ -246,9 +247,16 @@ class FreeboxManager
      * @param string $fileName
      * @param User $user
      * @throws FreeboxSessionException
+     * @throws IncompleteSettingsException
      */
     public function uploadFile($fileName, User $user)
     {
+        if (!$this->settingsManager->isComplete($this->settingsManager->getSettings($user))) {
+            throw new IncompleteSettingsException(
+                'You must configure your Freebox settings before uploading a file.'
+            );
+        }
+
         $filePath = $this->downloadDir . '/' . $fileName;
 
         if (is_dir($filePath)) {
@@ -310,7 +318,7 @@ class FreeboxManager
                 $this->upload->upload($file, $freeboxUrl, $uploadOptions);
             } else {
                 throw new FreeboxSessionException(
-                    'An error prevents to add the element to the downloads queue',
+                    'You need to open a Freebox session before uploading files.',
                     0,
                     $e
                 );

@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Martial\OpenCloudSeedbox\Settings\Entity\FreeboxSettingsEntity;
 use Martial\OpenCloudSeedbox\User\Entity\User;
 
-class FreeboxSettings
+class FreeboxSettings implements SettingsManagerInterface
 {
     /**
      * @var EntityManagerInterface
@@ -44,7 +44,7 @@ class FreeboxSettings
      * @param FreeboxSettingsEntity $settings
      * @param User $user
      */
-    public function updateSettings(FreeboxSettingsEntity $settings, User $user)
+    public function updateSettings($settings, User $user)
     {
         $currentSettings = $this->getSettings($user);
 
@@ -62,5 +62,16 @@ class FreeboxSettings
         }
 
         $this->em->flush();
+    }
+
+    /**
+     * Returns true if the settings are complete.
+     *
+     * @param FreeboxSettingsEntity $settings
+     * @return bool
+     */
+    public function isComplete($settings)
+    {
+        return $settings->getTransportHost() && $settings->getTransportPort();
     }
 }

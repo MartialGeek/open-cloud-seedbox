@@ -85,10 +85,7 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
         $this->authenticationProvider = $this
             ->getMock('\Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthenticationProviderInterface');
 
-        $this->settingsManager = $this
-            ->getMockBuilder('\Martial\OpenCloudSeedbox\Settings\FreeboxSettings')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->settingsManager = $this->getMock('\Martial\OpenCloudSeedbox\Settings\SettingsManagerInterface');
 
         $this->dataTransformer = $this
             ->getMockBuilder('\Martial\OpenCloudSeedbox\Settings\FreeboxSettingsDataTransformer')
@@ -256,6 +253,15 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
     {
         $file = 'TestDir';
         $userId = 42;
+
+        $this->getSettings($this->once());
+
+        $this
+            ->settingsManager
+            ->expects($this->once())
+            ->method('isComplete')
+            ->with($this->getSettingsEntity())
+            ->willReturn(true);
 
         $this
             ->user
@@ -683,10 +689,21 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
 
     private function upload($file, $uploadType = 'file', $withSessionToken = true, $internalCall = false)
     {
-        $getSettingsCalls = $withSessionToken ? $this->once() : $this->exactly(4);
+        if ($uploadType != 'archive') {
+            $this
+                ->settingsManager
+                ->expects($this->once())
+                ->method('isComplete')
+                ->with($this->getSettingsEntity())
+                ->willReturn(true);
+        }
+
+        $getSettingsCalls = $withSessionToken ? $this->exactly(2) : $this->exactly(5);
 
         if ($uploadType == 'error401') {
-            $getSettingsCalls = $this->exactly(4);
+            $getSettingsCalls = $this->exactly(5);
+        } elseif ($uploadType == 'archive') {
+            $getSettingsCalls = $this->once();
         }
 
         $settings = $this->getSettings($getSettingsCalls);

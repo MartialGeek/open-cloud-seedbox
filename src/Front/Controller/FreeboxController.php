@@ -2,6 +2,7 @@
 
 namespace Martial\OpenCloudSeedbox\Front\Controller;
 
+use Martial\OpenCloudSeedbox\Settings\IncompleteSettingsException;
 use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthorizationDeniedException;
 use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthenticationException;
 use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthorizationException;
@@ -12,7 +13,6 @@ use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxSessionException;
 use Martial\OpenCloudSeedbox\User\UserServiceInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -99,13 +99,11 @@ class FreeboxController extends AbstractController
         return $response;
     }
 
-    public function openSession(Request $request)
+    public function openSession()
     {
-        $appToken = $request->request->get('app_token');
-        $challenge = $request->request->get('challenge');
-
         try {
-            $this->freeboxManager->openSession($this->getUser(), $appToken, $challenge);
+            $this->freeboxManager->openSession($this->getUser());
+
             return new Response('', 204);
         } catch (FreeboxSessionException $e) {
             return new JsonResponse(['message' => 'An error occurred during the session opening.', 400]);
@@ -116,9 +114,12 @@ class FreeboxController extends AbstractController
     {
         try {
             $this->freeboxManager->uploadFile($filename, $this->getUser());
+
             return new Response('', 204);
         } catch (FreeboxSessionException $e) {
-            return new JsonResponse(['message' => 'You need to open a Freebox session before uploading files.'], 400);
+            return new JsonResponse(['message' => $e->getMessage()], 400);
+        } catch (IncompleteSettingsException $e) {
+            return new JsonResponse(['message' => $e->getMessage()], 400);
         }
     }
 }
