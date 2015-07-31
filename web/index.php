@@ -28,7 +28,8 @@ $bootstrap->registerControllers([
         'dependencies' => [
             $app['t411.api.client'],
             $app['settings.tracker'],
-            $app['transmission.manager']
+            $app['transmission.manager'],
+            $app['serializer']
         ]
     ],
     'transmission.controller' => [
@@ -101,6 +102,10 @@ $app
 $app
     ->post('/settings/tracker', 'settings.controller:updateTrackerSettings')
     ->bind('settings_tracker_update');
+
+$app
+    ->get('/tracker', 'tracker.controller:index')
+    ->bind('tracker');
 
 $app
     ->get('/tracker/search', 'tracker.controller:search')

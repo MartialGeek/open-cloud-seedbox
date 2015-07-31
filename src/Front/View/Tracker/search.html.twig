@@ -6,7 +6,7 @@
 
     <div class="row">
         <div class="small-centered">
-            <form action="{{ path('tracker_search') }}" method="get">
+            <form action="{{ path('tracker_search') }}" method="get" id="tracker-search-form">
                 {{ form_widget(searchForm) }}
 
                 <input type="submit" class="button" value="Search" />
@@ -14,66 +14,10 @@
         </div>
     </div>
 
-    {% if result is not empty %}
-        <div class="row">
-            <div class="small-centered">
-                <p>{{ result.total }} results.</p>
-            </div>
-        </div>
+    <div id="tracker-search-result-container">
 
-        {% include "@tracker/_result-pagination.html.twig" with {
-            'offset': result.offset,
-            'total': result.total,
-            'limit': result.limit,
-            'query': app.request.query.get('tracker_search')
-        } %}
-
-        <div class="row">
-            <table role="grid" id="tracker-search-result">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Verified</th>
-                    <th>Category</th>
-                    <th>Size</th>
-                    <th>Seeders</th>
-                    <th>Leechers</th>
-                    <th>Comments</th>
-                    <th>Times completed</th>
-                    <th>Addition date</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for torrent in result.torrents %}
-                    <tr>
-                        <td>
-                            <a data-action="torrent-add" href="{{ path('tracker_download', {'torrentId': torrent.id}) }}">{{ torrent.name }}</a>
-                        </td>
-                        <td>{{ torrent.isVerified }}</td>
-                        <td>{{ torrent.category.name }}</td>
-                        <td>{{ convertToHumanReadable(torrent.size) }}</td>
-                        <td>{{ torrent.numberOfSeeders }}</td>
-                        <td>{{ torrent.numberOfLeechers }}</td>
-                        <td>{{ torrent.numberOfComments }}</td>
-                        <td>{{ torrent.timesCompleted }}</td>
-                        <td>{{ torrent.additionDate|date('Y-m-d') }}</td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="9">No torrents found.</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-
-            {% include "@tracker/_result-pagination.html.twig" with {
-                'offset': result.offset,
-                'total': result.total,
-                'limit': result.limit,
-                'query': app.request.query.get('tracker_search')
-            } %}
-        {% endif %}
     </div>
+
 </div>
 
 <div id="download-modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">

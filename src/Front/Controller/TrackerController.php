@@ -2,6 +2,7 @@
 
 namespace Martial\OpenCloudSeedbox\Front\Controller;
 
+use JMS\Serializer\SerializerInterface;
 use Martial\OpenCloudSeedbox\Download\TorrentClientException;
 use Martial\OpenCloudSeedbox\Download\TorrentClientInterface;
 use Martial\OpenCloudSeedbox\Download\TransmissionSessionTrait;
@@ -9,9 +10,12 @@ use Martial\OpenCloudSeedbox\Form\TrackerSearch;
 use Martial\OpenCloudSeedbox\Settings\IncompleteSettingsException;
 use Martial\OpenCloudSeedbox\Settings\SettingsManagerInterface;
 use Martial\OpenCloudSeedbox\Settings\TrackerSettings;
+use Martial\T411\Api\Authentication\TokenInterface;
 use Martial\T411\Api\ClientInterface;
 use Martial\OpenCloudSeedbox\User\UserServiceInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,6 +42,11 @@ class TrackerController extends AbstractController
     private $torrentClient;
 
     /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
      * @param \Twig_Environment $twig
      * @param FormFactoryInterface $formFactory
      * @param Session $session
@@ -46,6 +55,7 @@ class TrackerController extends AbstractController
      * @param ClientInterface $client
      * @param SettingsManagerInterface $settingsManager
      * @param TorrentClientInterface $torrentClient
+     * @param SerializerInterface $serializer
      */
     public function __construct(
         \Twig_Environment $twig,
@@ -55,15 +65,17 @@ class TrackerController extends AbstractController
         UserServiceInterface $userService,
         ClientInterface $client,
         SettingsManagerInterface $settingsManager,
-        TorrentClientInterface $torrentClient
+        TorrentClientInterface $torrentClient,
+        SerializerInterface $serializer
     ) {
         $this->client = $client;
         $this->settingsManager = $settingsManager;
         $this->torrentClient = $torrentClient;
+        $this->serializer = $serializer;
         parent::__construct($twig, $formFactory, $session, $urlGenerator, $userService);
     }
 
-    public function search(Request $request)
+    public function index()
     {
         try {
             $this->checkTrackerAuthentication();
@@ -73,23 +85,35 @@ class TrackerController extends AbstractController
             return new RedirectResponse($this->urlGenerator->generate('homepage'));
         }
 
-        $token = $this->session->get('api_token');
-        $categories = $this->client->getCategories($token);
-        $searchForm = $this->formFactory->create(new TrackerSearch(), null, ['categories' => $categories]);
-        $result = [];
-
-        if ($request->query->has('tracker_search')) {
-            $queryParameterSearch = $request->query->get('tracker_search');
-            $searchForm->setData($queryParameterSearch);
-            $queryParameterSearch['offset'] = $request->query->get('offset', 0);
-            $queryParameterSearch['limit'] = $request->query->get('limit', 20);
-            $result = $this->client->search($token, $queryParameterSearch);
-        }
+        $searchForm = $this->getSearchForm($this->session->get('api_token'));
 
         return $this->twig->render('@tracker/search.html.twig', [
-            'result' => $result,
             'searchForm' => $searchForm->createView()
         ]);
+    }
+
+    public function search(Request $request)
+    {
+        $response = new JsonResponse();
+
+        try {
+            $this->checkTrackerAuthentication();
+        } catch (IncompleteSettingsException $e) {
+            $response
+                ->setData(['message' => $e->getMessage()])
+                ->setStatusCode(401);
+
+            return $response;
+        }
+
+        $token = $this->session->get('api_token');
+        $queryParameterSearch = $request->query->get('tracker_search');
+        $queryParameterSearch['offset'] = $request->query->get('offset', 0);
+        $queryParameterSearch['limit'] = $request->query->get('limit', 1000);
+        $result = $this->client->search($token, $queryParameterSearch);
+        $response->setContent($this->serializer->serialize($result, 'json'));
+
+        return $response;
     }
 
     public function download($torrentId)
@@ -130,5 +154,16 @@ class TrackerController extends AbstractController
                 $settings->getPassword()
             ));
         }
+    }
+
+    /**
+     * @param TokenInterface $token
+     * @return FormInterface
+     */
+    private function getSearchForm(TokenInterface $token)
+    {
+        $categories = $this->client->getCategories($token);
+
+        return $this->formFactory->create(new TrackerSearch(), null, ['categories' => $categories]);
     }
 }
