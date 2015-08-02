@@ -15,9 +15,9 @@ var tracker = {};
  */
 tracker.ResultSet = function(data) {
     this.query = m.prop(data.query);
-    this.total = m.prop(data.total);
-    this.offset = m.prop(data.offset);
-    this.limit = m.prop(data.limit);
+    this.total = m.prop(parseInt(data.total, 10));
+    this.offset = m.prop(parseInt(data.offset, 10));
+    this.limit = m.prop(parseInt(data.limit, 10));
     this.results = m.prop(data.results);
 };
 
@@ -28,9 +28,9 @@ tracker.ResultSet = function(data) {
  * @param {int} data.id - The ID of the result.
  * @param {string} data.name - The name of the torrent.
  * @param {tracker.Category} data.category - The category of the torrent.
- * @param {int} data.seeders - The number of seeders.
- * @param {int} data.leechers - The number of leechers.
- * @param {int} data.comments - The number of comments.
+ * @param {int} data.numberOfSeeders - The number of seeders.
+ * @param {int} data.numberOfLeechers - The number of leechers.
+ * @param {int} data.numberOfComments - The number of comments.
  * @param {bool} data.isVerified - The verification status of the torrent.
  * @param {Date} data.additionDate - The addition date of the torrent.
  * @param {int} data.size - The size of the torrent.
@@ -40,25 +40,42 @@ tracker.ResultSet = function(data) {
  * @constructor
  */
 tracker.Result = function(data) {
-    this.id = m.prop(data.id);
+    this.id = m.prop(parseInt(data.id, 10));
     this.name = m.prop(data.name);
     this.category = m.prop(data.category);
-    this.seeders = m.prop(data.seeders);
-    this.leechers = m.prop(data.leechers);
-    this.comments = m.prop(data.comments);
+    this.numberOfSeeders = m.prop(parseInt(data.numberOfSeeders, 10));
+    this.numberOfLeechers = m.prop(parseInt(data.numberOfLeechers, 10));
+    this.numberOfComments = m.prop(parseInt(data.numberOfComments, 10));
     this.isVerified = m.prop(data.isVerified);
     this.additionDate = m.prop(data.additionDate);
-    this.size = m.prop(data.size);
-    this.timesCompleted = m.prop(data.timesCompleted);
+    this.size = m.prop(parseInt(data.size, 10));
+    this.timesCompleted = m.prop(parseInt(data.timesCompleted, 10));
     this.owner = m.prop(data.owner);
     this.privacy = m.prop(data.privacy);
 };
 
+/**
+ * The Category entity.
+ *
+ * @param {Object} data - An object containing the Category data.
+ * @param {int} data.id - The ID of the category.
+ * @param {string} data.name - The name of the category.
+ * @param {tracker.Category[]} [data.subCategories] - The sub-categories if any.
+ * @param {tracker.Category} [data.parentCategory] - The parent category if any.
+ *
+ * @constructor
+ */
 tracker.Category = function(data) {
-    this.id = m.prop(data.id);
+    this.id = m.prop(parseInt(data.id, 10));
     this.name = m.prop(data.name);
-    this.subCategories = m.prop(data.subCategories);
-    this.parentCategory = m.prop(data.parentCategory);
+
+    if (data.subCategories) {
+        this.subCategories = m.prop(data.subCategories);
+    }
+
+    if (data.parentCategory) {
+        this.parentCategory = m.prop(data.parentCategory);
+    }
 };
 
 tracker.vm = (function() {
@@ -87,9 +104,7 @@ tracker.vm = (function() {
 
                 response.torrents.forEach(function(result) {
                     result.category = new tracker.Category(result.category);
-                    result.seeders = result.numberOfSeeders;
-                    result.leechers = result.numberOfLeechers;
-                    result.comments = result.numberOfComments;
+                    result.additionDate = new Date(result.additionDate);
                     results.push(new tracker.Result(result));
                 });
 
@@ -127,11 +142,45 @@ tracker.view = function() {
         return;
     }
 
+    /**
+     * Add a zero before a number if it is less than 10.
+     *
+     * @param {Number} int
+     * @returns {string}
+     */
+    var zeroFill = function(int) {
+        if (int.toString().length < 2) {
+            return "0" + int;
+        } else {
+            return int.toString();
+        }
+    };
+
+    /**
+     * Returns a human readable representation of a file size.
+     *
+     * @param {number} size
+     * @returns {string}
+     */
+    var convertSizeToHumanReadable = function(size) {
+        var converted, unit;
+
+        if (size > 999999999) {
+            converted = size / 1000000000;
+            unit = "GB";
+        } else {
+            converted = size / 1000000;
+            unit = "MB";
+        }
+
+        return Number(converted).toFixed(2) + " " + unit;
+    };
+
     var resultSet = tracker.vm.resultSet();
 
     var numberOfResults = m("div.row", [
         m("div.small-centered", [
-            m("p", resultSet.total() + " results.")
+            m("p", resultSet.results().length + " results.")
         ])
     ]);
     
@@ -155,18 +204,23 @@ tracker.view = function() {
                 }))
             ]),
             m("tbody", resultSet.results().map(function(torrent) {
+                var date = torrent.additionDate();
+                var dateToString = date.getFullYear() + "-";
+                dateToString += zeroFill(date.getMonth() + 1) + "-";
+                dateToString += zeroFill(date.getDate());
+
                 return m("tr", [
                     m("td", [
                         m("a", torrent.name())
                     ]),
                     m("td", torrent.isVerified() ? "OK" : "Not yet"),
                     m("td", torrent.category().name()),
-                    m("td", torrent.size()),
-                    m("td", torrent.seeders()),
-                    m("td", torrent.leechers()),
-                    m("td", torrent.comments()),
+                    m("td", convertSizeToHumanReadable(torrent.size())),
+                    m("td", torrent.numberOfSeeders()),
+                    m("td", torrent.numberOfLeechers()),
+                    m("td", torrent.numberOfComments()),
                     m("td", torrent.timesCompleted()),
-                    m("td", torrent.additionDate())
+                    m("td", dateToString)
                 ])
             }))
         ])

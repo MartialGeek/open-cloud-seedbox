@@ -109,7 +109,7 @@ class TrackerController extends AbstractController
         $token = $this->session->get('api_token');
         $queryParameterSearch = $request->query->get('tracker_search');
         $queryParameterSearch['offset'] = $request->query->get('offset', 0);
-        $queryParameterSearch['limit'] = $request->query->get('limit', 1000);
+        $queryParameterSearch['limit'] = $request->query->get('limit', 200);
         $result = $this->client->search($token, $queryParameterSearch);
         $response->setContent($this->serializer->serialize($result, 'json'));
 

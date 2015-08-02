@@ -17,7 +17,6 @@ use Martial\OpenCloudSeedbox\Download\TransmissionManager;
 use Martial\OpenCloudSeedbox\Filesystem\FileBrowser;
 use Martial\OpenCloudSeedbox\Filesystem\ZipArchiver;
 use Martial\OpenCloudSeedbox\Front\Controller\AbstractController;
-use Martial\OpenCloudSeedbox\Front\Twig\FileBrowserExtension;
 use Martial\OpenCloudSeedbox\Front\Twig\FileExtension;
 use Martial\OpenCloudSeedbox\Front\Twig\TransmissionExtension;
 use Martial\OpenCloudSeedbox\MessageQueuing\Freebox\FreeboxMessageConsumer;
@@ -130,7 +129,6 @@ class Bootstrap
 
         $this->app['twig']->addExtension(new TransmissionExtension());
         $this->app['twig']->addExtension(new FileExtension());
-        $this->app['twig']->addExtension(new FileBrowserExtension());
 
         AnnotationRegistry::registerAutoloadNamespace(
             'JMS\Serializer\Annotation',
