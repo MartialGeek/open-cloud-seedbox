@@ -220,7 +220,7 @@ tracker.view = function() {
 
                 return m("tr", [
                     m("td", [
-                        m("a", torrent.name())
+                        m("a[href='/tracker/download/" + torrent.id() + "']", torrent.name())
                     ]),
                     m("td", torrent.isVerified() ? "OK" : "Not yet"),
                     m("td", torrent.category().name()),
