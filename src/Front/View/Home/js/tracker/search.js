@@ -89,17 +89,22 @@ tracker.vm = (function() {
     /**
      * Sends the request to the "search" method of the T411 API.
      * @param {string} url - The requested URL
-     * @param {{}} data - The data sent
+     * @param {Object} data - The data sent
      * @param {string} data.terms - The query
      * @param {int} data.categoryId - The ID of the category
+     * @param {Function} callback
      */
-    vm.search = function(url, data) {
+    vm.search = function(url, data, callback) {
         var queryString = "?tracker_search[terms]=" + data.terms + "&tracker_search[category_id]=" + data.categoryId;
 
         vm.resultSet = m.request({
             method: "GET",
             url: url + queryString,
             unwrapSuccess: function(response) {
+                if (callback) {
+                    callback();
+                }
+
                 var results = [];
 
                 response.torrents.forEach(function(result) {
@@ -124,15 +129,19 @@ tracker.vm = (function() {
 
 tracker.controller = function() {
     var searchForm = document.querySelector("#tracker-search-form");
+    var loader = searchForm.querySelectorAll('div.loader')[0];
 
     searchForm.addEventListener('submit', function(event) {
         event.preventDefault();
 
         var form = event.currentTarget;
+        loader.style.display = "block";
 
         tracker.vm.search(form.action, {
             terms: form.elements[0].value,
             categoryId: form.elements[1].value
+        }, function() {
+            loader.style.display = "none";
         });
     }, false);
 };
