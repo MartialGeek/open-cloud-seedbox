@@ -92,17 +92,17 @@ tracker.vm = (function() {
      * @param {Object} data - The data sent
      * @param {string} data.terms - The query
      * @param {int} data.categoryId - The ID of the category
-     * @param {Function} callback
+     * @param {Function} success
      */
-    vm.search = function(url, data, callback) {
+    vm.search = function(url, data, success) {
         var queryString = "?tracker_search[terms]=" + data.terms + "&tracker_search[category_id]=" + data.categoryId;
 
         vm.resultSet = m.request({
             method: "GET",
             url: url + queryString,
             unwrapSuccess: function(response) {
-                if (callback) {
-                    callback();
+                if (success) {
+                    success();
                 }
 
                 var results = [];
@@ -121,6 +121,35 @@ tracker.vm = (function() {
                     results: results
                 });
             }
+        });
+    };
+
+    vm.sort = function(e) {
+        var order = "asc";
+        var column = e.currentTarget.getAttribute('data-column');
+        var results = vm.resultSet().results();
+
+        results.sort(function(a, b) {
+            var first = order == 'asc' ? a[column]() : b[column]();
+            var second = order == 'asc' ? b[column]() : a[column]();
+
+            if (typeof first == "string") {
+                first.toLocaleLowerCase();
+            }
+
+            if (typeof second == "string") {
+                second.toLowerCase();
+            }
+
+            if (first > second) {
+                return 1;
+            }
+
+            if (first < second) {
+                return -1;
+            }
+
+            return 0;
         });
     };
 
@@ -194,22 +223,64 @@ tracker.view = function() {
     ]);
     
     var tHeads = [
-        "Name",
-        "Verified",
-        "Category",
-        "Size",
-        "Seeders",
-        "Leechers",
-        "Comments",
-        "Times completed",
-        "Addition date"
+        {
+            text: "Name",
+            isSortable: true,
+            column: "name"
+        },
+        {
+            text: "Verified",
+            isSortable: false
+        },
+        {
+            text: "Category",
+            isSortable: false
+        },
+        {
+            text: "Size",
+            isSortable: true,
+            column: "size"
+        },
+        {
+            text: "Seeders",
+            isSortable: true,
+            column: "numberOfSeeders"
+        },
+        {
+            text: "Leechers",
+            isSortable: true,
+            column: "numberOfLeechers"
+        },
+        {
+            text: "Comments",
+            isSortable: true,
+            column: "numberOfComments"
+        },
+        {
+            text: "Times completed",
+            isSortable: true,
+            column: "timesCompleted"
+        },
+        {
+            text: "Addition date",
+            isSortable: true,
+            column: "additionDate"
+        }
     ];
 
     var table = m("div.row", [
         m("table#tracker-search-result", {role: "grid"}, [
             m("thead", [
                 m("tr", tHeads.map(function(head) {
-                    return m("th", head);
+                    if (head.isSortable) {
+                        return m("th", [
+                            m("a[data-column='" + head.column + "']", {
+                                onclick: tracker.vm.sort
+                            }, head.text)
+                        ])
+                    }
+
+                    return m("th", head.text);
                 }))
             ]),
             m("tbody", resultSet.results().map(function(torrent) {
