@@ -48,6 +48,11 @@ class TrackerControllerTest extends ControllerTestCase
      */
     public $torrentClient;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    public $serializer;
+
     public function testSearchActionWithAuthenticatedUser()
     {
         $this->search([
@@ -92,74 +97,56 @@ class TrackerControllerTest extends ControllerTestCase
         $this->sessionGet($sessionGet);
         $this->sessionHas(['api_token' => $options['is_user_authenticated']]);
         $this->checkTrackerAuthentication($userId, $trackerUsername, $trackerPassword, $options['is_user_authenticated']);
-        $this->hasQueryParameter('tracker_search', $options['has_search']);
 
-        $categories = ['cat1', 'cat2'];
-        $trackerResult = $options['has_search'] ? ['result1', 'result2'] : [];
+        $trackerResult = ['result1', 'result2'];
+        $serializedResult = json_encode($trackerResult, JSON_FORCE_OBJECT);
+        $offset = 0;
+        $limit = 200;
+
+        $apiSearch = [
+            'terms' => 'avatar',
+            'category_id' => 631,
+            'offset' => $offset,
+            'limit' => $limit
+        ];
+
+        $getParameters = [
+            'terms' => $apiSearch['terms'],
+            'category_id' => $apiSearch['category_id']
+        ];
+
+        $this
+            ->queryParameterBag
+            ->expects($this->exactly(3))
+            ->method('get')
+            ->withConsecutive(
+                [$this->equalTo('tracker_search')],
+                [$this->equalTo('offset')],
+                [$this->equalTo('limit')]
+            )
+            ->willReturnOnConsecutiveCalls($getParameters, $offset, $limit);
 
         $this
             ->client
             ->expects($this->once())
-            ->method('getCategories')
-            ->with($this->equalTo($this->trackerToken))
-            ->will($this->returnValue($categories));
+            ->method('search')
+            ->with(
+                $this->equalTo($this->trackerToken),
+                $this->equalTo($apiSearch)
+            )
+            ->willReturn($trackerResult);
 
-        $this->createForm(new TrackerSearch(), null, ['categories' => $categories]);
-        $this->createFormView();
+        $this
+            ->serializer
+            ->expects($this->once())
+            ->method('serialize')
+            ->with($trackerResult, 'json')
+            ->willReturn($serializedResult);
 
-        if ($options['has_search']) {
-            $offset = 0;
-            $limit = 20;
+        $response = $this->controller->search($this->request);
 
-            $apiSearch = [
-                'terms' => 'avatar',
-                'category_id' => 631,
-                'offset' => $offset,
-                'limit' => $limit
-            ];
-
-            $getParameters = [
-                'terms' => $apiSearch['terms'],
-                'category_id' => $apiSearch['category_id']
-            ];
-
-            $this
-                ->queryParameterBag
-                ->expects($this->exactly(3))
-                ->method('get')
-                ->withConsecutive(
-                    [$this->equalTo('tracker_search')],
-                    [$this->equalTo('offset')],
-                    [$this->equalTo('limit')]
-                )
-                ->willReturnOnConsecutiveCalls($getParameters, $offset, $limit);
-
-            $this
-                ->form
-                ->expects($this->once())
-                ->method('setData')
-                ->with($this->equalTo([
-                    'terms' => $apiSearch['terms'],
-                    'category_id' => $apiSearch['category_id']
-                ]));
-
-            $this
-                ->client
-                ->expects($this->once())
-                ->method('search')
-                ->with(
-                    $this->equalTo($this->trackerToken),
-                    $this->equalTo($apiSearch)
-                )
-                ->willReturn($trackerResult);
-        }
-
-        $this->render('@tracker/search.html.twig', [
-            'result' => $trackerResult,
-            'searchForm' => $this->formView
-        ]);
-
-        $this->controller->search($this->request);
+        $this->assertInstanceOf('\Symfony\Component\HttpFoundation\JsonResponse', $response);
+        $this->assertSame($serializedResult, $response->getContent());
     }
 
     protected function download($withErrors = false)
@@ -265,11 +252,13 @@ class TrackerControllerTest extends ControllerTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->torrentClient = $this->getMock('\Martial\OpenCloudSeedbox\Download\TorrentClientInterface');
+        $this->serializer = $this->getMock('\JMS\Serializer\SerializerInterface');
 
         $dependencies = parent::defineDependencies();
         $dependencies[] = $this->client;
         $dependencies[] = $this->settings;
         $dependencies[] = $this->torrentClient;
+        $dependencies[] = $this->serializer;
 
         return $dependencies;
     }
