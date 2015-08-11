@@ -87,6 +87,11 @@ tracker.vm = (function() {
     vm.resultSet = null;
 
     /**
+     * @type {{}}
+     */
+    vm.sortContext = {};
+
+    /**
      * Sends the request to the "search" method of the T411 API.
      * @param {string} url - The requested URL
      * @param {Object} data - The data sent
@@ -124,14 +129,19 @@ tracker.vm = (function() {
         });
     };
 
-    vm.sort = function(e) {
-        var elmt = e.currentTarget;
-        var column = elmt.getAttribute('data-column');
-        var order = elmt.getAttribute('data-sort-order') != null ? elmt.getAttribute('data-sort-order') : 'desc';
-        var nextOrder = order == 'asc' ? 'desc' : 'asc';
+    vm.sort = function(column) {
+        var previousOrder;
+
+        if (vm.sortContext.hasOwnProperty(column)) {
+            previousOrder = vm.sortContext[column];
+        } else {
+            previousOrder = 'asc';
+        }
+
+        var order = previousOrder == 'asc' ? 'desc' : 'asc';
         var results = vm.resultSet().results();
 
-        elmt.setAttribute('data-sort-order', nextOrder);
+        vm.sortContext[column] = order;
 
         results.sort(function(a, b) {
             var first = order == 'asc' ? a[column]() : b[column]();
@@ -279,7 +289,7 @@ tracker.view = function() {
                     if (head.isSortable) {
                         return m("th", [
                             m("a[data-column='" + head.column + "']", {
-                                onclick: tracker.vm.sort
+                                onclick: tracker.vm.sort.bind(tracker.vm, head.column)
                             }, head.text)
                         ])
                     }
