@@ -125,9 +125,13 @@ tracker.vm = (function() {
     };
 
     vm.sort = function(e) {
-        var order = "asc";
-        var column = e.currentTarget.getAttribute('data-column');
+        var elmt = e.currentTarget;
+        var column = elmt.getAttribute('data-column');
+        var order = elmt.getAttribute('data-sort-order') != null ? elmt.getAttribute('data-sort-order') : 'desc';
+        var nextOrder = order == 'asc' ? 'desc' : 'asc';
         var results = vm.resultSet().results();
+
+        elmt.setAttribute('data-sort-order', nextOrder);
 
         results.sort(function(a, b) {
             var first = order == 'asc' ? a[column]() : b[column]();
