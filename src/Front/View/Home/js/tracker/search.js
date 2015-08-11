@@ -93,6 +93,7 @@ tracker.vm = (function() {
 
     /**
      * Sends the request to the "search" method of the T411 API.
+     *
      * @param {string} url - The requested URL
      * @param {Object} data - The data sent
      * @param {string} data.terms - The query
@@ -105,6 +106,18 @@ tracker.vm = (function() {
         vm.resultSet = m.request({
             method: "GET",
             url: url + queryString,
+
+            /**
+             * Creates the result set corresponding to the API response.
+             *
+             * @param {Object} response
+             * @param {string} response.query
+             * @param {int} response.total
+             * @param {int} response.offset
+             * @param {int} response.limit
+             * @param {Object[]} response.torrents
+             * @returns {tracker.ResultSet}
+             */
             unwrapSuccess: function(response) {
                 if (success) {
                     success();
@@ -129,6 +142,11 @@ tracker.vm = (function() {
         });
     };
 
+    /**
+     * Sorts the result set by the given column. The order is determined by a context.
+     *
+     * @param {string} column
+     */
     vm.sort = function(column) {
         var previousOrder;
 
