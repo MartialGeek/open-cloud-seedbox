@@ -185,6 +185,15 @@ tracker.vm = (function() {
         });
     };
 
+    vm.addToDownloadQueue = function(torrentId) {
+        m.request({
+            method: "GET",
+            url: "/tracker/download/" + torrentId
+        }).then(function() {
+            alert("OK");
+        });
+    };
+
     return vm;
 }());
 
@@ -325,7 +334,9 @@ tracker.view = function() {
 
                 return m("tr", [
                     m("td", [
-                        m("a[href='/tracker/download/" + torrent.id() + "']", torrent.name())
+                        m("a", {
+                            onclick: tracker.vm.addToDownloadQueue.bind(tracker.vm, torrent.id())
+                        }, torrent.name())
                     ]),
                     m("td", torrent.isVerified() ? "OK" : "Not yet"),
                     m("td", torrent.category().name()),
