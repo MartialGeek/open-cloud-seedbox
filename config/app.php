@@ -86,7 +86,7 @@ return [
         ]
     ],
     'tracker' => [
-        'base_url' => 'https://api.t411.io',
+        'base_url' => $parameters['tracker_api_url'],
         'client' => [
             'torrent_files_path' => $parameters['torrent_files_path']
         ]

@@ -25,4 +25,5 @@ return [
     'message_queuing_freebox_connection_password' => '',
     'message_queuing_freebox_connection_vhost' => '',
     'file_browser_root_path' => '',
+    'tracker_api_url' => '',
 ];
