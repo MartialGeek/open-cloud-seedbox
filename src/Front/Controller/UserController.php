@@ -66,7 +66,7 @@ class UserController extends AbstractController
                     new \DateTime('+1 month')
                 );
 
-                $response =  new RedirectResponse($this->urlGenerator->generate('homepage'));
+                $response = new RedirectResponse($this->urlGenerator->generate('homepage'));
                 $response->headers->setCookie($cookie);
 
                 return $response;
@@ -86,9 +86,12 @@ class UserController extends AbstractController
 
     public function logout()
     {
+        $this->session->invalidate();
         $this->session->set('connected', false);
         $this->session->getFlashBag()->add('notice', 'You are logged out.');
+        $response = new RedirectResponse($this->urlGenerator->generate('homepage'));
+        $response->headers->clearCookie('remember_me');
 
-        return new RedirectResponse($this->urlGenerator->generate('homepage'));
+        return $response;
     }
 }
