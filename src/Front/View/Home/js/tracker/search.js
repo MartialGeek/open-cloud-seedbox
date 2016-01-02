@@ -255,8 +255,6 @@ tracker.view = function() {
         return Number(converted).toFixed(2) + " " + unit;
     };
 
-    tracker.vm.sort("numberOfSeeders");
-
     var resultSet = tracker.vm.resultSet();
 
     var numberOfResults = m("div.row", [
