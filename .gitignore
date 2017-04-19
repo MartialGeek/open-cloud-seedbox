@@ -8,7 +8,6 @@ bin/phing
 web/css
 web/js
 web/img
-web/bower_components
 node_modules
 behat.yml
 .vagrant/
@@ -17,4 +16,4 @@ config/deploy.rb
 config/deploy/*.rb
 build/
 data/provisioning/files/composer-auth.json
-
+docker-compose.yml
