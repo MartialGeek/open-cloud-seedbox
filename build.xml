@@ -19,7 +19,7 @@
     </target>
 
     <target name="composer_install">
-        <exec command="composer install" checkreturn="true" passthru="true" />
+        <exec command="composer install --ignore-platform-reqs" checkreturn="true" passthru="true" />
     </target>
 
     <target name="technical_tests">
@@ -37,4 +37,3 @@
         <phingcall target="technical_tests" />
     </target>
 </project>
-
