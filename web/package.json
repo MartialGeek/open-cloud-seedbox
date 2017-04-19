@@ -5,6 +5,7 @@
     "grunt-contrib-watch": "^1.0.0",
     "grunt-sass": "^2.0.0",
     "mithril": "0.2.0",
+    "modernizr": "^3.5.0",
     "node-sass": "^4.5.2",
     "zurb-foundation-5": "^5.4.7"
   },

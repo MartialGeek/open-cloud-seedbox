@@ -1,4 +1,19 @@
+var exec = require('child_process').execFile;
+
 module.exports = function(grunt) {
+  grunt.registerTask('modernizr', 'Build the modernizr script', function() {
+    grunt.log.writeln('Running the build...');
+    exec('./node_modules/modernizr/bin/modernizr', [
+      '-c',
+      'node_modules/modernizr/lib/config-all.json'
+    ], function(error, stdout, stderr) {
+      if (error) {
+        grunt.log.error(stderr);
+        throw error;
+      }
+    });
+  });
+
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
@@ -29,6 +44,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-sass');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
-  grunt.registerTask('build', ['sass']);
+  grunt.registerTask('build', ['sass', 'modernizr']);
   grunt.registerTask('default', ['build','watch']);
 };
