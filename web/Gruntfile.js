@@ -4,14 +4,14 @@ module.exports = function(grunt) {
 
     sass: {
       options: {
-        includePaths: ['web/bower_components/foundation/scss']
+        includePaths: ['node_modules/zurb-foundation-5/scss']
       },
       dist: {
         options: {
           outputStyle: 'compressed'
         },
         files: {
-          'web/css/app.css': 'src/Front/View/Home/scss/app.scss'
+          'css/app.css': '../src/Front/View/Home/scss/app.scss'
         }
       }
     },
@@ -20,7 +20,7 @@ module.exports = function(grunt) {
       grunt: { files: ['Gruntfile.js'] },
 
       sass: {
-        files: 'src/Front/View/Home/scss/**/*.scss',
+        files: '../src/Front/View/Home/scss/**/*.scss',
         tasks: ['sass']
       }
     }

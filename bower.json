@@ -1,7 +1,0 @@
-{
-  "name": "foundation-libsass-template",
-  "dependencies": {
-    "foundation": "zurb/bower-foundation",
-    "mithril": "~0.2.0"
-  }
-}

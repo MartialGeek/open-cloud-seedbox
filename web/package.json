@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "foundation-sites": "zurb/foundation",
+    "grunt": "^1.0.1",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-sass": "^2.0.0",
+    "mithril": "0.2.0",
+    "node-sass": "^4.5.2",
+    "zurb-foundation-5": "^5.4.7"
+  },
+  "name": "open-cloud-seedbox",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT"
+}
