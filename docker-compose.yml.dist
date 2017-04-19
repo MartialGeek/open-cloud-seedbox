@@ -4,8 +4,8 @@ services:
         image: martialgeek/php:7.1-dev
         volumes:
             - .:/var/www/html
-            - warez_archive_path:/data/tmp
-            - /Users/martial/workspace/perso:/data/files
+            - warez_archive_path:/downloads/archives
+            - /path/to/downloads:/downloads
         links:
             - mysql
             - rabbitmq
@@ -25,24 +25,29 @@ services:
         volumes:
             - warez_db:/var/lib/mysql
         environment:
-            MYSQL_ROOT_PASSWORD: awesome_password
+            MYSQL_ROOT_PASSWORD: root
             MYSQL_USER: warez
-            MYSQL_PASSWORD: awesome_password
+            MYSQL_PASSWORD: warez
             MYSQL_DATABASE: warez
     rabbitmq:
         image: rabbitmq:3.6.9
+        volumes:
+            - warez_archive_path:/var/lib/rabbitmq
         environment:
             RABBITMQ_DEFAULT_USER: warez
-            RABBITMQ_DEFAULT_PASS: awesome_password
+            RABBITMQ_DEFAULT_PASS: warez
             RABBITMQ_DEFAULT_VHOST: warez
     transmission:
         image: linuxserver/transmission
         volumes:
-            - /Users/martial/workspace/perso:/downloads
+            - /path/to/downlods:/downloads
         environment:
             TZ: Europe/Paris
             PGID: 501
             PUID: 20
+        ports:
+            - "9091:9091"
 volumes:
     warez_db:
     warez_archive_path:
+    warez_rabbitmq:
