@@ -6,7 +6,7 @@ CREATE TABLE `users` (
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   `cookie_token_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `cookie_token_hash` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `cookie_token_hash` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQ_1483A5E9F85E0677` (`username`),
   UNIQUE KEY `UNIQ_1483A5E9E7927C74` (`email`),
