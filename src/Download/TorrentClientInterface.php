@@ -18,6 +18,7 @@ interface TorrentClientInterface
      *
      * @param string $sessionId
      * @param int $torrentId
+     * @throws TorrentClientException
      */
     public function removeFromQueue($sessionId, $torrentId);
 
@@ -26,6 +27,7 @@ interface TorrentClientInterface
      *
      * @param string $sessionId
      * @return array
+     * @throws TorrentClientException
      */
     public function getTorrentList($sessionId);
 
@@ -35,6 +37,7 @@ interface TorrentClientInterface
      * @param string $sessionId
      * @param int $torrentId
      * @return array
+     * @throws TorrentClientException
      */
     public function getTorrentData($sessionId, $torrentId);
 
@@ -42,6 +45,7 @@ interface TorrentClientInterface
      * Returns the session ID.
      *
      * @return string
+     * @throws TorrentClientException
      */
     public function getSessionId();
 }

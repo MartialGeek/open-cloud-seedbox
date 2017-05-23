@@ -2,8 +2,11 @@
 
 namespace Martial\OpenCloudSeedbox\Download;
 
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\RequestException;
+use Martial\Transmission\API\Argument\Torrent\Add;
+use Martial\Transmission\API\Argument\Torrent\Get;
+use Martial\Transmission\API\CSRFException;
+use Martial\Transmission\API\TorrentIdList;
+use Martial\Transmission\API\TransmissionAPI;
 
 class TransmissionManager implements TorrentClientInterface
 {
@@ -16,23 +19,16 @@ class TransmissionManager implements TorrentClientInterface
     const TORRENT_STATUS_SEEDING = 6;
 
     /**
-     * @var ClientInterface
+     * @var TransmissionAPI
      */
-    private $httpClient;
+    private $rpcClient;
 
     /**
-     * @var array
+     * @param TransmissionAPI $rpcClient
      */
-    private $config;
-
-    /**
-     * @param ClientInterface $httpClient
-     * @param array $config
-     */
-    public function __construct(ClientInterface $httpClient, array $config)
+    public function __construct(TransmissionAPI $rpcClient)
     {
-        $this->httpClient = $httpClient;
-        $this->config = $config;
+        $this->rpcClient = $rpcClient;
     }
 
     /**
@@ -44,15 +40,15 @@ class TransmissionManager implements TorrentClientInterface
      */
     public function addToQueue($sessionId, \SplFileInfo $torrent)
     {
-        $body = '{"method": "torrent-add", "arguments": {"filename": "' . $torrent->getPathname() . '"}}';
-        $response = $this->sendRequest($sessionId, $body)->json();
-
-        if ($response['result'] != 'success') {
+        try {
+            $this->rpcClient->torrentAdd($sessionId, [
+                Add::FILENAME => $torrent->getPathname()
+            ]);
+        } catch (\Exception $e) {
             throw new TorrentClientException(
-                sprintf(
-                    'The torrent could not be added to the queue: %s',
-                    $response['result']
-                )
+                sprintf('Unable to add the torrent %s in the queue', $torrent->getFilename()),
+                0,
+                $e
             );
         }
     }
@@ -62,10 +58,19 @@ class TransmissionManager implements TorrentClientInterface
      *
      * @param string $sessionId
      * @param int $torrentId
+     * @throws TorrentClientException
      */
     public function removeFromQueue($sessionId, $torrentId)
     {
-        // TODO: Implement removeFromQueue() method.
+        try {
+            $this->rpcClient->torrentRemove($sessionId, new TorrentIdList([$torrentId]));
+        } catch (\Exception $e) {
+            throw new TorrentClientException(
+                sprintf('Unable to remove the torrent ID %d from the queue', $torrentId),
+                0,
+                $e
+            );
+        }
     }
 
     /**
@@ -73,14 +78,21 @@ class TransmissionManager implements TorrentClientInterface
      *
      * @param string $sessionId
      * @return array
+     * @throws TorrentClientException
      */
     public function getTorrentList($sessionId)
     {
-        $body = '{"method": "torrent-get", "arguments": {"fields": ' . $this->getTorrentFields() . '}}';
+        try {
+            $torrents = $this->rpcClient->torrentGet($sessionId, new TorrentIdList([]), $this->getTorrentFields());
+        } catch (\Exception $e) {
+            throw new TorrentClientException(
+                'Unable to retrieve the torrents list',
+                0,
+                $e
+            );
+        }
 
-        $response = $this->sendRequest($sessionId, $body)->json();
-
-        return $response['arguments']['torrents'];
+        return $torrents;
     }
 
     /**
@@ -89,20 +101,23 @@ class TransmissionManager implements TorrentClientInterface
      * @param string $sessionId
      * @param int $torrentId
      * @return array
+     * @throws TorrentClientException
      */
     public function getTorrentData($sessionId, $torrentId)
     {
-        $body = '{
-            "method": "torrent-get",
-            "arguments": {
-                "ids": [' . $torrentId . '],
-                "fields": ' . $this->getTorrentFields() .
-            '}
-        }';
+        try {
+            $torrentData = $this
+                ->rpcClient
+                ->torrentGet($sessionId, new TorrentIdList([(string) $torrentId]), $this->getTorrentFields());
+        } catch (\Exception $e) {
+            throw new TorrentClientException(
+                sprintf('Unable to retrieve the data of the torrent ID %d', $torrentId),
+                0,
+                $e
+            );
+        }
 
-        $response = $this->sendRequest($sessionId, $body)->json();
-
-        return $response['arguments']['torrents'][0];
+        return $torrentData[0];
     }
 
     /**
@@ -115,63 +130,43 @@ class TransmissionManager implements TorrentClientInterface
         $sessionId = '';
 
         try {
-            $this->getTorrentList('');
-        } catch (RequestException $e) {
-            $sessionId = $e->getResponse()->getHeader('X-Transmission-Session-Id');
+            $this->rpcClient->sessionGet($sessionId);
+        } catch (CSRFException $e) {
+            $sessionId = $e->getSessionId();
         }
 
         return $sessionId;
     }
 
     /**
-     * Sends the request to the Transmission API.
-     *
-     * @param string $sessionId
-     * @param string $body
-     * @return \GuzzleHttp\Message\ResponseInterface
-     */
-    protected function sendRequest($sessionId, $body)
-    {
-        return $this
-            ->httpClient
-            ->post($this->config['rpc_uri'], [
-                'body' => $body,
-                'auth' => [$this->config['login'], $this->config['password']],
-                'headers' => [
-                    'X-Transmission-Session-Id' => $sessionId
-                ]
-            ]);
-    }
-
-    /**
      * Returns a JSON array of the torrent's fields.
      *
-     * @return string
+     * @return array
      */
     protected function getTorrentFields()
     {
-        return '[
-            "id",
-            "name",
-            "addedDate",
-            "downloadedEver",
-            "isFinished",
-            "isStalled",
-            "leftUntilDone",
-            "peers",
-            "percentDone",
-            "queuePosition",
-            "rateDownload",
-            "rateUpload",
-            "secondsDownloading",
-            "secondsSeeding",
-            "startDate",
-            "status",
-            "trackers",
-            "totalSize",
-            "torrentFile",
-            "uploadedEver",
-            "wanted"
-        ]';
+        return [
+            Get::ID,
+            Get::NAME,
+            Get::ADDED_DATE,
+            Get::DOWNLOAD_EVER,
+            Get::IS_FINISHED,
+            Get::IS_STALLED,
+            Get::LEFT_UNTIL_DONE,
+            Get::PEERS,
+            Get::PERCENT_DONE,
+            Get::QUEUE_POSITION,
+            Get::RATE_DOWNLOAD,
+            Get::RATE_UPLOAD,
+            Get::SECONDS_DOWNLOADING,
+            Get::SECONDS_SEEDING,
+            Get::START_DATE,
+            Get::STATUS,
+            Get::TRACKERS,
+            Get::TOTAL_SIZE,
+            Get::TORRENT_FILE,
+            Get::UPLOAD_EVER,
+            Get::WANTED,
+        ];
     }
 }

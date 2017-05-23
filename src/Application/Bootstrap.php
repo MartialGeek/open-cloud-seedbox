@@ -39,6 +39,7 @@ use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxManager;
 use Martial\OpenCloudSeedbox\Upload\UploadAdapterFactory;
 use Martial\OpenCloudSeedbox\Upload\UploadUrlResolver;
 use Martial\OpenCloudSeedbox\User\UserService;
+use Martial\Transmission\API\RpcClient;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use Pikirasa\RSA;
 use Silex\Application;
@@ -299,9 +300,10 @@ class Bootstrap
 
         $app['transmission.http_client'] = function() use ($config) {
             $url = sprintf(
-                'http://%s:%d',
+                'http://%s:%d%s',
                 $config['transmission']['host'],
-                $config['transmission']['port']
+                $config['transmission']['port'],
+                $config['transmission']['rpc_uri']
             );
 
             return new GuzzleClient([
@@ -309,8 +311,17 @@ class Bootstrap
             ]);
         };
 
-        $app['transmission.manager'] = function() use ($app, $config) {
-            return new TransmissionManager($app['transmission.http_client'], $config['transmission']);
+        $app['transmission.rpc_client'] = function() use ($app, $config) {
+            return new RpcClient(
+                $app['transmission.http_client'],
+                $config['transmission']['login'],
+                $config['transmission']['password'],
+                $app['logger']
+            );
+        };
+
+        $app['transmission.manager'] = function() use ($app) {
+            return new TransmissionManager($app['transmission.rpc_client']);
         };
 
         $app['filesystem.archiver.zip'] = function() use ($app) {
