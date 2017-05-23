@@ -17,6 +17,7 @@ use Martial\OpenCloudSeedbox\Download\TransmissionManager;
 use Martial\OpenCloudSeedbox\Filesystem\FileBrowser;
 use Martial\OpenCloudSeedbox\Filesystem\ZipArchiver;
 use Martial\OpenCloudSeedbox\Front\Controller\AbstractController;
+use Martial\OpenCloudSeedbox\Front\Controller\ErrorControllerInterface;
 use Martial\OpenCloudSeedbox\Front\Twig\FileExtension;
 use Martial\OpenCloudSeedbox\Front\Twig\TransmissionExtension;
 use Martial\OpenCloudSeedbox\MessageQueuing\Freebox\FreeboxMessageConsumer;
@@ -44,12 +45,12 @@ use Silex\Application;
 use Silex\Provider\DoctrineServiceProvider;
 use Silex\Provider\FormServiceProvider;
 use Silex\Provider\HttpFragmentServiceProvider;
+use Silex\Provider\LocaleServiceProvider;
 use Silex\Provider\MonologServiceProvider;
 use Silex\Provider\ServiceControllerServiceProvider;
 use Silex\Provider\SessionServiceProvider;
 use Silex\Provider\TranslationServiceProvider;
 use Silex\Provider\TwigServiceProvider;
-use Silex\Provider\UrlGeneratorServiceProvider;
 use Silex\Provider\ValidatorServiceProvider;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -100,9 +101,9 @@ class Bootstrap
         $app = $this->app;
 
         foreach ($controllers as $serviceKey => $parameters) {
-            $app[$serviceKey] = $app->share(function() use ($app, $parameters) {
+            $app[$serviceKey] = function() use ($app, $parameters) {
                 return $this->getControllerInstance($parameters['class'], $parameters);
-            });
+            };
         }
     }
 
@@ -146,9 +147,9 @@ class Bootstrap
             ->register(new FormServiceProvider())
             ->register(new ValidatorServiceProvider())
             ->register(new TranslationServiceProvider(), $this->config['translator'])
-            ->register(new UrlGeneratorServiceProvider())
             ->register(new DoctrineServiceProvider(), $this->config['doctrine']['dbal'])
-            ->register(new HttpFragmentServiceProvider());
+            ->register(new HttpFragmentServiceProvider())
+            ->register(new LocaleServiceProvider());
     }
 
     protected function registerServices()
@@ -156,7 +157,7 @@ class Bootstrap
         $app = $this->app;
         $config = $this->config;
 
-        $app['doctrine.entity_manager'] = $app->share(function() {
+        $app['doctrine.entity_manager'] = function() {
 
             if ('dev' == $this->env) {
                 $cache = new ArrayCache();
@@ -172,27 +173,27 @@ class Bootstrap
             );
 
             return EntityManager::create($this->config['doctrine']['dbal']['db.options'], $config);
-        });
+        };
 
-        $app['filesystem'] = $app->share(function() {
+        $app['filesystem'] = function() {
             return new Filesystem();
-        });
+        };
         
-        $app['t411.api.http_client'] = $app->share(function() use ($config) {
+        $app['t411.api.http_client'] = function() use ($config) {
             return new GuzzleClient([
-                'base_url' => $config['tracker']['base_url']
+                'base_uri' => $config['tracker']['base_url']
             ]);
-        });
+        };
 
-        $app['t411.api.data.data_transformer'] = $app->share(function() {
+        $app['t411.api.data.data_transformer'] = function() {
             return new DataTransformer();
-        });
+        };
 
-        $app['t411.api.query_factory'] = $app->share(function() {
+        $app['t411.api.query_factory'] = function() {
             return new QueryFactory();
-        });
+        };
 
-        $app['t411.api.client'] = $app->share(function() use ($app, $config) {
+        $app['t411.api.client'] = function() use ($app, $config) {
             return new Client(
                 $app['t411.api.http_client'],
                 $app['t411.api.data.data_transformer'],
@@ -200,84 +201,84 @@ class Bootstrap
                 $app['t411.api.query_factory'],
                 $config['tracker']['client']
             );
-        });
+        };
 
-        $app['security.password_hash'] = $app->share(function() {
+        $app['security.password_hash'] = function() {
             return new BlowfishHashPassword();
-        });
+        };
 
-        $app['security.authentication_provider'] = $app->share(function() use ($app) {
+        $app['security.authentication_provider'] = function() use ($app) {
             return new AuthenticationProvider($app['security.password_hash']);
-        });
+        };
 
-        $app['security.encoder'] = $app->share(function() use ($config) {
+        $app['security.encoder'] = function() use ($config) {
             $rsa = new RSA(
                 $config['security']['certificate']['public'],
                 $config['security']['certificate']['private']
             );
 
             return new OpenSSLEncoder($rsa);
-        });
+        };
 
-        $app['security.cookie.tokenizer'] = $app->share(function() use ($app) {
+        $app['security.cookie.tokenizer'] = function() use ($app) {
             return new CookieTokenizer($app['doctrine.entity_manager']);
-        });
+        };
 
-        $app['security.remember_me_listener'] = $app->share(function() use ($app) {
+        $app['security.remember_me_listener'] = function() use ($app) {
             return new RememberMeListener($app['security.cookie.tokenizer'], $app['session']);
-        });
+        };
 
-        $app['user.service'] = $app->share(function() use ($app) {
+        $app['user.service'] = function() use ($app) {
             return new UserService(
                 $app['doctrine.entity_manager'],
                 $app['security.authentication_provider'],
                 $app['security.password_hash'],
                 $app['settings.tracker']
             );
-        });
+        };
 
-        $app['settings.tracker'] = $app->share(function() use ($app) {
+        $app['settings.tracker'] = function() use ($app) {
             return new TrackerSettings($app['security.encoder'], $app['doctrine.entity_manager']);
-        });
+        };
 
-        $app['settings.freebox'] = $app->share(function() use ($app) {
+        $app['settings.freebox'] = function() use ($app) {
             return new FreeboxSettings($app['doctrine.entity_manager']);
-        });
+        };
 
-        $app['settings.freebox.data_transformer'] = $app->share(function() {
+        $app['settings.freebox.data_transformer'] = function() {
             return new FreeboxSettingsDataTransformer();
-        });
+        };
 
-        $app['security.firewall'] = $app->share(function() use ($app) {
+        $app['security.firewall'] = function() use ($app) {
             return new Firewall($app['session'], $app['url_generator']);
-        });
+        };
 
-        $app['upload.http_client'] = $app->share(function() use ($app) {
+        $app['upload.http_client'] = function() use ($app) {
             return new GuzzleClient();
-        });
+        };
 
-        $app['upload.url_resolver'] = $app->share(function() use ($config) {
+        $app['upload.url_resolver'] = function() use ($config) {
             $revolver = new UploadUrlResolver();
             $revolver->setHost($config['application']['host']);
 
             return $revolver;
-        });
+        };
 
-        $app['upload.adapter_factory'] = $app->share(function() use ($app, $config) {
+        $app['upload.adapter_factory'] = function() use ($app, $config) {
             return new UploadAdapterFactory($app['upload.http_client'], $app['upload.url_resolver']);
-        });
+        };
 
-        $app['upload.freebox_adapter'] = $app->share(function() use ($app, $config) {
+        $app['upload.freebox_adapter'] = function() use ($app, $config) {
             return $app['upload.adapter_factory']->get(
                 $config['upload']['adapter']
             );
-        });
+        };
 
-        $app['upload.freebox_authentication_provider'] = $app->share(function() use ($app) {
+        $app['upload.freebox_authentication_provider'] = function() use ($app) {
             return new FreeboxAuthenticationProvider($app['upload.http_client']);
-        });
+        };
 
-        $app['upload.freebox.manager'] = $app->share(function() use ($app, $config) {
+        $app['upload.freebox.manager'] = function() use ($app, $config) {
             $manager = new FreeboxManager(
                 $app['upload.freebox_adapter'],
                 $app['upload.freebox_authentication_provider'],
@@ -294,9 +295,9 @@ class Bootstrap
             $manager->setDownloadDir($config['download_dir']);
 
             return $manager;
-        });
+        };
 
-        $app['transmission.http_client'] = $app->share(function() use ($config) {
+        $app['transmission.http_client'] = function() use ($config) {
             $url = sprintf(
                 'http://%s:%d',
                 $config['transmission']['host'],
@@ -304,27 +305,27 @@ class Bootstrap
             );
 
             return new GuzzleClient([
-                'base_url' => $url
+                'base_uri' => $url
             ]);
-        });
+        };
 
-        $app['transmission.manager'] = $app->share(function() use ($app, $config) {
+        $app['transmission.manager'] = function() use ($app, $config) {
             return new TransmissionManager($app['transmission.http_client'], $config['transmission']);
-        });
+        };
 
-        $app['filesystem.archiver.zip'] = $app->share(function() use ($app) {
+        $app['filesystem.archiver.zip'] = function() use ($app) {
             return new ZipArchiver($app['zippy']);
-        });
+        };
 
-        $app['filesystem.file_browser'] = $app->share(function() use ($app, $config) {
+        $app['filesystem.file_browser'] = function() use ($app, $config) {
             return new FileBrowser($config['file_browser']['root_path']);
-        });
+        };
 
         $app['zippy'] = function() {
             return Zippy::load();
         };
 
-        $app['message_queuing.freebox.connection'] = $app->share(function() use ($app, $config) {
+        $app['message_queuing.freebox.connection'] = function() use ($app, $config) {
             $messageConfig = $config['message_queuing']['freebox'];
 
             return new AMQPStreamConnection(
@@ -334,29 +335,29 @@ class Bootstrap
                 $messageConfig['connection']['password'],
                 $messageConfig['connection']['vhost']
             );
-        });
+        };
 
-        $app['message_queuing.freebox.consumer'] = $app->share(function() use ($app) {
+        $app['message_queuing.freebox.consumer'] = function() use ($app) {
             $consumer = new FreeboxMessageConsumer($app['message_queuing.freebox.connection']);
             $consumer->setLogger($app['logger']);
             $consumer->setFreeboxManager($app['upload.freebox.manager']);
             $consumer->setUserService($app['user.service']);
 
             return $consumer;
-        });
+        };
 
-        $app['message_queuing.freebox.producer'] = $app->share(function() use ($app) {
+        $app['message_queuing.freebox.producer'] = function() use ($app) {
             $consumer = new FreeboxMessageProducer($app['message_queuing.freebox.connection']);
             $consumer->setLogger($app['logger']);
 
             return $consumer;
-        });
+        };
 
-        $app['console'] = $app->share(function() use ($app) {
+        $app['console'] = function() use ($app) {
             return new CLIApplication($app, $this->config);
-        });
+        };
 
-        $app['serializer'] = $app->share(function() use ($app, $config) {
+        $app['serializer'] = function() use ($app, $config) {
             $jsonSerializer = new JsonSerializationVisitor(new IdenticalPropertyNamingStrategy());
             $jsonSerializer->setOptions(JSON_UNESCAPED_SLASHES);
 
@@ -365,14 +366,14 @@ class Bootstrap
                 ->setCacheDir($config['serializer']['cache_dir'])
                 ->setDebug($app['debug'])
                 ->build();
-        });
+        };
 
-        $app['application.exception_listener'] = $app->share(function() use ($app) {
+        $app['application.exception_listener'] = function() use ($app) {
             return new ExceptionHandler(
                 $this->getControllerInstance('\Martial\OpenCloudSeedbox\Front\Controller\ErrorController'),
                 $app['debug']
             );
-        });
+        };
     }
 
     /**
@@ -380,9 +381,9 @@ class Bootstrap
      *
      * @param string $controllerClass
      * @param array $parameters
-     * @return AbstractController
+     * @return AbstractController|ErrorControllerInterface
      */
-    protected function getControllerInstance($controllerClass, array $parameters = [])
+    private function getControllerInstance($controllerClass, array $parameters = [])
     {
         $reflectionClass = new \ReflectionClass($controllerClass);
         $dependencies = isset($parameters['dependencies']) ? $parameters['dependencies'] : [];
@@ -399,6 +400,7 @@ class Bootstrap
             ];
         }
 
+        /** @var AbstractController $controller */
         $controller = $reflectionClass->newInstanceArgs(array_merge($defaultDependencies, $dependencies));
 
         if (isset($parameters['calls'])) {

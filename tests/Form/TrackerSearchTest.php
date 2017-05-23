@@ -3,6 +3,10 @@
 namespace Martial\OpenCloudSeedbox\Tests\Form;
 
 use Martial\OpenCloudSeedbox\Form\TrackerSearch;
+use Martial\T411\Api\Category\Category;
+use Martial\T411\Api\Category\CategoryInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormTypeInterface;
 
 class TrackerSearchTest extends FormTestCase
@@ -18,27 +22,22 @@ class TrackerSearchTest extends FormTestCase
         $secondCategory = $this->getCategory();
         $subCategory = $this->getCategory();
 
-        $firstCategoryId = 12;
         $firstCategoryName = 'Film';
-
-        $secondCategoryId = 13;
         $secondCategoryName = 'Music';
-
         $subCategoryId = 15;
         $subCategoryName = 'Animation';
 
         $categories = [
-            $firstCategoryId => $firstCategoryName,
-            $subCategoryId => $subCategoryName,
-            $secondCategoryId => $secondCategoryName
+            $firstCategoryName => [
+                $subCategoryName => $subCategoryId
+            ],
+            $secondCategoryName => []
         ];
 
-        $this->setCategoryBehavior($firstCategory, 'getId', $firstCategoryId);
         $this->setCategoryBehavior($firstCategory, 'getName', $firstCategoryName);
         $this->setCategoryBehavior($firstCategory, 'getSubCategories', [$subCategory]);
         $this->setCategoryBehavior($subCategory, 'getId', $subCategoryId);
         $this->setCategoryBehavior($subCategory, 'getName', $subCategoryName);
-        $this->setCategoryBehavior($secondCategory, 'getId', $secondCategoryId);
         $this->setCategoryBehavior($secondCategory, 'getName', $secondCategoryName);
         $this->setCategoryBehavior($secondCategory, 'getSubCategories', []);
 
@@ -47,9 +46,14 @@ class TrackerSearchTest extends FormTestCase
             ->expects($this->exactly(2))
             ->method('add')
             ->withConsecutive(
-                [$this->equalTo('terms'), $this->equalTo('text')],
-                [$this->equalTo('category_id'), $this->equalTo('choice'), $this->equalTo([
-                    'choices' => $categories
+                [$this->equalTo('terms'), $this->equalTo(TextType::class)],
+                [$this->equalTo('category_id'), $this->equalTo(ChoiceType::class), $this->equalTo([
+                    'choices' => $categories,
+                    'preferred_choices' => [
+                        (string) Category::ID_FILM_VIDEO_MOVIE,
+                        (string) Category::ID_FILM_VIDEO_TV_SERIES,
+                        (string) Category::ID_AUDIO_MUSIC
+                    ]
                 ])]
             )
             ->will($this->returnValue($this->formBuilder));
@@ -62,40 +66,30 @@ class TrackerSearchTest extends FormTestCase
         ]);
     }
 
-    public function testDefaultOptions()
+    public function testConfigureOptions()
     {
         $this
             ->resolver
             ->expects($this->once())
             ->method('setRequired')
-            ->with($this->equalTo(['categories']))
+            ->with(['categories'])
             ->will($this->returnValue($this->resolver));
 
         $this
             ->resolver
             ->expects($this->once())
             ->method('setAllowedTypes')
-            ->with($this->equalTo(['categories' => 'array']))
+            ->with('categories', ['array'])
             ->will($this->returnValue($this->resolver));
 
         $this
             ->resolver
             ->expects($this->once())
             ->method('setDefaults')
-            ->with($this->equalTo(['csrf_protection' => false]))
+            ->with(['csrf_protection' => false])
             ->will($this->returnValue($this->resolver));
 
-        $this->getForm()->setDefaultOptions($this->resolver);
-    }
-
-    /**
-     * Returns the name of the form.
-     *
-     * @return string
-     */
-    protected function getFormName()
-    {
-        return 'tracker_search';
+        $this->getForm()->configureOptions($this->resolver);
     }
 
     /**
@@ -117,13 +111,13 @@ class TrackerSearchTest extends FormTestCase
      */
     private function getCategory()
     {
-        return $this->getMock('\Martial\T411\Api\Category\CategoryInterface');
+        return $this->getMock(CategoryInterface::class);
     }
 
     /**
      * @param \PHPUnit_Framework_MockObject_MockObject $category
      * @param string $method
-     * @param string $returnedValue
+     * @param mixed $returnedValue
      */
     private function setCategoryBehavior(\PHPUnit_Framework_MockObject_MockObject $category, $method, $returnedValue)
     {

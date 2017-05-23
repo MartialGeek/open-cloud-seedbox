@@ -20,8 +20,8 @@
         <section class="top-bar-section">
             <!-- Right Nav Section -->
             <ul class="right">
-                {% if app.session.get('connected') %}
-                    {%  set currentPage = app.request.attributes.get('_route') %}
+                {% if global.session.get('connected') %}
+                    {%  set currentPage = global.request.attributes.get('_route') %}
                     <li{% if currentPage == 'file_browser' %} class="active"{% endif %}>
                         <a href="{{ path('file_browser') }}">Browse files</a>
                     </li>
@@ -32,7 +32,7 @@
                         <a href="{{ path('transmission_torrents') }}">Downloads</a>
                     </li>
                     <li class="has-dropdown{% if currentPage == 'settings' %} active{% endif %}">
-                        <a href="{{ path('settings') }}">{{ app.session.get('username') }}</a>
+                        <a href="{{ path('settings') }}">{{ global.session.get('username') }}</a>
                         <ul class="dropdown">
                             <li{% if currentPage == 'settings' %} class="active"{% endif %}>
                                 <a href="{{ path('settings') }}">Settings</a>
@@ -52,28 +52,28 @@
     <div class="main-content">
         <div class="row">
             <div class="small-12 columns">
-                {% for flashMessage in app.session.flashbag.get('notice') %}
+                {% for flashMessage in global.session.flashbag.get('notice') %}
                     <div data-alert class="alert-box info radius">
                         {{ flashMessage }}
                         <a href="#" class="close">&times;</a>
                     </div>
                 {% endfor %}
 
-                {% for flashMessage in app.session.flashbag.get('success') %}
+                {% for flashMessage in global.session.flashbag.get('success') %}
                     <div data-alert class="alert-box success radius">
                         {{ flashMessage }}
                         <a href="#" class="close">&times;</a>
                     </div>
                 {% endfor %}
 
-                {% for flashMessage in app.session.flashbag.get('error') %}
+                {% for flashMessage in global.session.flashbag.get('error') %}
                     <div data-alert class="alert-box alert radius">
                         {{ flashMessage }}
                         <a href="#" class="close">&times;</a>
                     </div>
                 {% endfor %}
 
-                {% for flashMessage in app.session.flashbag.get('warning') %}
+                {% for flashMessage in global.session.flashbag.get('warning') %}
                     <div data-alert class="alert-box warning radius">
                         {{ flashMessage }}
                         <a href="#" class="close">&times;</a>

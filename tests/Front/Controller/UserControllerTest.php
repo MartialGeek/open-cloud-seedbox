@@ -5,7 +5,11 @@ namespace Martial\OpenCloudSeedbox\Tests\Front\Controller;
 use Martial\OpenCloudSeedbox\Form\Login;
 use Martial\OpenCloudSeedbox\Front\Controller\UserController;
 use Martial\OpenCloudSeedbox\Security\BadCredentialsException;
+use Martial\OpenCloudSeedbox\Security\CookieTokenInterface;
+use Martial\OpenCloudSeedbox\Security\CookieTokenizerInterface;
+use Martial\OpenCloudSeedbox\User\Entity\User;
 use Martial\OpenCloudSeedbox\User\UserNotFoundException;
+use Martial\OpenCloudSeedbox\User\UserServiceInterface;
 
 class UserControllerTest extends ControllerTestCase
 {
@@ -71,7 +75,7 @@ class UserControllerTest extends ControllerTestCase
      */
     protected function getControllerClassName()
     {
-        return '\Martial\OpenCloudSeedbox\Front\Controller\UserController';
+        return UserController::class;
     }
 
     /**
@@ -87,11 +91,11 @@ class UserControllerTest extends ControllerTestCase
         $username = 'Toto';
 
         $user = $this
-            ->getMockBuilder('\Martial\OpenCloudSeedbox\User\Entity\User')
+            ->getMockBuilder(User::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->createForm(new Login());
+        $this->createForm(Login::class);
         $this->handleRequest($this->request);
 
         switch ($context) {
@@ -106,7 +110,7 @@ class UserControllerTest extends ControllerTestCase
                     ->method('getId')
                     ->will($this->returnValue(123));
 
-                $cookieToken = $this->getMock('\Martial\OpenCloudSeedbox\Security\CookieTokenInterface');
+                $cookieToken = $this->getMock(CookieTokenInterface::class);
 
                 $cookieToken
                     ->expects($this->once())
@@ -180,11 +184,11 @@ class UserControllerTest extends ControllerTestCase
 
     protected function setUp()
     {
-        $this->userService = $this->getMock('\Martial\OpenCloudSeedbox\User\UserServiceInterface');
-        $this->cookieTokenizer = $this->getMock('\Martial\OpenCloudSeedbox\Security\CookieTokenizerInterface');
+        $this->userService = $this->getMock(UserServiceInterface::class);
+        $this->cookieTokenizer = $this->getMock(CookieTokenizerInterface::class);
 
         $this->user = $this
-            ->getMockBuilder('\Martial\OpenCloudSeedbox\User\Entity\User')
+            ->getMockBuilder(User::class)
             ->disableOriginalConstructor()
             ->getMock();
 

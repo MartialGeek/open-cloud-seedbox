@@ -2,8 +2,12 @@
 
 namespace Martial\OpenCloudSeedbox\Tests\Upload\Freebox;
 
+use GuzzleHttp\ClientInterface;
 use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxUploaderAdapter;
 use Martial\OpenCloudSeedbox\Upload\UploadException;
+use Martial\OpenCloudSeedbox\Upload\UploadUrlResolverInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 use Symfony\Component\HttpFoundation\File\File;
 
 class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
@@ -56,8 +60,8 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->httpClient = $this->getMock('\GuzzleHttp\ClientInterface');
-        $this->urlResolver = $this->getMock('\Martial\OpenCloudSeedbox\Upload\UploadUrlResolverInterface');
+        $this->httpClient = $this->getMock(ClientInterface::class);
+        $this->urlResolver = $this->getMock(UploadUrlResolverInterface::class);
         $this->config = [
             'app_id' => 'net.open-cloud-seedbox',
             'app_name' => 'Open Cloud Seedbox',
@@ -73,7 +77,7 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
      */
     private function createResponse()
     {
-        return $this->getMock('\GuzzleHttp\Message\ResponseInterface');
+        return $this->getMock(ResponseInterface::class);
     }
 
     private function upload($uploadType = 'regular', $success = true)
@@ -105,24 +109,31 @@ class FreeboxUploaderAdapterTest extends \PHPUnit_Framework_TestCase
         $this
             ->httpClient
             ->expects($this->once())
-            ->method('post')
-            ->with(
-                $this->equalTo($freeboxUrl . '/api/v3/downloads/add'),
-                $this->equalTo([
-                    'body' => [
-                        'download_url' => $uploadUrl
-                    ],
-                    'headers' => [
-                        'X-Fbx-App-Auth' => $sessionToken
-                    ]
-                ])
-            )
+            ->method('request')
+            ->with('POST', $freeboxUrl . '/api/v3/downloads/add', [
+                'form_params' => [
+                    'download_url' => $uploadUrl
+                ],
+                'headers' => [
+                    'X-Fbx-App-Auth' => $sessionToken
+                ]
+            ])
             ->willReturn($addDownloadResponse);
+
+        $stream = $this
+            ->getMockBuilder(StreamInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $addDownloadResponse
             ->expects($this->once())
-            ->method('json')
-            ->willReturn($addDownloadResponseData);
+            ->method('getBody')
+            ->willReturn($stream);
+
+        $stream
+            ->expects($this->once())
+            ->method('getContents')
+            ->willReturn(json_encode($addDownloadResponseData, JSON_FORCE_OBJECT));
 
         $this->freeboxAdapter->upload($uploadedFile, $freeboxUrl, [
             'session_token' => $sessionToken,

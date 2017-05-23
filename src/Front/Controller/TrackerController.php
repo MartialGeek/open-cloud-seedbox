@@ -164,6 +164,6 @@ class TrackerController extends AbstractController
     {
         $categories = $this->client->getCategories($token);
 
-        return $this->formFactory->create(new TrackerSearch(), null, ['categories' => $categories]);
+        return $this->formFactory->create(TrackerSearch::class, null, ['categories' => $categories]);
     }
 }

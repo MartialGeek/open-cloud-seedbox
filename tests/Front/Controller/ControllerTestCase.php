@@ -3,7 +3,7 @@
 namespace Martial\OpenCloudSeedbox\Tests\Front\Controller;
 
 use Martial\OpenCloudSeedbox\Front\Controller\AbstractController;
-use Symfony\Component\Form\FormTypeInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -38,7 +38,7 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
     public $formView;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|Request
      */
     public $request;
 
@@ -128,17 +128,17 @@ abstract class ControllerTestCase extends \PHPUnit_Framework_TestCase
     /**
      * Simulates a call to the method create of the form factory component.
      *
-     * @param FormTypeInterface $formType
+     * @param string $formClass
      * @param mixed $data
      * @param array $options
      */
-    protected function createForm(FormTypeInterface $formType, $data = null, $options = [])
+    protected function createForm($formClass, $data = null, $options = [])
     {
         $this
             ->formFactory
             ->expects($this->once())
             ->method('create')
-            ->with($this->equalTo($formType), $this->equalTo($data), $this->equalTo($options))
+            ->with($this->equalTo($formClass), $this->equalTo($data), $this->equalTo($options))
             ->will($this->returnValue($this->form));
     }
 

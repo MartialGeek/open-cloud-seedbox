@@ -3,6 +3,8 @@
 namespace Martial\OpenCloudSeedbox\Form;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Length;
@@ -13,27 +15,17 @@ class Login extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('email', 'email', [
+            ->add('email', EmailType::class, [
                 'constraints' => [
                     new NotBlank(),
                     new Email()
                 ]
             ])
-            ->add('password', 'password', [
+            ->add('password', PasswordType::class, [
                 'constraints' => [
                     new NotBlank(),
                     new Length(['min' => 8])
                 ]
             ]);
-    }
-
-    /**
-     * Returns the name of this type.
-     *
-     * @return string The name of this type
-     */
-    public function getName()
-    {
-        return 'login';
     }
 }

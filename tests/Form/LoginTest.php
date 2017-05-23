@@ -3,6 +3,8 @@
 namespace Martial\OpenCloudSeedbox\Tests\Form;
 
 use Martial\OpenCloudSeedbox\Form\Login;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Length;
@@ -24,7 +26,7 @@ class LoginTest extends FormTestCase
             ->withConsecutive(
                 [
                     $this->equalTo('email'),
-                    $this->equalTo('email'),
+                    $this->equalTo(EmailType::class),
                     $this->equalTo(['constraints' => [
                         new NotBlank(),
                         new Email()
@@ -32,7 +34,7 @@ class LoginTest extends FormTestCase
                 ],
                 [
                     $this->equalTo('password'),
-                    $this->equalTo('password'),
+                    $this->equalTo(PasswordType::class),
                     $this->equalTo(['constraints' => [
                         new NotBlank(),
                         new Length(['min' => 8])
@@ -42,16 +44,6 @@ class LoginTest extends FormTestCase
             ->will($this->returnValue($this->formBuilder));
 
         $this->getForm()->buildForm($this->formBuilder, []);
-    }
-
-    /**
-     * Returns the name of the form.
-     *
-     * @return string
-     */
-    protected function getFormName()
-    {
-        return 'login';
     }
 
     /**

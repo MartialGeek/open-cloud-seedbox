@@ -2,16 +2,18 @@
 
 namespace Martial\OpenCloudSeedbox\Form;
 
+use Martial\OpenCloudSeedbox\Settings\Entity\FreeboxSettingsEntity;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FreeboxSettings extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('id', 'hidden')
+            ->add('id', HiddenType::class)
             ->add('transportHost')
             ->add('transportPort')
             ->add('appId')
@@ -20,20 +22,10 @@ class FreeboxSettings extends AbstractType
             ->add('deviceName');
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => '\Martial\OpenCloudSeedbox\Settings\Entity\FreeboxSettingsEntity'
+            'data_class' => FreeboxSettingsEntity::class
         ]);
-    }
-
-    /**
-     * Returns the name of this type.
-     *
-     * @return string The name of this type
-     */
-    public function getName()
-    {
-        return 'freebox_settings';
     }
 }

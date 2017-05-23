@@ -4,6 +4,7 @@ namespace Martial\OpenCloudSeedbox\Tests\Front\Controller;
 
 use Martial\OpenCloudSeedbox\Form\Login;
 use Martial\OpenCloudSeedbox\Front\Controller\HomeController;
+use Symfony\Component\HttpFoundation\Response;
 
 class HomeControllerTest extends ControllerTestCase
 {
@@ -15,12 +16,12 @@ class HomeControllerTest extends ControllerTestCase
     public function testIndex()
     {
         $templatePath = '@home/index.html.twig';
-        $this->createForm(new Login());
+        $this->createForm(Login::class);
         $this->createFormView();
         $this->render($templatePath, ['loginForm' => $this->formView]);
 
         $response = $this->controller->index();
-        $this->assertInstanceOf('\Symfony\Component\HttpFoundation\Response', $response);
+        $this->assertInstanceOf(Response::class, $response);
     }
 
     /**
@@ -30,6 +31,6 @@ class HomeControllerTest extends ControllerTestCase
      */
     protected function getControllerClassName()
     {
-        return '\Martial\OpenCloudSeedbox\Front\Controller\HomeController';
+        return HomeController::class;
     }
 }

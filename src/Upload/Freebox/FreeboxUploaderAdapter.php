@@ -42,17 +42,20 @@ class FreeboxUploaderAdapter implements UploadInterface
     {
         $uploadType = isset($config['upload_type']) ? $config['upload_type'] : FreeboxManager::UPLOAD_TYPE_REGULAR;
 
-        $response = $this
+        $rawrResponse = $this
             ->httpClient
-            ->post($targetUrl . '/api/v3/downloads/add', [
-                'body' => [
+            ->request('POST', $targetUrl . '/api/v3/downloads/add', [
+                'form_params' => [
                     'download_url' => $this->urlResolver->resolve($file, ['upload_type' => $uploadType])
                 ],
                 'headers' => [
                     'X-Fbx-App-Auth' => $config['session_token']
                 ]
             ])
-            ->json();
+            ->getBody()
+            ->getContents();
+
+        $response = \GuzzleHttp\json_decode($rawrResponse, true);
 
         if (!$response['success']) {
             throw new UploadException($response['msg']);

@@ -14,7 +14,7 @@ class SecurityControllerTest extends ControllerTestCase
 
     public function testLoginForm()
     {
-        $this->createForm(new Login());
+        $this->createForm(Login::class);
         $this->createFormView();
         $this->render('@security/loginForm.html.twig', [
             'loginForm' => $this->formView
@@ -30,6 +30,6 @@ class SecurityControllerTest extends ControllerTestCase
      */
     protected function getControllerClassName()
     {
-        return '\Martial\OpenCloudSeedbox\Front\Controller\SecurityController';
+        return SecurityController::class;
     }
 }

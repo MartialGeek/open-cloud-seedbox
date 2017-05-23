@@ -4,8 +4,10 @@ namespace Martial\OpenCloudSeedbox\Form;
 
 use Martial\T411\Api\Category\Category;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TrackerSearch extends AbstractType
 {
@@ -15,43 +17,48 @@ class TrackerSearch extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $categories = [];
-
-        /**
-         * @var Category $category
-         */
-        foreach ($options['categories'] as $category) {
-            $categories[$category->getId()] = $category->getName();
-
-            foreach ($category->getSubCategories() as $subCategory) {
-                $categories[$subCategory->getId()] = $subCategory->getName();
-            }
-        }
+        $categories = $this->buildCategoriesTree($options['categories']);
 
         $builder
-            ->add('terms', 'text')
-            ->add('category_id', 'choice', [
-                'choices' => $categories
+            ->add('terms', TextType::class)
+            ->add('category_id', ChoiceType::class, [
+                'choices' => $categories,
+                'preferred_choices' => [
+                    (string) Category::ID_FILM_VIDEO_MOVIE,
+                    (string) Category::ID_FILM_VIDEO_TV_SERIES,
+                    (string) Category::ID_AUDIO_MUSIC
+                ]
             ]);
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
             ->setRequired(['categories'])
-            ->setAllowedTypes(['categories' => 'array'])
+            ->setAllowedTypes('categories', ['array'])
             ->setDefaults([
                 'csrf_protection' => false,
             ]);
     }
 
     /**
-     * Returns the name of this type.
-     *
-     * @return string The name of this type
+     * @param Category[] $categories
+     * @return array
      */
-    public function getName()
+    private function buildCategoriesTree(array $categories)
     {
-        return 'tracker_search';
+        $tree = [];
+
+        foreach ($categories as $category) {
+            $subCategories = [];
+
+            foreach ($category->getSubCategories() as $subCategory) {
+                $subCategories[$subCategory->getName()] = (string) $subCategory->getId();
+            }
+
+            $tree[$category->getName()] = $subCategories;
+        }
+
+        return $tree;
     }
 }

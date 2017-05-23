@@ -3,7 +3,10 @@
 namespace Martial\OpenCloudSeedbox\Tests\Form;
 
 use Martial\OpenCloudSeedbox\Form\TrackerSettings;
+use Martial\OpenCloudSeedbox\Settings\Entity\TrackerSettingsEntity;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormTypeInterface;
+use Symfony\Component\HttpKernel\Profiler\Profile;
 
 class ProfileTest extends FormTestCase
 {
@@ -21,7 +24,7 @@ class ProfileTest extends FormTestCase
             ->withConsecutive(
                 [$this->equalTo('username')],
                 [
-                    $this->equalTo('password'), $this->equalTo('password'), $this->equalTo([
+                    $this->equalTo('password'), $this->equalTo(PasswordType::class), $this->equalTo([
                         'required' => false
                     ])
                 ]
@@ -31,26 +34,16 @@ class ProfileTest extends FormTestCase
         $this->getForm()->buildForm($this->formBuilder, []);
     }
 
-    public function testDefaultOptions()
+    public function testConfigureOptions()
     {
         $this
             ->resolver
             ->expects($this->once())
             ->method('setDefaults')
-            ->with($this->equalTo(['data_class' => '\Martial\OpenCloudSeedbox\Settings\Entity\TrackerSettingsEntity']))
+            ->with($this->equalTo(['data_class' => TrackerSettingsEntity::class]))
             ->will($this->returnValue($this->resolver));
 
-        $this->getForm()->setDefaultOptions($this->resolver);
-    }
-
-    /**
-     * Returns the name of the form.
-     *
-     * @return string
-     */
-    protected function getFormName()
-    {
-        return 'tracker_settings';
+        $this->getForm()->configureOptions($this->resolver);
     }
 
     /**

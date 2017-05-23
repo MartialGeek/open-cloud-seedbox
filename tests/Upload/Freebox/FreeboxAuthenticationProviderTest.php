@@ -2,7 +2,10 @@
 
 namespace Martial\OpenCloudSeedbox\Tests\Upload\Freebox;
 
+use GuzzleHttp\ClientInterface;
 use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthenticationProvider;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 
 class FreeboxAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -114,16 +117,17 @@ JSON;
         $this
             ->httpClient
             ->expects($this->once())
-            ->method('post')
-            ->with($this->equalTo($this->buildUrl('/api/v3/login/authorize')), $this->equalTo([
-                'body' => json_encode($params, JSON_FORCE_OBJECT)
-            ]))
+            ->method('request')
+            ->with('POST', $this->buildUrl('/api/v3/login/authorize'), [
+                'json' => $params
+            ])
             ->willReturn($this->response);
 
-        $this->getJsonDecodedResponse($jsonResponse);
+        $response = $this->getJsonDecodedResponse($jsonResponse);
         $result = $this->provider->getApplicationToken($params);
 
         if ($success) {
+            $this->assertSame($response, $result);
             $this->assertTrue($result['success']);
             $this->assertInternalType('string', $result['result']['app_token']);
         }
@@ -150,14 +154,15 @@ JSON;
         $this
             ->httpClient
             ->expects($this->once())
-            ->method('get')
-            ->with($this->equalTo($this->buildUrl('/api/v3/login/authorize/' . $trackId)))
+            ->method('request')
+            ->with('GET', $this->buildUrl('/api/v3/login/authorize/' . $trackId))
             ->willReturn($this->response);
 
-        $this->getJsonDecodedResponse($jsonResponse);
+        $response = $this->getJsonDecodedResponse($jsonResponse);
         $result = $this->provider->getAuthorizationStatus($trackId);
 
         if ($success) {
+            $this->assertSame($response, $result);
             $this->assertSame('granted', $result['result']['status']);
         }
     }
@@ -167,7 +172,7 @@ JSON;
         $challenge = 'VzhbtpR4r8CLaJle2QgJBEkyd8JPb0zL';
         $sessionToken = $withSessionToken ? uniqid() : '';
 
-        $headers = $withSessionToken ? [
+        $options = $withSessionToken ? [
             'headers' => [
                 'X-Fbx-App-Auth' => $sessionToken
             ]
@@ -190,14 +195,15 @@ JSON;
         $this
             ->httpClient
             ->expects($this->once())
-            ->method('get')
-            ->with($this->equalTo($this->buildUrl('/api/v3/login')), $this->equalTo($headers))
+            ->method('request')
+            ->with('GET', $this->buildUrl('/api/v3/login'), $options)
             ->willReturn($this->response);
 
-        $this->getJsonDecodedResponse($jsonResponse);
+        $response = $this->getJsonDecodedResponse($jsonResponse);
         $result = $this->provider->getConnectionStatus($sessionToken);
 
         if ($success) {
+            $this->assertSame($response, $result);
             $this->assertSame($challenge, $result['result']['challenge']);
         }
     }
@@ -232,31 +238,32 @@ JSON;
         $this
             ->httpClient
             ->expects($this->once())
-            ->method('post')
-            ->with($this->equalTo($this->buildUrl('/api/v3/login/session')), $this->equalTo([
-                    'body' => json_encode([
+            ->method('request')
+            ->with('POST', $this->buildUrl('/api/v3/login/session'), [
+                    'json' => [
                         'app_id' => $params['app_id'],
                         'password' => hash_hmac(
                             'sha1',
                             $params['challenge'],
                             $params['app_token']
                         )
-                    ], JSON_FORCE_OBJECT)
-            ]))
+                    ]
+            ])
             ->willReturn($this->response);
 
-        $this->getJsonDecodedResponse($jsonResponse);
+        $response = $this->getJsonDecodedResponse($jsonResponse);
         $result = $this->provider->openSession($params);
 
         if ($success) {
+            $this->assertSame($response, $result);
             $this->assertSame($sessionToken, $result['result']['session_token']);
         }
     }
 
     protected function setUp()
     {
-        $this->httpClient = $this->getMock('\GuzzleHttp\ClientInterface');
-        $this->response = $this->getMock('\GuzzleHttp\Message\ResponseInterface');
+        $this->httpClient = $this->getMock(ClientInterface::class);
+        $this->response = $this->getMock(ResponseInterface::class);
         $this->host = '66.66.66.66';
         $this->port = 8888;
         $this->provider = new FreeboxAuthenticationProvider($this->httpClient);
@@ -266,16 +273,29 @@ JSON;
 
     /**
      * @param string $json
+     * @return array
      */
     private function getJsonDecodedResponse($json)
     {
-        $json = str_replace('\\', '\\\\', $json);
+        $stream = $this
+            ->getMockBuilder(StreamInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this
             ->response
             ->expects($this->once())
-            ->method('json')
-            ->willReturn(json_decode($json, true));
+            ->method('getBody')
+            ->willReturn($stream);
+
+        $json = str_replace('\\', '\\\\', $json);
+
+        $stream
+            ->expects($this->once())
+            ->method('getContents')
+            ->willReturn($json);
+
+        return \GuzzleHttp\json_decode($json, true);
     }
 
     /**

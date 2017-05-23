@@ -12,7 +12,7 @@ class HomeController extends AbstractController
      */
     public function index()
     {
-        $loginForm = $this->formFactory->create(new Login());
+        $loginForm = $this->formFactory->create(Login::class);
 
         return new Response(
             $this->twig->render('@home/index.html.twig', [

@@ -2,31 +2,21 @@
 
 namespace Martial\OpenCloudSeedbox\Tests\Form;
 
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormTypeInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 abstract class FormTestCase extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|FormBuilderInterface
      */
     protected $formBuilder;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|OptionsResolver
      */
     protected $resolver;
-
-    public function testFormName()
-    {
-        $this->assertSame($this->getFormName(), $this->getForm()->getName());
-    }
-
-    /**
-     * Returns the name of the form.
-     *
-     * @return string
-     */
-    abstract protected function getFormName();
 
     /**
      * Returns an instance of your form.
@@ -37,7 +27,7 @@ abstract class FormTestCase extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->formBuilder = $this->getMock('\Symfony\Component\Form\FormBuilderInterface');
-        $this->resolver = $this->getMock('\Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $this->formBuilder = $this->getMock(FormBuilderInterface::class);
+        $this->resolver = $this->getMock(OptionsResolver::class);
     }
 }

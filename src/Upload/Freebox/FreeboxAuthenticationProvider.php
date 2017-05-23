@@ -76,13 +76,15 @@ class FreeboxAuthenticationProvider implements FreeboxAuthenticationProviderInte
      */
     public function getApplicationToken(array $params)
     {
-        $response = $this
+        $rawResponse = $this
             ->httpClient
-            ->post($this->buildUrl('/api/v3/login/authorize'), [
-                'body' => json_encode($params, JSON_FORCE_OBJECT)
+            ->request('POST', $this->buildUrl('/api/v3/login/authorize'), [
+                'json' => $params
             ])
-            ->json();
+            ->getBody()
+            ->getContents();
 
+        $response = $this->deserializeResponse($rawResponse);
         $this->checkResponseStatus($response);
 
         return $response;
@@ -107,11 +109,13 @@ class FreeboxAuthenticationProvider implements FreeboxAuthenticationProviderInte
      */
     public function getAuthorizationStatus($trackId)
     {
-        $response = $this
+        $rawResponse = $this
             ->httpClient
-            ->get($this->buildUrl('/api/v3/login/authorize/' . $trackId))
-            ->json();
+            ->request('GET', $this->buildUrl('/api/v3/login/authorize/' . $trackId))
+            ->getBody()
+            ->getContents();
 
+        $response = $this->deserializeResponse($rawResponse);
         $this->checkResponseStatus($response);
 
         return $response;
@@ -136,17 +140,19 @@ class FreeboxAuthenticationProvider implements FreeboxAuthenticationProviderInte
      */
     public function getConnectionStatus($sessionToken = '')
     {
-        $headers = !empty($sessionToken) ? [
+        $options = !empty($sessionToken) ? [
             'headers' => [
                 'X-Fbx-App-Auth' => $sessionToken
             ]
         ] : [];
 
-        $response = $this
+        $rawResponse = $this
             ->httpClient
-            ->get($this->buildUrl('/api/v3/login'), $headers)
-            ->json();
+            ->request('GET', $this->buildUrl('/api/v3/login'), $options)
+            ->getBody()
+            ->getContents();
 
+        $response = $this->deserializeResponse($rawResponse);
         $this->checkResponseStatus($response);
 
         return $response;
@@ -181,22 +187,22 @@ class FreeboxAuthenticationProvider implements FreeboxAuthenticationProviderInte
      */
     public function openSession(array $params)
     {
-        $body = json_encode([
-            'app_id' => $params['app_id'],
-            'password' => hash_hmac(
-                'sha1',
-                $params['challenge'],
-                $params['app_token']
-            )
-        ]);
-
-        $response = $this
+        $rawResponse = $this
             ->httpClient
-            ->post($this->buildUrl('/api/v3/login/session'), [
-                'body' => $body
+            ->request('POST', $this->buildUrl('/api/v3/login/session'), [
+                'json' => [
+                    'app_id' => $params['app_id'],
+                    'password' => hash_hmac(
+                        'sha1',
+                        $params['challenge'],
+                        $params['app_token']
+                    )
+                ]
             ])
-            ->json();
+            ->getBody()
+            ->getContents();
 
+        $response = $this->deserializeResponse($rawResponse);
         $this->checkResponseStatus($response);
 
         return $response;
@@ -224,5 +230,10 @@ class FreeboxAuthenticationProvider implements FreeboxAuthenticationProviderInte
     private function buildUrl($uri)
     {
         return sprintf('http://%s:%d%s', $this->host, $this->port, $uri);
+    }
+
+    private function deserializeResponse($response)
+    {
+        return \GuzzleHttp\json_decode($response, true);
     }
 }

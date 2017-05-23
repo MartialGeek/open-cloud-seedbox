@@ -3,6 +3,8 @@
 namespace Martial\OpenCloudSeedbox\Tests\Form;
 
 use Martial\OpenCloudSeedbox\Form\FreeboxSettings;
+use Martial\OpenCloudSeedbox\Settings\Entity\FreeboxSettingsEntity;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormTypeInterface;
 
 class FreeboxSettingsTest extends FormTestCase
@@ -16,7 +18,7 @@ class FreeboxSettingsTest extends FormTestCase
             ->withConsecutive(
                 [
                     $this->equalTo('id'),
-                    $this->equalTo('hidden')
+                    $this->equalTo(HiddenType::class)
                 ],
                 [$this->equalTo('transportHost')],
                 [$this->equalTo('transportPort')],
@@ -30,26 +32,16 @@ class FreeboxSettingsTest extends FormTestCase
         $this->getForm()->buildForm($this->formBuilder, []);
     }
 
-    public function testDefaultOptions()
+    public function testConfigureOptions()
     {
         $this
             ->resolver
             ->expects($this->once())
             ->method('setDefaults')
-            ->with($this->equalTo(['data_class' => '\Martial\OpenCloudSeedbox\Settings\Entity\FreeboxSettingsEntity']))
+            ->with($this->equalTo(['data_class' => FreeboxSettingsEntity::class]))
             ->will($this->returnValue($this->resolver));
 
-        $this->getForm()->setDefaultOptions($this->resolver);
-    }
-
-    /**
-     * Returns the name of the form.
-     *
-     * @return string
-     */
-    protected function getFormName()
-    {
-        return 'freebox_settings';
+        $this->getForm()->configureOptions($this->resolver);
     }
 
     /**

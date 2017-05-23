@@ -2,9 +2,11 @@
 
 namespace Martial\OpenCloudSeedbox\Form;
 
+use Martial\OpenCloudSeedbox\Settings\Entity\TrackerSettingsEntity;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TrackerSettings extends AbstractType
 {
@@ -16,28 +18,15 @@ class TrackerSettings extends AbstractType
     {
         $builder
             ->add('username')
-            ->add('password', 'password', [
+            ->add('password', PasswordType::class, [
                 'required' => false
             ]);
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => '\Martial\OpenCloudSeedbox\Settings\Entity\TrackerSettingsEntity'
+            'data_class' => TrackerSettingsEntity::class
         ]);
-    }
-
-    /**
-     * Returns the name of this type.
-     *
-     * @return string The name of this type
-     */
-    public function getName()
-    {
-        return 'tracker_settings';
     }
 }

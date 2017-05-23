@@ -9,7 +9,7 @@ class SecurityController extends AbstractController
 {
     public function loginForm()
     {
-        $loginForm = $this->formFactory->create(new Login());
+        $loginForm = $this->formFactory->create(Login::class);
 
         return new Response(
             $this->twig->render('@security/loginForm.html.twig', [

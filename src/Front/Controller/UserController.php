@@ -44,7 +44,7 @@ class UserController extends AbstractController
 
     public function login(Request $request)
     {
-        $loginForm = $this->formFactory->create(new Login());
+        $loginForm = $this->formFactory->create(Login::class);
         $loginForm->handleRequest($request);
 
         if ($loginForm->isValid()) {

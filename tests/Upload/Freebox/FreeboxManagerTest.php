@@ -2,12 +2,22 @@
 
 namespace Martial\OpenCloudSeedbox\Tests\Upload\Freebox;
 
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Message\Request;
-use GuzzleHttp\Message\Response;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
+use Martial\OpenCloudSeedbox\Filesystem\ZipArchiver;
+use Martial\OpenCloudSeedbox\MessageQueuing\Freebox\FreeboxMessageProducer;
+use Martial\OpenCloudSeedbox\Settings\FreeboxSettingsDataTransformer;
+use Martial\OpenCloudSeedbox\Settings\SettingsManagerInterface;
 use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthenticationException;
+use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthenticationProviderInterface;
 use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxManager;
 use Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxSessionException;
+use Martial\OpenCloudSeedbox\Upload\UploadInterface;
+use Martial\OpenCloudSeedbox\User\Entity\User;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,52 +27,52 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
     public $freeboxManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|UploadInterface
      */
     public $uploadManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|FreeboxAuthenticationProviderInterface
      */
     public $authenticationProvider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|SettingsManagerInterface
      */
     public $settingsManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|FreeboxSettingsDataTransformer
      */
     public $dataTransformer;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|ClientInterface
      */
     public $httpClient;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|UrlGeneratorInterface
      */
     public $urlGenerator;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|ZipArchiver
      */
     public $archiver;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|Filesystem
      */
     public $fs;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|FreeboxMessageProducer
      */
     public $messageProducer;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|User
      */
     public $user;
 
@@ -78,37 +88,34 @@ class FreeboxManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->uploadManager = $this->getMock('\Martial\OpenCloudSeedbox\Upload\UploadInterface');
-        $this->httpClient = $this->getMock('\GuzzleHttp\ClientInterface');
-        $this->urlGenerator = $this->getMock('\Symfony\Component\Routing\Generator\UrlGeneratorInterface');
-
-        $this->authenticationProvider = $this
-            ->getMock('\Martial\OpenCloudSeedbox\Upload\Freebox\FreeboxAuthenticationProviderInterface');
-
-        $this->settingsManager = $this->getMock('\Martial\OpenCloudSeedbox\Settings\SettingsManagerInterface');
+        $this->uploadManager = $this->getMock(UploadInterface::class);
+        $this->httpClient = $this->getMock(ClientInterface::class);
+        $this->urlGenerator = $this->getMock(UrlGeneratorInterface::class);
+        $this->authenticationProvider = $this->getMock(FreeboxAuthenticationProviderInterface::class);
+        $this->settingsManager = $this->getMock(SettingsManagerInterface::class);
 
         $this->dataTransformer = $this
-            ->getMockBuilder('\Martial\OpenCloudSeedbox\Settings\FreeboxSettingsDataTransformer')
+            ->getMockBuilder(FreeboxSettingsDataTransformer::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->archiver = $this
-            ->getMockBuilder('\Martial\OpenCloudSeedbox\Filesystem\ZipArchiver')
+            ->getMockBuilder(ZipArchiver::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->fs = $this
-            ->getMockBuilder('\Symfony\Component\Filesystem\Filesystem')
+            ->getMockBuilder(Filesystem::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->messageProducer = $this
-            ->getMockBuilder('\Martial\OpenCloudSeedbox\MessageQueuing\Freebox\FreeboxMessageProducer')
+            ->getMockBuilder(FreeboxMessageProducer::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->user = $this
-            ->getMockBuilder('\Martial\OpenCloudSeedbox\User\Entity\User')
+            ->getMockBuilder(User::class)
             ->disableOriginalConstructor()
             ->getMock();
 

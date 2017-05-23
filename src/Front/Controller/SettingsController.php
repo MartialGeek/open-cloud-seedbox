@@ -8,7 +8,6 @@ use Martial\OpenCloudSeedbox\Settings\Entity\FreeboxSettingsEntity;
 use Martial\OpenCloudSeedbox\Settings\Entity\TrackerSettingsEntity;
 use Martial\OpenCloudSeedbox\Settings\FreeboxSettings;
 use Martial\OpenCloudSeedbox\Settings\TrackerSettings;
-use Martial\OpenCloudSeedbox\User\Entity\User;
 use Martial\OpenCloudSeedbox\User\UserServiceInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -120,7 +119,7 @@ class SettingsController extends AbstractController
      */
     private function getFreeboxForm(FreeboxSettingsEntity $settings)
     {
-        return $this->formFactory->create(new FreeboxSettingsType(), $settings);
+        return $this->formFactory->create(FreeboxSettingsType::class, $settings);
     }
 
     /**
@@ -137,7 +136,7 @@ class SettingsController extends AbstractController
      */
     private function getTrackerForm(TrackerSettingsEntity $settings)
     {
-        return $this->formFactory->create(new TrackerSettingsType(), $settings);
+        return $this->formFactory->create(TrackerSettingsType::class, $settings);
     }
 
     /**
