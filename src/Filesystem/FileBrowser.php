@@ -19,11 +19,11 @@ class FileBrowser implements FileBrowserInterface
         }
 
         if (!is_dir($rootPath)) {
-            throw new \InvalidArgumentException('The path %s is not a directory.', $rootPath);
+            throw new \InvalidArgumentException(sprintf('The path %s is not a directory.', $rootPath));
         }
 
         if (!is_readable($rootPath)) {
-            throw new \InvalidArgumentException('The path %s is not readable.', $rootPath);
+            throw new \InvalidArgumentException(sprintf('The path %s is not readable.', $rootPath));
         }
 
         $this->rootPath = $rootPath;
