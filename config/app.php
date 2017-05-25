@@ -49,7 +49,7 @@ return [
         ]
     ],
     'monolog' => [
-        'monolog.logfile' => __DIR__ . '/../var/log/' . $parameters['app_env'] . '.log'
+        'monolog.logfile' => 'php://stdout'
     ],
     'translator' => [
         'translator.domains' => []
