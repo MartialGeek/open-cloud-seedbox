@@ -1,0 +1,5 @@
+FROM martialgeek/php:7.1
+
+COPY . /var/www/html
+
+RUN chown -R www-data:www-data /var/www/html/var
