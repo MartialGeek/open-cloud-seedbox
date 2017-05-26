@@ -22,7 +22,8 @@
                         <span class="meter" data-torrent-percent-done="{{ torrent.percentDone * 100 }}"></span>
                     </div>
                 </td>
-                <td data-torrent-field="download-ever">{{ convertToHumanReadable(torrent.downloadedEver) }}</td>
+                {% set downloaded = computeDownloadedSize(torrent.totalSize, torrent.percentDone) %}
+                <td data-torrent-field="downloaded">{{ convertToHumanReadable(downloaded) }}</td>
                 <td data-torrent-field="total-size">{{ convertToHumanReadable(torrent.totalSize) }}</td>
                 <td data-torrent-field="status">{{ torrentStatusLabel(torrent.status) }}</td>
                 <td data-torrent-field="added-date">{{ torrent.addedDate|date('Y-m-d') }}</td>

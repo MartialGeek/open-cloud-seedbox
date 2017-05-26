@@ -35,23 +35,24 @@ $(function() {
     });
 
     $('table#torrent-queue').find('tbody tr').each(function() {
-        var row = this;
+        var $row = $(this);
 
         setInterval(function() {
-            var percentDone = $(row).find('[data-torrent-percent-done]').attr('data-torrent-percent-done');
+            var percentDone = $row.find('[data-torrent-percent-done]').attr('data-torrent-percent-done');
 
             if (percentDone == 100) {
                 return;
             }
 
-            var dataUrl = $(row).attr('data-torrent-data-url');
+            var dataUrl = $row.attr('data-torrent-data-url');
 
             $.get(dataUrl, function(data) {
                 var percentDone = data.percentDone * 100;
+                var downloaded = data.totalSize * data.percentDone;
 
-                $(row).find('[data-torrent-field=name] div.progress span.meter').css('width', percentDone + '%');
-                $(row).find('[data-torrent-field=download-ever]').html(getHumanReadableSize(data.downloadedEver));
-                $(row).find('[data-torrent-percent-done]').attr('data-torrent-percent-done', percentDone);
+                $row.find('[data-torrent-field=name] div.progress span.meter').css('width', percentDone + '%');
+                $row.find('[data-torrent-field=downloaded]').html(getHumanReadableSize(downloaded));
+                $row.find('[data-torrent-percent-done]').attr('data-torrent-percent-done', percentDone);
             }, 'json');
         }, 2000);
     });

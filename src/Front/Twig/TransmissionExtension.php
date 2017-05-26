@@ -24,8 +24,21 @@ class TransmissionExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('torrentStatusLabel', [$this, 'getTorrentStatusLabel'])
+            new \Twig_SimpleFunction('torrentStatusLabel', [$this, 'getTorrentStatusLabel']),
+            new \Twig_SimpleFunction('computeDownloadedSize', [$this, 'computeDownloadedSize']),
         ];
+    }
+
+    /**
+     * Returns the downloaded size of a file.
+     *
+     * @param float $totalSize
+     * @param float $percentDone    From the RPC API, range from 0 to 1
+     * @return float
+     */
+    public function computeDownloadedSize($totalSize, $percentDone)
+    {
+        return (float) $totalSize * (float) $percentDone;
     }
 
     /**

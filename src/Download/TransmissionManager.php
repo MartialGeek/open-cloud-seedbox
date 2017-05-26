@@ -149,7 +149,6 @@ class TransmissionManager implements TorrentClientInterface
             Get::ID,
             Get::NAME,
             Get::ADDED_DATE,
-            Get::DOWNLOAD_EVER,
             Get::IS_FINISHED,
             Get::IS_STALLED,
             Get::LEFT_UNTIL_DONE,
