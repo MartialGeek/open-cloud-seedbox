@@ -1,21 +1,27 @@
 version: '3'
 services:
     php:
-        image: martialgeek/php:7.1-dev
+        build:
+            context: .
+            dockerfile: ./docker/Dockerfile-dev-php
         volumes:
             - .:/var/www/html
-            - warez_archive_path:/downloads/archives
-            - /path/to/downloads:/downloads
+            - warez_generated_archives:/app/generated-archives
+            - /home/warez/data/files:/app/data/files
+            - /home/warez/data/torrents:/app/data/files/torrents
+            - /home/warez/data/torrents:/downloads
         links:
             - mysql
             - rabbitmq
             - transmission
+        environment:
+            PHP_GID: 1000
+            PHP_UID: 1000
     nginx:
         image: nginx:1.11
         volumes:
             - ./docker/nginx-vhost.conf:/etc/nginx/conf.d/default.conf
             - .:/var/www/html
-            - warez_archive_path:/data/tmp
         links:
             - php
         ports:
@@ -29,10 +35,12 @@ services:
             MYSQL_USER: warez
             MYSQL_PASSWORD: warez
             MYSQL_DATABASE: warez
+        ports:
+            - 3310:3306
     rabbitmq:
         image: rabbitmq:3.6.9
         volumes:
-            - warez_archive_path:/var/lib/rabbitmq
+            - warez_generated_archives:/var/lib/rabbitmq
         environment:
             RABBITMQ_DEFAULT_USER: warez
             RABBITMQ_DEFAULT_PASS: warez
@@ -40,14 +48,16 @@ services:
     transmission:
         image: linuxserver/transmission
         volumes:
-            - /path/to/downlods:/downloads
+            - /home/warez/data/torrents:/downloads
+            - /home/warez/data/transmission/config:/config
+            - /home/warez/data/transmission/watch:/watch
         environment:
             TZ: Europe/Paris
-            PGID: 501
-            PUID: 20
+            PGID: 1000
+            PUID: 1000
         ports:
             - "9091:9091"
 volumes:
     warez_db:
-    warez_archive_path:
+    warez_generated_archives:
     warez_rabbitmq:
