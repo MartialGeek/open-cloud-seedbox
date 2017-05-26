@@ -40,18 +40,6 @@ class Application extends BaseApplication
      */
     public function registerCommands(array $commandProviders = [])
     {
-        if (!isset($this->config['assets'])) {
-            throw new \InvalidArgumentException('Missing assets configuration.');
-        }
-
-        if (!isset($this->config['assets']['source_paths'])) {
-            throw new \InvalidArgumentException('The source_paths key is required in the assets configuration.');
-        }
-
-        if (!isset($this->config['assets']['destination_path'])) {
-            throw new \InvalidArgumentException('The destination_path key is required in the assets configuration.');
-        }
-
         $this->setHelperSet(new HelperSet([
             'em' => new EntityManagerHelper($this->app['doctrine.entity_manager']),
         ]));
@@ -77,11 +65,6 @@ class Application extends BaseApplication
         }
 
         $this->addCommands([
-            new AssetsInstall(
-                new Filesystem(),
-                $this->config['assets']['source_paths'],
-                $this->config['assets']['destination_path']
-            ),
             new ServerRun(new ProcessBuilder(), $this->config['project_root']),
             new UserCreate($this->app['user.service']),
             new Listen(
