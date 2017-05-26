@@ -11,8 +11,8 @@ node_modules
 behat.yml
 .vagrant/
 config/parameters.php
-config/deploy.rb
-config/deploy/*.rb
+config/private.pem
+config/public.pem
 build/
 data/provisioning/files/composer-auth.json
 docker-compose.yml
