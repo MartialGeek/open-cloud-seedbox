@@ -108,7 +108,7 @@ class TransmissionManager implements TorrentClientInterface
         try {
             $torrentData = $this
                 ->rpcClient
-                ->torrentGet($sessionId, new TorrentIdList([(string) $torrentId]), $this->getTorrentFields());
+                ->torrentGet($sessionId, new TorrentIdList([$torrentId]), $this->getTorrentFields());
         } catch (\Exception $e) {
             throw new TorrentClientException(
                 sprintf('Unable to retrieve the data of the torrent ID %d', $torrentId),

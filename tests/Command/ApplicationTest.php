@@ -43,7 +43,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $command = $this->console->find('list');
         $commandTester = new CommandTester($command);
         $commandTester->execute(['command' => $command->getName()]);
-        $this->assertRegExp('/assets:install/', $commandTester->getDisplay(), 'Command assets:install was not found.');
         $this->assertRegExp('/server:run/', $commandTester->getDisplay(), 'Command server:run was not found.');
         $this->assertRegExp('/user:create/', $commandTester->getDisplay(), 'Command server:run was not found.');
         $this->assertRegExp('/message:listen/', $commandTester->getDisplay(), 'Command server:run was not found.');
