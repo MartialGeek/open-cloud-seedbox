@@ -1,5 +1,20 @@
 FROM martialgeek/php:7.1
 
+ENV PHP_UID www-data
+ENV PHP_GID www-data
+
 COPY . /var/www/html
 
-RUN chown -R www-data:www-data /var/www/html/var
+RUN mkdir -p /downloads \
+    && mkdir -p /app/data/files
+
+COPY ./docker/php-fpm-www.conf /usr/local/etc/php-fpm.d/www.conf
+COPY ./docker/php-entrypoint.sh /php-entrypoint.sh
+
+RUN chmod +x /php-entrypoint.sh
+
+VOLUME /app/data/files /app/data/files/torrents
+
+ENTRYPOINT ["/php-entrypoint.sh"]
+CMD ["php-fpm"]
+
