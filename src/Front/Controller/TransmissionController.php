@@ -54,7 +54,7 @@ class TransmissionController extends AbstractController
 
     public function torrentData($torrentId)
     {
-        $data = $this->torrentClient->getTorrentData($this->transmissionSessionId, $torrentId);
+        $data = $this->torrentClient->getTorrentData($this->transmissionSessionId, (int) $torrentId);
 
         return new JsonResponse($data);
     }
